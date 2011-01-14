@@ -1,0 +1,6 @@
+[submodule "subs/bufferz"]
+	path = subs/bufferz
+	url = git@git.assembla.com:bufferz.git
+[submodule "subs/triggerspace"]
+	path = subs/triggerspace
+	url = git@git.assembla.com:triggerspace.git
