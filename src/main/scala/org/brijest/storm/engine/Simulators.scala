@@ -3,6 +3,7 @@ package org.brijest.storm.engine
 
 
 import org.triggerspace._
+import model._
 
 
 
@@ -13,14 +14,14 @@ trait Simulators extends Transactors {
   
   /* simulator logic */
   
-  class Simulator(t: Transactors) extends Transactor.Template[SimulatorInfo](t) {
-    val model = struct(SimulatorInfo(_))
+  class Simulator(t: Transactors) extends Transactor.Template[Info](t) {
+    val model = struct(Info(_))
     
     def transact() {
       // initialize
       
       repeat {
-        // simulator loop
+        // simulator loop iteration
       } until (model.shouldStop())
     }
   }
@@ -33,10 +34,12 @@ trait Simulators extends Transactors {
 
 object Simulators {
   
-  case class SimulatorInfo(m: Models) extends Struct(m) {
-    val model = void // TODO
-    val clients = void // TODO
-    val neighbours = void // TODO
+  trait Action extends (Area => Unit) with ImmutableValue
+  
+  case class Info(m: Models) extends Struct(m) {
+    val area = struct(Area(_))
+    val clients = set[Transactor[Clients.Info]]
+    val neighbours = table[AreaId, Transactor[Info]]
     val paused = cell(false)
     val shouldStop = cell(false)
   }

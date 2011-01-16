@@ -3,18 +3,15 @@ package org.brijest.storm.engine
 
 
 import org.triggerspace._
-import org.brijest.bufferz._
-
+import model._
 
 
 
 trait Clients
 extends Transactors
-   with Models
    with Simulators
-   with Buffers // TODO: change to screens, buffers just one impl
+   with Screens
 {
-shell: Shell =>
   import Clients._
   
   /* settings */
@@ -24,8 +21,8 @@ shell: Shell =>
   
   /* client logic */
   
-  class Client(t: Transactors) extends Transactor.Template[ClientInfo](t) {
-    val model = struct(ClientInfo(_))
+  class Client(t: Transactors) extends Transactor.Template[Info](t) {
+    val model = struct(Info(_))
     
     def transact() {
       // register with necessary core transactor
@@ -36,6 +33,8 @@ shell: Shell =>
         // run pending actions to update model
         
         // update screen
+        
+        // clear pending actions
         
         // register with a new core transactor if necessary
         
@@ -49,12 +48,15 @@ shell: Shell =>
 
 object Clients {
   
-  case class ClientInfo(m: Models) extends Struct(m) {
+  trait Input extends ImmutableValue
+  
+  case class Info(m: Models) extends Struct(m) {
+    val area = struct(Area(_))
+    val inputs = queue[Input]
+    val actions = queue[Simulators.Action]
+    val position = cell((0, 0))
     val shouldStop = cell(false)
-    val model = void // TODO
-    val inputs = void // TODO
-    val events = void // TODO
-    val registeredWith = cell(0) // TODO
+    val registeredWith = cell[Transactor[Simulators.Info]]
   }
   
 }
