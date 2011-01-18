@@ -34,10 +34,8 @@ trait Simulators extends Transactors {
 
 object Simulators {
   
-  trait Action extends (Area => Unit) with ImmutableValue
-  
   case class Info(m: Models) extends Struct(m) {
-    val area = struct(Area(_))
+    val area = struct(Area)
     val clients = set[Transactor[Clients.Info]]
     val neighbours = table[AreaId, Transactor[Info]]
     val paused = cell(false)

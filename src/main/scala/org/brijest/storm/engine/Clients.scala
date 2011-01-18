@@ -51,9 +51,9 @@ object Clients {
   trait Input extends ImmutableValue
   
   case class Info(m: Models) extends Struct(m) {
-    val area = struct(Area(_))
+    val area = struct(Area)
     val inputs = queue[Input]
-    val actions = queue[Simulators.Action]
+    val actions = queue[(Entity, Action)]
     val position = cell((0, 0))
     val shouldStop = cell(false)
     val registeredWith = cell[Transactor[Simulators.Info]]

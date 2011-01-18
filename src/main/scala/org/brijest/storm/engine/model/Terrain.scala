@@ -8,12 +8,19 @@ import org.triggerspace._
 
 
 trait Terrain {
+  def walkable: Boolean
+  def seethrough: Boolean
 }
 
 
-object HardRock extends Terrain
-
-
 case class Slot(tpe: Terrain, height: Int)
+
+
+object HardRock extends Terrain {
+  def walkable = false
+  def seethrough = false
+}
+
+
 
 
