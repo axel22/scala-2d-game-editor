@@ -42,8 +42,8 @@ package object model {
     def southwest = 1
     def southeast = 3
 
-    def from(pos: Pos, dir: Direction): Pos = from(pos.x, pos.y, dir)
-    def from(x: Int, y: Int, dir: Direction): Pos = (dir: @switch) match {
+    def fromTo(pos: Pos, dir: Direction): Pos = fromTo(pos.x, pos.y, dir)
+    def fromTo(x: Int, y: Int, dir: Direction): Pos = (dir: @switch) match {
       case 8 => Pos(x, y - 1)
       case 7 => Pos(x - 1, y - 1)
       case 9 => Pos(x + 1, y - 1)

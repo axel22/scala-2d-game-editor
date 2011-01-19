@@ -22,7 +22,7 @@ extends Transactors
   /* client logic */
   
   class Client(t: Transactors) extends Transactor.Template[Info](t) {
-    val model = struct(Info(_))
+    val model = struct(Info)
     
     def transact() {
       // register with necessary core transactor
@@ -50,7 +50,7 @@ object Clients {
   
   trait Input extends ImmutableValue
   
-  case class Info(m: Models) extends Struct(m) {
+  case class Info(t: Transactors) extends Struct(t) {
     val area = struct(Area)
     val inputs = queue[Input]
     val actions = queue[(Entity, Action)]

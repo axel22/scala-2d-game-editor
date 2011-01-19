@@ -7,4 +7,6 @@ import org.triggerspace.ImmutableValue
 
 
 
-case class Pos(x: Int, y: Int) extends ImmutableValue
+case class Pos(x: Int, y: Int) extends ImmutableValue {
+  def to(dir: Direction) = Direction.fromTo(this, dir)
+}

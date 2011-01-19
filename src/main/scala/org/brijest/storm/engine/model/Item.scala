@@ -7,6 +7,6 @@ import org.triggerspace._
 
 
 
-abstract class Item(i: EntityId, m: Models) extends Entity(i, m) {
+abstract class Item(i: EntityId, t: Transactors) extends Entity(i, t) {
   
 }

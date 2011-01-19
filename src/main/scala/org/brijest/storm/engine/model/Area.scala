@@ -7,13 +7,13 @@ import org.triggerspace._
 
 
 
-case class Area(m: Models) extends Struct(m) {
+case class Area(t: Transactors) extends Struct(t) {
   
   /* fields */
   
   val id = cell(invalidAreaId)
   
-  val terrain = spatialmap(1, 1, Slot(HardRock, 0))
+  val terrain = matrix(1, 1, Slot(HardRock, 0))
   
   val characters = table[Pos, Character]
   

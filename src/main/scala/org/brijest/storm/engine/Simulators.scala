@@ -15,7 +15,7 @@ trait Simulators extends Transactors {
   /* simulator logic */
   
   class Simulator(t: Transactors) extends Transactor.Template[Info](t) {
-    val model = struct(Info(_))
+    val model = struct(Info)
     
     def transact() {
       // initialize
@@ -34,7 +34,7 @@ trait Simulators extends Transactors {
 
 object Simulators {
   
-  case class Info(m: Models) extends Struct(m) {
+  case class Info(t: Transactors) extends Struct(t) {
     val area = struct(Area)
     val clients = set[Transactor[Clients.Info]]
     val neighbours = table[AreaId, Transactor[Info]]

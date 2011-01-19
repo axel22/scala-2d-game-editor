@@ -7,7 +7,7 @@ import org.triggerspace._
 
 
 
-abstract class Entity(val id: EntityId, m: Models) extends Struct(m) {
+abstract class Entity(val id: EntityId, t: Transactors) extends Struct(t) {
   
   def action(area: Area): (Action, Option[Int])
   

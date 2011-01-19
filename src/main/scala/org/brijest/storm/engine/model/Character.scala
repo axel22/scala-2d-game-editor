@@ -7,7 +7,7 @@ import org.triggerspace._
 
 
 
-abstract class Character(i: EntityId, m: Models) extends Entity(i, m) {
+abstract class Character(i: EntityId, t: Transactors) extends Entity(i, t) with BasicStats {
   
   val position = cell(Pos(0, 0))
   
