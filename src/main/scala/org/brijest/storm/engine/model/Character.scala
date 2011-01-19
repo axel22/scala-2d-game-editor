@@ -9,6 +9,18 @@ import org.triggerspace._
 
 abstract class Character(i: EntityId, m: Models) extends Entity(i, m) {
   
+  val position = cell(Pos(0, 0))
+  
   val dimensions = cell((1, 1))
   
 }
+
+
+trait BasicStats extends Trait {
+  
+  val speed = cell(50)
+  
+}
+
+
+
