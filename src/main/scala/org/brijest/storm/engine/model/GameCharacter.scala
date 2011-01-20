@@ -10,8 +10,6 @@ import util.pathfinding.Path
 
 abstract class RegularCharacter(i: EntityId, t: Transactors) extends Character(i, t) {
   
-  
-  
 }
 
 

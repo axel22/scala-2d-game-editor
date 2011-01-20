@@ -14,13 +14,19 @@ package object model {
   
   type AreaId = Long
   
-  def invalidAreaId = 0L
+  def invalidAreaId = -1L
 
   /* entity */
   
   type EntityId = Long
   
-  def invalidEntityId = 0L
+  def invalidEntityId = -1L
+  
+  /* player */
+  
+  type PlayerId = Long
+  
+  def invalidPlayerId = -1L
   
   /* various types */
   

@@ -15,7 +15,9 @@ case class Area(t: Transactors) extends Struct(t) {
   
   val terrain = matrix(1, 1, Slot(HardRock, 0))
   
-  val characters = table[Pos, Character]
+  val characters = table[EntityId, Character]
+  
+  val characterlocs = table[Pos, Character]
   
   val items = table[Pos, List[Item]]
   
@@ -23,7 +25,7 @@ case class Area(t: Transactors) extends Struct(t) {
   
   def entities(implicit ctx: Ctx): Iterator[Entity] = characters.iterator.map(_._2) ++ items.iterator.flatMap(_._2.iterator)
   
-  def isWalkable(pos: Pos)(implicit ctx: Ctx): Boolean = terrain(pos.x, pos.y).walkable && !characters.contains(pos)
+  def isWalkable(pos: Pos)(implicit ctx: Ctx): Boolean = terrain(pos.x, pos.y).walkable && !characterlocs.contains(pos)
   
 }
 

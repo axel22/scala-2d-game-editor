@@ -7,7 +7,10 @@ import org.triggerspace._
 import util.pathfinding.Path
 
 
+
 case class PlayerCharacter(i: EntityId)(t: Transactors) extends RegularCharacter(i, t) {
+  
+  val owner = cell[PlayerId](invalidPlayerId)
   
   val order = cell[Order](DoNothing)
   
@@ -29,12 +32,18 @@ case object DoNothing extends Order {
 
 
 case class Move(path: Path, destination: Pos) extends Order {
-  def apply(gc: PlayerCharacter, area: Area)(implicit ctx: Ctx) = {
-    // check if walkable
-    
-    // if not, recompute path
-    
-    NoAction
+  def apply(pc: PlayerCharacter, area: Area)(implicit ctx: Ctx) = {
+    val pos = pc.position()
+    path.nextPos(pos) match {
+      case Some(next) =>
+        // check if walkable
+        if (area.isWalkable(next)) DisplaceRegularCharacter(pos, next)
+        else {
+          // if not, recompute path
+          NoAction // TODO
+        }
+      case None => HaltPlayerCharacter(pc.id)
+    }
   }
 }
 
