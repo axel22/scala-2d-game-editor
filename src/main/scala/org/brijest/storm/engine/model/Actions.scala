@@ -20,9 +20,13 @@ object NoAction extends Action {
 
 case class DisplaceRegularCharacter(from: Pos, to: Pos) extends Action {
   def apply(a: Area, e: Entity)(implicit ctx: Ctx) {
-    e match {
+    a.characters(from) match {
       case rc @ RegularCharacter(_) =>
-        
+        if (a.isWalkable(to)) {
+          rc.position := to
+          a.characters.remove(from)
+          a.characters(to) = rc
+        } else illegalarg(to + " is not walkable.")
       case _ => illegalarg(e)
     }
   }

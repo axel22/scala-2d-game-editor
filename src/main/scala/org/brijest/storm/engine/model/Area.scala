@@ -21,7 +21,9 @@ case class Area(t: Transactors) extends Struct(t) {
   
   /* methods */
   
-  def entities: Iterator[Entity] = characters.iterator.map(_._2) ++ items.iterator.flatMap(_._2.iterator)
+  def entities(implicit ctx: Ctx): Iterator[Entity] = characters.iterator.map(_._2) ++ items.iterator.flatMap(_._2.iterator)
+  
+  def isWalkable(pos: Pos)(implicit ctx: Ctx): Boolean = terrain(pos.x, pos.y).walkable && !characters.contains(pos)
   
 }
 

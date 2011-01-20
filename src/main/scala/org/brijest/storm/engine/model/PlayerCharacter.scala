@@ -11,24 +11,30 @@ case class PlayerCharacter(i: EntityId)(t: Transactors) extends RegularCharacter
   
   val order = cell[Order](DoNothing)
   
-  def action(area: Area): (Action, Option[Int]) = {
+  def action(area: Area)(implicit ctx: Ctx): (Action, Option[Int]) = {
     (order().apply(this, area), Some(speed()))
   }
   
 }
 
 
-trait Order extends ((PlayerCharacter, Area) => Action) with ImmutableValue
-
-
-case object DoNothing extends Order {
-  def apply(gc: PlayerCharacter, area: Area) = NoAction
+trait Order extends ImmutableValue {
+  def apply(gc: PlayerCharacter, area: Area)(implicit ctx: Ctx): Action
 }
 
 
-case class Move(path: Path) extends Order {
-  def apply(gc: PlayerCharacter, area: Area) = {
-    NoAction // TODO
+case object DoNothing extends Order {
+  def apply(gc: PlayerCharacter, area: Area)(implicit ctx: Ctx) = NoAction
+}
+
+
+case class Move(path: Path, destination: Pos) extends Order {
+  def apply(gc: PlayerCharacter, area: Area)(implicit ctx: Ctx) = {
+    // check if walkable
+    
+    // if not, recompute path
+    
+    NoAction
   }
 }
 

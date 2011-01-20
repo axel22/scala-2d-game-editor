@@ -8,6 +8,7 @@ import org.triggerspace._
 
 
 case class Slot(tpe: Terrain, height: Int) extends ImmutableValue {
+  def walkable = tpe.walkable
 }
 
 
