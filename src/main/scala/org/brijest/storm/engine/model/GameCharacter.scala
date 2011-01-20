@@ -11,7 +11,7 @@ case class GameCharacter(i: EntityId)(t: Transactors) extends Character(i, t) {
   
   val order = cell[Order](DoNothing)
   
-  def action(area: Area): (Action, Option[Int]) = {
+  def action(area: Area)(implicit ctx: Ctx): (Action, Option[Int]) = {
     (order().apply(this, area), Some(speed()))
   }
   
