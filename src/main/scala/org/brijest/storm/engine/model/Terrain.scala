@@ -7,13 +7,14 @@ import org.triggerspace._
 
 
 
+case class Slot(tpe: Terrain, height: Int) extends ImmutableValue {
+}
+
+
 trait Terrain {
   def walkable: Boolean
   def seethrough: Boolean
 }
-
-
-case class Slot(tpe: Terrain, height: Int)
 
 
 object HardRock extends Terrain {

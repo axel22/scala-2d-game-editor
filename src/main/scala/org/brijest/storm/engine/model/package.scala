@@ -24,12 +24,6 @@ package object model {
   
   /* various types */
   
-  trait Action extends ((Area, Entity) => Unit) with ImmutableValue
-  
-  object NoAction extends Action {
-    def apply(a: Area, e: Entity) {}
-  }
-  
   type Direction = Int
   
   object Direction {

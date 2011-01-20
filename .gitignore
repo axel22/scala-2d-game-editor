@@ -5,6 +5,12 @@
 **/*.*~
 
 
+# garbage
+*.scala#
+
+
 # project files
 project/boot
 target
+
+
