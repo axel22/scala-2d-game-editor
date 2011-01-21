@@ -14,32 +14,47 @@ extends Transactors
 {
   import Clients._
   
-  /* settings */
-  
-  def framesPerSecond = 30.0
-  def frameLength = 1 / framesPerSecond
-  
   /* client logic */
   
-  class Client(t: Transactors) extends Transactor.Template[Info](t) {
+  class Client(pid: PlayerId)(t: Transactors) extends Transactor.Template[Info](t) {
     val model = struct(Info)
+    import model._
     
     def transact() {
       // register with necessary core transactor
+      initialize()
       
       repeat {
         // wait for new input, but no longer than frameLength
+        inputs.await(frameLengthNanos)
         
-        // run pending actions to update model
+        // run pending actions to update area
+        updateArea()
         
         // update screen
+        updateScreen(actions.iterator, area)
         
         // clear pending actions
+        actions.clear()
         
         // register with a new core transactor if necessary
+        reregister()
         
         // send all commands
+        sendCommands()
       } until (model.shouldStop())
+    }
+    
+    def initialize() {
+    }
+    
+    def updateArea() {
+    }
+    
+    def reregister() {
+    }
+    
+    def sendCommands() {
     }
   }
     
@@ -51,12 +66,20 @@ object Clients {
   trait Input extends ImmutableValue
   
   case class Info(t: Transactors) extends Struct(t) {
+    /* data model */
     val area = struct(Area)
-    val inputs = queue[Input]
     val actions = queue[(Entity, Action)]
+    
+    /* inputs */
+    val inputs = queue[Input]
+    
+    /* client state related */
     val position = cell((0, 0))
     val shouldStop = cell(false)
+    
+    /* registration */
     val registeredWith = cell[Transactor[Simulators.Info]]
+    val pendingRegistration = cell[Option[Transactor[Simulators.Info]]]
   }
   
 }

@@ -38,10 +38,7 @@ case class Move(path: Path, destination: Pos) extends Order {
       case Some(next) =>
         // check if walkable
         if (area.isWalkable(next)) DisplaceRegularCharacter(pos, next)
-        else {
-          // if not, recompute path
-          NoAction // TODO
-        }
+        else HaltPlayerCharacter(pc.id) // maybe we'll be smarter later
       case None => HaltPlayerCharacter(pc.id)
     }
   }

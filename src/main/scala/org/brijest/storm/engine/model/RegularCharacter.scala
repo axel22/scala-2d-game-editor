@@ -8,6 +8,10 @@ import util.pathfinding.Path
 
 
 
+/** A regular character.
+ *  
+ *  Most characters are of this type. A regular character takes 1x1 space.
+ */
 abstract class RegularCharacter(i: EntityId, t: Transactors) extends Character(i, t) {
   
 }
