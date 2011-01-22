@@ -9,17 +9,22 @@ import util.pathfinding.Path
 
 
 case class PlayerCharacter(i: EntityId)(t: Transactors) extends RegularCharacter(i, t) {
+pc =>
   
   val owner = cell[PlayerId](invalidPlayerId)
   
   val order = cell[Order](DoNothing)
   
-  def action(area: Area)(implicit ctx: Ctx): (Action, Option[Int]) = {
-    (order().apply(this, area), Some(speed()))
+  def manager = new Manager {
+    def action(area: Area)(implicit ctx: Ctx): (Action, Trigger) = {
+      (order().apply(pc, area), AfterTime(speed()))
+    }
   }
   
 }
 
+
+/* orders */
 
 trait Order extends ImmutableValue {
   def apply(gc: PlayerCharacter, area: Area)(implicit ctx: Ctx): Action

@@ -42,7 +42,9 @@ extends Transactors
         
         // send all commands
         sendCommands()
-      } until (model.shouldStop())
+      } until (shouldStop())
+      
+      terminate()
     }
     
     def initialize() {
@@ -55,6 +57,9 @@ extends Transactors
     }
     
     def sendCommands() {
+    }
+    
+    def terminate() {
     }
   }
     

@@ -34,6 +34,8 @@ extends Transactors
       repeat {
         simulationStep()
         
+        resolveTriggers()
+        
         notifyClients()
         
         // clear action queue
@@ -47,7 +49,9 @@ extends Transactors
         
         // wait one period
         shouldStop.await(turnLengthNanos)
-      } until (model.shouldStop())
+      } until (shouldStop())
+      
+      terminate()
     }
     
     def initialize() {
@@ -56,10 +60,16 @@ extends Transactors
     def simulationStep() {
     }
     
+    def resolveTriggers() {
+    }
+    
     def notifyClients() {
     }
     
     def performTransactions() {
+    }
+    
+    def terminate() {
     }
     
   }
@@ -75,14 +85,14 @@ object Simulators {
   case class Info(t: Transactors) extends Struct(t) {
     /* data model */
     val area = struct(Area)
-    val actions = queue[(Entity, Action)]
-    val neighbours = table[AreaId, Transactor[Info]]
+    val actions = queue[(EntityId, Action)]
+    val triggers = queue[Trigger]
     val transactions = queue[Transaction]
     
     /* simulation state */
     val paused = cell(false)
     val shouldStop = cell(false)
-
+    
     /* clients */
     val clients = set[Transactor[Clients.Info]]
   }
