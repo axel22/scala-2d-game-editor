@@ -9,7 +9,7 @@ import model._
 
 trait Screens {
   
-  def updateScreen(lastActions: Iterator[(Entity, Action)], area: Area): Unit
+  def updateScreen(lastActions: Iterator[(EntityId, Action)], area: Area): Unit
   
 }
 

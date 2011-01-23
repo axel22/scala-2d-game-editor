@@ -17,18 +17,19 @@ extends Transactors
   
   /* methods */
   
-  def mainCharacterFor(pid: PlayerId): PlayerCharacter
+  def mainCharacterFor(pid: PlayerId): EntityId
   
-  def simulatorFor(pcid: EntityId): Transactor[Info]
+  def areaFor(eid: EntityId): AreaId
+  
+  def simulatorFor(aid: AreaId): Transactor[Info]
   
   /* simulator logic */
   
-  class Simulator(t: Transactors) extends Transactor.Template[Info](t) {
+  class Simulator(aid: AreaId)(t: Transactors) extends Transactor.Template[Info](t) {
     val model = struct(Info)
     import model._
     
     def transact() {
-      // initialize
       initialize()
       
       repeat {
@@ -42,6 +43,7 @@ extends Transactors
         actions.clear()
         
         // perform inter-simulator transactions
+        // (possibly adding new actions to the queue)
         performTransactions()
         
         // check pause state
@@ -63,7 +65,12 @@ extends Transactors
     def resolveTriggers() {
     }
     
-    def notifyClients() {
+    def notifyClients() = {
+      val as = actions.iterator.toSeq
+      for (c <- clients.iterator) send (c) {
+        implicit ctx =>
+        for (a <- as) c.model.actions.enqueue(a)(ctx)
+      }
     }
     
     def performTransactions() {

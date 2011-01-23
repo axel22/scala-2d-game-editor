@@ -73,7 +73,7 @@ object Clients {
   case class Info(t: Transactors) extends Struct(t) {
     /* data model */
     val area = struct(Area)
-    val actions = queue[(Entity, Action)]
+    val actions = queue[(EntityId, Action)]
     
     /* inputs */
     val inputs = queue[Input]
