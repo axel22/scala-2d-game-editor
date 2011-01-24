@@ -8,7 +8,7 @@ import org.triggerspace._
 
 
 
-trait Action extends ImmutableValue {
+sealed trait Action extends ImmutableValue {
   def apply(a: Area, e: Entity)(implicit ctx: Ctx): Unit
 }
 
