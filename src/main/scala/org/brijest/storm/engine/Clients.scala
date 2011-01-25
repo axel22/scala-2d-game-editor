@@ -48,6 +48,8 @@ extends Transactors
     }
     
     def initialize() {
+      playerId := pid
+      
       // find transactor
       val t = simulatorForPlayer(pid)
       
@@ -108,7 +110,7 @@ object Clients {
   case class Info(t: Transactors) extends Struct(t) {
     /* data model */
     val area = struct(Area)
-    val pid = cell[PlayerId]
+    val playerId = cell[PlayerId]
     
     /* updates */
     val actions = queue[(EntityId, Action)]
