@@ -9,17 +9,17 @@ import org.triggerspace._
 
 
 sealed trait Action extends ImmutableValue {
-  def apply(a: Area, e: Entity)(implicit ctx: Ctx): Unit
+  def apply(a: Area)(implicit ctx: Ctx): Unit
 }
 
 
 object NoAction extends Action {
-  def apply(a: Area, e: Entity)(implicit ctx: Ctx) {}
+  def apply(a: Area)(implicit ctx: Ctx) {}
 }
 
 
 case class HaltPlayerCharacter(id: EntityId) extends Action {
-  def apply(a: Area, e: Entity)(implicit ctx: Ctx) = a.characters(id) match {
+  def apply(a: Area)(implicit ctx: Ctx) = a.characters(id) match {
     case pc @ PlayerCharacter(_) => pc.order := DoNothing
     case c => illegalarg(c)
   }
@@ -27,7 +27,7 @@ case class HaltPlayerCharacter(id: EntityId) extends Action {
   
 
 case class DisplaceRegularCharacter(from: Pos, to: Pos) extends Action {
-  def apply(a: Area, e: Entity)(implicit ctx: Ctx) {
+  def apply(a: Area)(implicit ctx: Ctx) {
     a.characterlocs(from) match {
       case rc @ RegularCharacter(_) =>
         if (a.isWalkable(to)) {
@@ -35,7 +35,7 @@ case class DisplaceRegularCharacter(from: Pos, to: Pos) extends Action {
           a.characterlocs.remove(from)
           a.characterlocs(to) = rc
         } else illegalarg(to + " is not walkable.")
-      case _ => illegalarg(e)
+      case _ => illegalarg(from + ", " + to)
     }
   }
 }

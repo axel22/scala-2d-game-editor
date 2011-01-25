@@ -19,9 +19,15 @@ extends Transactors
   
   def mainCharacterFor(pid: PlayerId): EntityId
   
-  def areaFor(eid: EntityId): AreaId
+  def areaFor(playerCharacterId: EntityId): AreaId
   
-  def simulatorFor(aid: AreaId): Transactor[Info]
+  def simulatorForArea(aid: AreaId): Transactor[Info]
+  
+  def simulatorForPlayer(playerCharacterId: PlayerId): Transactor[Info]
+  
+  def deserialize(aid: AreaId, area: Area, trigs: Queue[Trigger], sched: Queue[List[EntityId]]): Unit
+  
+  def serialize(area: Area, trigs: Queue[Trigger], sched: Queue[List[EntityId]]): Unit
   
   /* simulator logic */
   
@@ -57,10 +63,13 @@ extends Transactors
     }
     
     def initialize() {
-      // TODO
       // fetch and deserialize
+      deserialize(aid, area, triggers, schedule)
       
-      // register triggers
+      // install triggers
+      for (t <- triggers.iterator) {
+        // TODO
+      }
     }
     
     def simulationStep() {
@@ -70,7 +79,7 @@ extends Transactors
         val (act, trig) = e.action(area)
         
         // perform and store action
-        act(area, e)
+        act(area)
         actions.enqueue(eid, act)
         
         // install trigger
@@ -90,32 +99,35 @@ extends Transactors
       while (triggers.length > 0) {
         val t = triggers.dequeue()
         // process trigger
+        // TODO
       }
     }
     
     def notifyClients() = {
       val as = actions.iterator.toSeq
       for (c <- clients.iterator) send (c) {
-        implicit ctx =>
-        for (a <- as) c.model.actions.enqueue(a)(ctx)
+        implicit ctx => for (a <- as) c.model.actions.enqueue(a)(ctx)
       }
     }
     
     def performTransactions() = {
       for (t <- transactions.iterator) {
-        // process transactions
+        // preprocess transactions
+        // TODO
       }
       
-      // checkout and do all transactions
+      // checkout and do all transactions at once
+      // TODO
       
       transactions.clear()
     }
     
     def terminate() {
+      // deinstall triggers
       // TODO
-      // unregister triggers
       
       // serialize
+      serialize(area, triggers, schedule)
     }
     
   }

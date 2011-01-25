@@ -36,6 +36,10 @@ case class Area(t: Transactors) extends Struct(t) {
   
   def isWalkable(pos: Pos)(implicit ctx: Ctx): Boolean = terrain(pos.x, pos.y).walkable && !characterlocs.contains(pos)
   
+  def load(area: Area)(implicit ctx: Ctx): Unit = {
+    // TODO
+  }
+  
 }
 
 

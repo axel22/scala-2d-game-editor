@@ -48,31 +48,69 @@ extends Transactors
     }
     
     def initialize() {
+      // find transactor
+      val t = simulatorForPlayer(pid)
+      
+      // register
+      register(t)
     }
     
-    def updateArea() {
+    def updateArea() = for ((eid, a) <- actions.iterator) a(area)
+    
+    def reregister() = pendingRegistration() match {
+      case Some(t) =>
+        unregister()
+        register(t)
+      case None =>
     }
     
-    def reregister() {
-    }
-    
-    def sendCommands() {
+    def sendCommands() = {
+      val ins = inputs.iterator.toSeq
+      send (registeredWith()) {
+        ctx => for (i <- ins) i(ctx)
+      }
     }
     
     def terminate() {
+      // unregister
+      unregister()
+    }
+    
+    def register(s: Transactor[Simulators.Info]) {
+      checkout (s) {
+        txn =>
+        // synchronize area id
+        area load s.model.area
+        
+        s.model.clients.add(thiz)
+        registeredWith := s
+      }
+    }
+    
+    def unregister() {
+      // checkout and set
+      val s = registeredWith()
+      if (s ne null) checkout (s) {
+        txn =>
+        s.model.clients.remove(thiz)
+        registeredWith := null
+      }
     }
   }
-    
+  
 }
 
 
 object Clients {
   
-  trait Input extends ImmutableValue
+  trait Input extends ImmutableValue with (Ctx => Unit)
   
   case class Info(t: Transactors) extends Struct(t) {
     /* data model */
     val area = struct(Area)
+    val pid = cell[PlayerId]
+    
+    /* updates */
     val actions = queue[(EntityId, Action)]
     
     /* inputs */
@@ -80,7 +118,7 @@ object Clients {
     
     /* client state related */
     val position = cell((0, 0))
-    val shouldStop = cell(false)
+    val shouldStop = cell(true)
     
     /* registration */
     val registeredWith = cell[Transactor[Simulators.Info]]
