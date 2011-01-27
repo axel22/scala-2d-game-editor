@@ -80,7 +80,7 @@ extends Transactors
     
     def register(s: Transactor[Simulators.Info]) {
       checkout (s) {
-        txn =>
+        implicit txn =>
         // synchronize area id
         area load s.model.area
         
@@ -93,7 +93,7 @@ extends Transactors
       // checkout and set
       val s = registeredWith()
       if (s ne null) checkout (s) {
-        txn =>
+        implicit txn =>
         s.model.clients.remove(thiz)
         registeredWith := null
       }
