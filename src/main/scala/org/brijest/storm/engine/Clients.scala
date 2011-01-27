@@ -69,7 +69,7 @@ extends Transactors
     def sendCommands() = {
       val ins = inputs.iterator.toSeq
       send (registeredWith()) {
-        ctx => for (i <- ins) i(ctx)
+        implicit ctx => for (i <- ins) i(ctx)
       }
     }
     
