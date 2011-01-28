@@ -14,3 +14,5 @@ project/boot
 target
 
 
+# managed libraries
+lib_managed/
