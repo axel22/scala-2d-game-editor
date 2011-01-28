@@ -17,17 +17,13 @@ extends Transactors
   
   /* methods */
   
-  def mainCharacterFor(pid: PlayerId): EntityId
-  
-  def areaFor(playerCharacterId: EntityId): AreaId
+  def areaFor(pid: PlayerId): AreaId
   
   def simulatorForArea(aid: AreaId): Transactor[Info]
   
   def simulatorForPlayer(playerCharacterId: PlayerId): Transactor[Info]
   
-  def deserialize(aid: AreaId, area: Area, trigs: Queue[Trigger], sched: Queue[List[EntityId]]): Unit
-  
-  def serialize(area: Area, trigs: Queue[Trigger], sched: Queue[List[EntityId]]): Unit
+  def serialize(siminfo: Simulators.Info): Unit
   
   /* simulator logic */
   
@@ -63,9 +59,6 @@ extends Transactors
     }
     
     def initialize() {
-      // fetch and deserialize
-      deserialize(aid, area, triggers, schedule)
-      
       // install triggers
       for (t <- triggers.iterator) {
         // TODO
@@ -80,7 +73,8 @@ extends Transactors
         
         // perform and store action
         act(area)
-        actions.enqueue(eid, act)
+        actions.enqueue(actioncount(), eid, act)
+        actioncount += 1
         
         // install trigger
         trig match {
@@ -123,11 +117,13 @@ extends Transactors
     }
     
     def terminate() {
+      // inform clients
+      
       // deinstall triggers
       // TODO
       
       // serialize
-      serialize(area, triggers, schedule)
+      serialize(model)
     }
     
   }
@@ -145,7 +141,8 @@ object Simulators {
     val area = struct(Area)
     
     /* simulation state */
-    val actions = queue[(EntityId, Action)]
+    val actioncount = cell(0L)
+    val actions = queue[(Long, EntityId, Action)]
     val triggers = queue[Trigger]
     val transactions = queue[Transaction]
     val schedule = queue[List[EntityId]]

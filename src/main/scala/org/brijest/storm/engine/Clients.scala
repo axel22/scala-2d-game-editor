@@ -1,4 +1,5 @@
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 
 
 
@@ -32,10 +33,10 @@ extends Transactors
         updateArea()
         
         // update screen
-        updateScreen(actions.iterator, area)
+        updateScreen(appliedActions.iterator, area)
         
         // clear pending actions
-        actions.clear()
+        appliedActions.clear()
         
         // register with a new core transactor if necessary
         reregister()
@@ -57,7 +58,19 @@ extends Transactors
       register(t)
     }
     
-    def updateArea() = for ((eid, a) <- actions.iterator) a(area)
+    def updateArea() = {
+      var cont = true
+      while (cont && actions.length > 0) {
+        val (cnt, eid, a) = actions.front
+        if (cnt > actioncount()) cont = false // TODO wrapping around
+        else if (cnt == actioncount()) {
+          actions.dequeue()
+          a(area)
+          actioncount += 1
+          appliedActions.enqueue((eid, a))
+        } else illegalstate(cnt + " < " + actioncount())
+      }
+    }
     
     def reregister() = pendingRegistration() match {
       case Some(t) =>
@@ -84,6 +97,10 @@ extends Transactors
         // synchronize area id
         area load s.model.area
         
+        // set action counter
+        actioncount := s.model.actioncount()
+        
+        // register self
         s.model.clients.add(thiz)
         registeredWith := s
       }
@@ -113,7 +130,9 @@ object Clients {
     val playerId = cell[PlayerId]
     
     /* updates */
-    val actions = queue[(EntityId, Action)]
+    val actioncount = cell(0L)
+    val actions = priorityQueue[(Long, EntityId, Action)] // TODO wrapped ordering!
+    val appliedActions = queue[(EntityId, Action)]
     
     /* inputs */
     val inputs = queue[Input]

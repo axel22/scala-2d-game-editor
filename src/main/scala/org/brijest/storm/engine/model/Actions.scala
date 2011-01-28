@@ -8,6 +8,14 @@ import org.triggerspace._
 
 
 
+
+object Action {
+  implicit object ActionOrdering extends Ordering[Action] {
+    def compare(a1: Action, a2: Action) = 0
+  }
+}
+
+
 sealed trait Action extends ImmutableValue {
   def apply(a: Area)(implicit ctx: Ctx): Unit
 }

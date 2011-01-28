@@ -12,4 +12,6 @@ package object storm {
   
   def illegalarg(obj: Any) = throw new IllegalArgumentException(obj.toString)
   
+  def illegalstate(msg: String) = throw new IllegalStateException(msg)
+  
 }

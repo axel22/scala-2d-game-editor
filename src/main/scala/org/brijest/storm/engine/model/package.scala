@@ -28,6 +28,8 @@ package object model {
   
   def invalidPlayerId = -1L
   
+  def observerPlayerId = -2L
+  
   /* various types */
   
   type Direction = Int
