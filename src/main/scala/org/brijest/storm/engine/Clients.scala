@@ -3,6 +3,7 @@ package engine
 
 
 
+import com.weiglewilczek.slf4s._
 import org.triggerspace._
 import model._
 
@@ -17,9 +18,11 @@ extends Transactors
   
   /* client logic */
   
-  class Client(pid: PlayerId)(t: Transactors) extends Transactor.Template[Info](t) {
+  class Client(pid: PlayerId)(t: Transactors)
+  extends Transactor.Template[Info](t) with Logging {
     val model = struct(Info)
     import model._
+    import logger._
     
     def transact() {
       // register with necessary core transactor
@@ -49,6 +52,8 @@ extends Transactors
     }
     
     def initialize() {
+      debug("Initializing client for player " + pid)
+      
       playerId := pid
       
       // find transactor
@@ -59,6 +64,8 @@ extends Transactors
     }
     
     def updateArea() = {
+      debug("Updating area for client %d - updates %s".format(pid, actions.iterator.mkString(", ")))
+      
       var cont = true
       while (cont && actions.length > 0) {
         val (cnt, eid, a) = actions.front
@@ -74,12 +81,15 @@ extends Transactors
     
     def reregister() = pendingRegistration() match {
       case Some(t) =>
+        debug("Reregistration for client %d".format(pid))
         unregister()
         register(t)
       case None =>
     }
     
     def sendCommands() = {
+      debug("Sending commands for client %d - inputs: %s.".format(pid, inputs.iterator.mkString(", ")))
+      
       val ins = inputs.iterator.toSeq
       send (registeredWith()) {
         implicit ctx => for (i <- ins) i(ctx)
@@ -87,6 +97,8 @@ extends Transactors
     }
     
     def terminate() {
+      debug("Termination of client %d.".format(pid))
+      
       // unregister
       unregister()
     }

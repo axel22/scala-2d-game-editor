@@ -2,6 +2,7 @@ package org.brijest.storm.engine
 
 
 
+import com.weiglewilczek.slf4s._
 import org.triggerspace._
 import model._
 
@@ -27,9 +28,11 @@ extends Transactors
   
   /* simulator logic */
   
-  class Simulator(aid: AreaId)(t: Transactors) extends Transactor.Template[Info](t) {
+  class Simulator(aid: AreaId)(t: Transactors)
+  extends Transactor.Template[Info](t) with Logging {
     val model = struct(Info)
     import model._
+    import logger._
     
     def transact() {
       initialize()
@@ -59,6 +62,8 @@ extends Transactors
     }
     
     def initialize() {
+      debug("Initializing simulator for area " + aid)
+      
       // install triggers
       for (t <- triggers.iterator) {
         // TODO
@@ -66,6 +71,8 @@ extends Transactors
     }
     
     def simulationStep() {
+      debug("Simulation step for area " + aid)
+      
       // get action for current entities
       val current = schedule.dequeue()
       for (eid <- current; e <- area.entity(eid)) {
@@ -98,6 +105,8 @@ extends Transactors
     }
     
     def notifyClients() = {
+      debug("Notifying clients for area " + aid)
+      
       val as = actions.iterator.toSeq
       for (c <- clients.iterator) send (c) {
         implicit ctx => for (a <- as) c.model.actions.enqueue(a)(ctx)
@@ -117,6 +126,8 @@ extends Transactors
     }
     
     def terminate() {
+      debug("Terminating simulator for area " + aid)
+      
       // inform clients
       
       // deinstall triggers
