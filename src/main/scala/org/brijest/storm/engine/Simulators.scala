@@ -109,7 +109,7 @@ extends Transactors
       
       val as = actions.iterator.toSeq
       for (c <- clients.iterator) send (c) {
-        implicit ctx => for (a <- as) c.model.actions.enqueue(a)(ctx)
+        implicit ctx => for (a <- as) c.model.actions.enqueue(a)
       }
     }
     
@@ -128,13 +128,16 @@ extends Transactors
     def terminate() {
       debug("Terminating simulator for area " + aid)
       
-      // inform clients
-      
       // deinstall triggers
       // TODO
       
       // serialize
       serialize(model)
+      
+      // inform clients
+      for (c <- clients.iterator) send (c) {
+        implicit ctx => c.model.shouldStop := (true)
+      }
     }
     
   }

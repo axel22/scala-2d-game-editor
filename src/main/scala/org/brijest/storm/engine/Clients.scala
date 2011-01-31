@@ -13,6 +13,7 @@ trait Clients
 extends Transactors
    with Simulators
    with Screens
+   with Inputs
 {
   import Clients._
   
@@ -30,7 +31,7 @@ extends Transactors
       
       repeat {
         // wait for new input, but no longer than frameLength
-        inputs.await(frameLengthNanos)
+        awaitCommands()
         
         // run pending actions to update area
         updateArea()
@@ -41,11 +42,11 @@ extends Transactors
         // clear pending actions
         appliedActions.clear()
         
-        // register with a new core transactor if necessary
-        reregister()
-        
         // send all commands
         sendCommands()
+
+        // register with a new core transactor if necessary
+        reregister()
       } until (shouldStop())
       
       terminate()
@@ -61,6 +62,15 @@ extends Transactors
       
       // register
       register(t)
+    }
+    
+    def awaitCommands() = {
+      val inputs = await {
+        waitInputs(frameLengthNanos)
+      }
+      
+      // turn inputs into commands
+      for (c <- inputs map toCommand) commands.enqueue(c)
     }
     
     def updateArea() = {
@@ -88,11 +98,12 @@ extends Transactors
     }
     
     def sendCommands() = {
-      debug("Sending commands for client %d - inputs: %s.".format(pid, inputs.iterator.mkString(", ")))
+      debug("Sending commands for client %d - commands: %s.".format(pid, commands.iterator.mkString(", ")))
       
-      val ins = inputs.iterator.toSeq
-      send (registeredWith()) {
-        implicit ctx => for (i <- ins) i(ctx)
+      val comm = commands.iterator.toSeq
+      val t = registeredWith()
+      send (t) {
+        implicit ctx => for (c <- comm) c(t.model.area, ctx)
       }
     }
     
@@ -129,12 +140,19 @@ extends Transactors
     }
   }
   
+  /* methods */
+  
+  def toCommand(i: Input): Command = i match {
+    case KeyPress(c) => null // TODO critical
+    case MouseClick(x, y, b) => null // TODO critical
+  }
+  
 }
 
 
 object Clients {
   
-  trait Input extends ImmutableValue with (Ctx => Unit)
+  trait Command extends ImmutableValue with ((Area, RCtx) => Unit)
   
   case class Info(t: Transactors) extends Struct(t) {
     /* data model */
@@ -146,11 +164,10 @@ object Clients {
     val actions = priorityQueue[(Long, EntityId, Action)] // TODO wrapped ordering!
     val appliedActions = queue[(EntityId, Action)]
     
-    /* inputs */
-    val inputs = queue[Input]
+    /* commands */
+    val commands = queue[Command]
     
     /* client state related */
-    val position = cell((0, 0))
     val shouldStop = cell(true)
     
     /* registration */
