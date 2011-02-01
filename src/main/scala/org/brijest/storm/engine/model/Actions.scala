@@ -13,6 +13,17 @@ object Action {
   implicit object ActionOrdering extends Ordering[Action] {
     def compare(a1: Action, a2: Action) = 0
   }
+  
+  def composite(actions: Action*) = CompositeAction(actions)
+  
+  def nothing = NoAction
+  
+  def halt(id: EntityId) = HaltPlayerCharacter(id)
+  
+  def move(from: Pos, to: Pos) = MoveRegularCharacter(from, to)
+  
+  def setOrder(id: EntityId, order: Order) = SetOrder(id, order)
+  
 }
 
 
@@ -26,6 +37,11 @@ object NoAction extends Action {
 }
 
 
+case class CompositeAction(actions: Seq[Action]) extends Action {
+  def apply(a: Area)(implicit ctx: Ctx) = for (act <- actions) act(a)
+}
+
+
 case class HaltPlayerCharacter(id: EntityId) extends Action {
   def apply(a: Area)(implicit ctx: Ctx) = a.characters(id) match {
     case pc @ PlayerCharacter(_) => pc.order := DoNothing
@@ -34,7 +50,7 @@ case class HaltPlayerCharacter(id: EntityId) extends Action {
 }
   
 
-case class DisplaceRegularCharacter(from: Pos, to: Pos) extends Action {
+case class MoveRegularCharacter(from: Pos, to: Pos) extends Action {
   def apply(a: Area)(implicit ctx: Ctx) {
     a.characterlocs(from) match {
       case rc @ RegularCharacter(_) =>
@@ -43,9 +59,20 @@ case class DisplaceRegularCharacter(from: Pos, to: Pos) extends Action {
           a.characterlocs.remove(from)
           a.characterlocs(to) = rc
         } else illegalarg(to + " is not walkable.")
+        
+        rc match {
+          case o: Orders => o.order 
+          case _ => 
+        }
       case _ => illegalarg(from + ", " + to)
     }
   }
 }
 
 
+case class SetOrder(id: EntityId, order: Order) extends Action {
+  def apply(a: Area)(implicit ctx: Ctx) = a.characters(id) match {
+    case o: Orders => o.order := order
+    case x => illegalarg(id + " -> " + x)
+  }
+}

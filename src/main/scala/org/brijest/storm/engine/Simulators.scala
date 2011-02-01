@@ -14,13 +14,7 @@ extends Transactors
 {
   import Simulators._
   
-  /* settings */
-  
   /* methods */
-  
-  def areaFor(pid: PlayerId): AreaId
-  
-  def simulatorForArea(aid: AreaId): Transactor[Info]
   
   def simulatorForPlayer(playerCharacterId: PlayerId): Transactor[Info]
   

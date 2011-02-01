@@ -7,7 +7,18 @@ import org.triggerspace._
 
 
 
-case class Area(t: Transactors) extends Struct(t) {
+trait AreaView extends Trait {
+  def id: immutable.Cell[AreaId]
+  def terrain: immutable.Matrix[Slot]
+  def characters: immutable.Table[EntityId, CharacterView]
+  def characterlocs: immutable.Table[Pos, CharacterView]
+  def items: immutable.Table[EntityId, ItemView]
+  def itemlocs: immutable.Table[Pos, List[ItemView]]
+  def neighbours: immutable.Table[Pos, AreaId]
+}
+
+
+case class Area(t: Transactors) extends Struct(t) with AreaView {
   
   /* fields */
   
@@ -37,7 +48,22 @@ case class Area(t: Transactors) extends Struct(t) {
   def isWalkable(pos: Pos)(implicit ctx: Ctx): Boolean = terrain(pos.x, pos.y).walkable && !characterlocs.contains(pos)
   
   def load(area: Area)(implicit ctx: Ctx): Unit = {
-    // TODO very important
+    // id
+    id := area.id()
+    
+    // area
+    terrain load area.terrain
+    
+    // TODO characters
+    
+    // TODO characterlocs
+    
+    // TODO items
+    
+    // TODO itemlocs
+    
+    // neighbours
+    for ((p, aid) <- neighbours.iterator) neighbours.put(p, aid)
   }
   
 }
