@@ -1,7 +1,9 @@
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 
 
 
+import com.weiglewilczek.slf4s._
 import org.triggerspace._
 import model._
 
@@ -11,14 +13,17 @@ trait Clients
 extends Transactors
    with Simulators
    with Screens
+   with Inputs
 {
   import Clients._
   
   /* client logic */
   
-  class Client(pid: PlayerId)(t: Transactors) extends Transactor.Template[Info](t) {
+  class Client(pid: PlayerId)(t: Transactors)
+  extends Transactor.Template[Info](t) with Logging {
     val model = struct(Info)
     import model._
+    import logger._
     
     def transact() {
       // register with necessary core transactor
@@ -26,28 +31,30 @@ extends Transactors
       
       repeat {
         // wait for new input, but no longer than frameLength
-        inputs.await(frameLengthNanos)
+        awaitCommands()
         
         // run pending actions to update area
         updateArea()
         
         // update screen
-        updateScreen(actions.iterator, area)
+        updateScreen(appliedActions.iterator, area)
         
         // clear pending actions
-        actions.clear()
-        
-        // register with a new core transactor if necessary
-        reregister()
+        appliedActions.clear()
         
         // send all commands
         sendCommands()
+
+        // register with a new core transactor if necessary
+        reregister()
       } until (shouldStop())
       
       terminate()
     }
     
     def initialize() {
+      debug("Initializing client for player " + pid)
+      
       playerId := pid
       
       // find transactor
@@ -57,33 +64,66 @@ extends Transactors
       register(t)
     }
     
-    def updateArea() = for ((eid, a) <- actions.iterator) a(area)
+    def awaitCommands() = {
+      val inputs = await {
+        waitInputs(frameLengthNanos)
+      }
+      
+      // turn inputs into commands
+      for (c <- inputs map toCommand) commands.enqueue(c)
+    }
+    
+    def updateArea() = {
+      debug("Updating area for client %d - updates %s".format(pid, actions.iterator.mkString(", ")))
+      
+      var cont = true
+      while (cont && actions.length > 0) {
+        val (cnt, eid, a) = actions.front
+        if (cnt > actioncount()) cont = false // TODO wrapping around
+        else if (cnt == actioncount()) {
+          actions.dequeue()
+          a(area)
+          actioncount += 1
+          appliedActions.enqueue((eid, a))
+        } else illegalstate(cnt + " < " + actioncount())
+      }
+    }
     
     def reregister() = pendingRegistration() match {
       case Some(t) =>
+        debug("Reregistration for client %d".format(pid))
         unregister()
         register(t)
       case None =>
     }
     
     def sendCommands() = {
-      val ins = inputs.iterator.toSeq
-      send (registeredWith()) {
-        implicit ctx => for (i <- ins) i(ctx)
+      debug("Sending commands for client %d - commands: %s.".format(pid, commands.iterator.mkString(", ")))
+      
+      val comm = commands.iterator.toSeq
+      val t = registeredWith()
+      send (t) {
+        implicit ctx => for (c <- comm) c(t.model.area, ctx)
       }
     }
     
     def terminate() {
+      debug("Termination of client %d.".format(pid))
+      
       // unregister
       unregister()
     }
     
     def register(s: Transactor[Simulators.Info]) {
       checkout (s) {
-        txn =>
+        implicit txn =>
         // synchronize area id
         area load s.model.area
         
+        // set action counter
+        actioncount := s.model.actioncount()
+        
+        // register self
         s.model.clients.add(thiz)
         registeredWith := s
       }
@@ -93,11 +133,18 @@ extends Transactors
       // checkout and set
       val s = registeredWith()
       if (s ne null) checkout (s) {
-        txn =>
+        implicit txn =>
         s.model.clients.remove(thiz)
         registeredWith := null
       }
     }
+  }
+  
+  /* methods */
+  
+  def toCommand(i: Input): Command = i match {
+    case KeyPress(c) => null // TODO critical
+    case MouseClick(x, y, b) => null // TODO critical
   }
   
 }
@@ -105,7 +152,7 @@ extends Transactors
 
 object Clients {
   
-  trait Input extends ImmutableValue with (Ctx => Unit)
+  trait Command extends ImmutableValue with ((Area, RCtx) => Unit)
   
   case class Info(t: Transactors) extends Struct(t) {
     /* data model */
@@ -113,13 +160,14 @@ object Clients {
     val playerId = cell[PlayerId]
     
     /* updates */
-    val actions = queue[(EntityId, Action)]
+    val actioncount = cell(0L)
+    val actions = priorityQueue[(Long, EntityId, Action)] // TODO wrapped ordering!
+    val appliedActions = queue[(EntityId, Action)]
     
-    /* inputs */
-    val inputs = queue[Input]
+    /* commands */
+    val commands = queue[Command]
     
     /* client state related */
-    val position = cell((0, 0))
     val shouldStop = cell(true)
     
     /* registration */

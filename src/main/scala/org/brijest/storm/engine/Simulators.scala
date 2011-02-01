@@ -2,6 +2,7 @@ package org.brijest.storm.engine
 
 
 
+import com.weiglewilczek.slf4s._
 import org.triggerspace._
 import model._
 
@@ -17,23 +18,21 @@ extends Transactors
   
   /* methods */
   
-  def mainCharacterFor(pid: PlayerId): EntityId
-  
-  def areaFor(playerCharacterId: EntityId): AreaId
+  def areaFor(pid: PlayerId): AreaId
   
   def simulatorForArea(aid: AreaId): Transactor[Info]
   
   def simulatorForPlayer(playerCharacterId: PlayerId): Transactor[Info]
   
-  def deserialize(aid: AreaId, area: Area, trigs: Queue[Trigger], sched: Queue[List[EntityId]]): Unit
-  
-  def serialize(area: Area, trigs: Queue[Trigger], sched: Queue[List[EntityId]]): Unit
+  def serialize(siminfo: Simulators.Info): Unit
   
   /* simulator logic */
   
-  class Simulator(aid: AreaId)(t: Transactors) extends Transactor.Template[Info](t) {
+  class Simulator(aid: AreaId)(t: Transactors)
+  extends Transactor.Template[Info](t) with Logging {
     val model = struct(Info)
     import model._
+    import logger._
     
     def transact() {
       initialize()
@@ -63,8 +62,7 @@ extends Transactors
     }
     
     def initialize() {
-      // fetch and deserialize
-      deserialize(aid, area, triggers, schedule)
+      debug("Initializing simulator for area " + aid)
       
       // install triggers
       for (t <- triggers.iterator) {
@@ -73,6 +71,8 @@ extends Transactors
     }
     
     def simulationStep() {
+      debug("Simulation step for area " + aid)
+      
       // get action for current entities
       val current = schedule.dequeue()
       for (eid <- current; e <- area.entity(eid)) {
@@ -80,7 +80,8 @@ extends Transactors
         
         // perform and store action
         act(area)
-        actions.enqueue(eid, act)
+        actions.enqueue(actioncount(), eid, act)
+        actioncount += 1
         
         // install trigger
         trig match {
@@ -104,9 +105,11 @@ extends Transactors
     }
     
     def notifyClients() = {
+      debug("Notifying clients for area " + aid)
+      
       val as = actions.iterator.toSeq
       for (c <- clients.iterator) send (c) {
-        implicit ctx => for (a <- as) c.model.actions.enqueue(a)(ctx)
+        implicit ctx => for (a <- as) c.model.actions.enqueue(a)
       }
     }
     
@@ -123,11 +126,18 @@ extends Transactors
     }
     
     def terminate() {
+      debug("Terminating simulator for area " + aid)
+      
       // deinstall triggers
       // TODO
       
       // serialize
-      serialize(area, triggers, schedule)
+      serialize(model)
+      
+      // inform clients
+      for (c <- clients.iterator) send (c) {
+        implicit ctx => c.model.shouldStop := (true)
+      }
     }
     
   }
@@ -145,7 +155,8 @@ object Simulators {
     val area = struct(Area)
     
     /* simulation state */
-    val actions = queue[(EntityId, Action)]
+    val actioncount = cell(0L)
+    val actions = queue[(Long, EntityId, Action)]
     val triggers = queue[Trigger]
     val transactions = queue[Transaction]
     val schedule = queue[List[EntityId]]
