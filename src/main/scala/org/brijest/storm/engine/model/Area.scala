@@ -47,20 +47,28 @@ case class Area(t: Transactors) extends Struct(t) with AreaView {
   
   def isWalkable(pos: Pos)(implicit ctx: Ctx): Boolean = terrain(pos.x, pos.y).walkable && !characterlocs.contains(pos)
   
-  def load(area: Area)(implicit ctx: Ctx): Unit = {
+  def copy(area: Area)(implicit ctx: Ctx): Unit = {
     // id
     id := area.id()
     
     // area
-    terrain load area.terrain
+    terrain copy area.terrain
     
-    // TODO characters
+    // characters
+    characters.clear
+    for ((eid, chr) <- area.characters.iterator) characters.put(eid, chr.copy)
     
-    // TODO characterlocs
+    // characterlocs
+    characterlocs.clear
+    for ((pos, chr) <- area.characterlocs.iterator) characterlocs.put(pos, characters(chr.id))
     
-    // TODO items
+    // items
+    items.clear
+    for ((eid, it) <- area.items.iterator) items.put(eid, it.copy)
     
-    // TODO itemlocs
+    // itemlocs
+    itemlocs.clear
+    for ((pos, itlist) <- area.itemlocs.iterator) itemlocs.put(pos, itlist map { i => items(i.id) })
     
     // neighbours
     for ((p, aid) <- neighbours.iterator) neighbours.put(p, aid)

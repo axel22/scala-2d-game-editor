@@ -118,7 +118,7 @@ extends Transactors
       checkout (s) {
         implicit txn =>
         // synchronize area id
-        area load s.model.area
+        area copy s.model.area
         
         // set action counter
         actioncount := s.model.actioncount()

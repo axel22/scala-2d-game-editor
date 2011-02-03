@@ -14,4 +14,6 @@ package object storm {
   
   def illegalstate(msg: String) = throw new IllegalStateException(msg)
   
+  def unsupported(obj: Any*) = throw new UnsupportedOperationException(obj.mkString(", "))
+  
 }

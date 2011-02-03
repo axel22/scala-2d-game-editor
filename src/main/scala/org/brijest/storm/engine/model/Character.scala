@@ -1,4 +1,5 @@
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package model
 
 
@@ -27,6 +28,8 @@ abstract class Character(i: EntityId, t: Transactors) extends Entity(i, t) with 
   def action(area: Area)(implicit ctx: Ctx) = manager.action(area)
   
   def manager: Manager
+  
+  override def copy(implicit ctx: Ctx): Character = throw new UnsupportedOperationException
   
 }
 
