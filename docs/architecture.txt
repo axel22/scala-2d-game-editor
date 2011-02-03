@@ -1,0 +1,14 @@
+Storm Enroute Architecture
+--------------------------
+
+Layers:
+
+ --------------
+| Clients      |
+ --------------
+| Simulators   |
+ --------------
+| triggerspace |
+ --------------
+
+

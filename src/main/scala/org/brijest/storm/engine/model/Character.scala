@@ -8,8 +8,8 @@ import org.triggerspace._
 
 
 trait CharacterView extends Trait {
-  def position: immutable.Cell[Pos]
-  def dimensions: immutable.Cell[(Int, Int)]
+  val position: immutable.Cell[Pos]
+  val dimensions: immutable.Cell[(Int, Int)]
 }
 
 

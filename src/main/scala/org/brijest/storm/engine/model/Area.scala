@@ -8,13 +8,13 @@ import org.triggerspace._
 
 
 trait AreaView extends Trait {
-  def id: immutable.Cell[AreaId]
-  def terrain: immutable.Matrix[Slot]
-  def characters: immutable.Table[EntityId, CharacterView]
-  def characterlocs: immutable.Table[Pos, CharacterView]
-  def items: immutable.Table[EntityId, ItemView]
-  def itemlocs: immutable.Table[Pos, List[ItemView]]
-  def neighbours: immutable.Table[Pos, AreaId]
+  val id: immutable.Cell[AreaId]
+  val terrain: immutable.Matrix[Slot]
+  val characters: immutable.Table[EntityId, CharacterView]
+  val characterlocs: immutable.Table[Pos, CharacterView]
+  val items: immutable.Table[EntityId, ItemView]
+  val itemlocs: immutable.Table[Pos, List[ItemView]]
+  val neighbours: immutable.Table[Pos, AreaId]
 }
 
 
