@@ -11,7 +11,7 @@ trait Screens {
   
   var position: (Int, Int)
   
-  def updateScreen(lastActions: Iterator[(EntityId, Action)], area: Area): Unit
+  def updateScreen(lastActions: Iterator[(EntityId, Action)], area: AreaView): Unit
   
 }
 

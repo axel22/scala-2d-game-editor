@@ -10,6 +10,11 @@ import org.triggerspace._
 trait CharacterTableView extends Trait {
   def ids: immutable.Table[EntityId, CharacterView]
   def locs: immutable.Table[Pos, CharacterView]
+  
+  def findFor(pid: PlayerId)(implicit ctx: Ctx) = ids.iterator map { _._2 } find {
+    case PlayerCharacter(pid.chrid) => true
+    case _ => false
+  } get
 }
 
 

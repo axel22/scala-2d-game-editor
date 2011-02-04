@@ -15,6 +15,8 @@ pc =>
   
   def manager = new OrderManager(pc)
   
+  def pov(area: AreaView)(implicit ctx: Ctx) = area // TODO
+  
 }
 
 

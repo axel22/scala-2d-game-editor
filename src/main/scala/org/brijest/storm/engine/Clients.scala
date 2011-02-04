@@ -37,14 +37,14 @@ extends Transactors
         updateArea()
         
         // update screen
-        updateScreen(appliedActions.iterator, area)
+        updateScreen(appliedActions.iterator, area.characters.findFor(pid).pov(area))
         
         // clear pending actions
         appliedActions.clear()
         
         // send all commands
         sendCommands()
-
+        
         // register with a new core transactor if necessary
         reregister()
       } until (shouldStop())

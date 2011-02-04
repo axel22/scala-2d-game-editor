@@ -20,9 +20,7 @@ trait CharacterView extends EntityView {
  *  depending on the current state.
  */
 abstract class Character(i: EntityId, t: Transactors) extends Entity(i, t) with BasicStats with CharacterView {
-  
   val position = cell(Pos(0, 0))
-  
   val dimensions = cell((1, 1))
   
   def action(area: Area)(implicit ctx: Ctx) = manager.action(area)
@@ -35,16 +33,12 @@ abstract class Character(i: EntityId, t: Transactors) extends Entity(i, t) with 
 
 
 object Character {
-  
   def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[Character]) Some(e.id) else None
-  
 }
 
 
 trait BasicStats extends Trait {
-  
   val speed = cell(50)
-  
 }
 
 

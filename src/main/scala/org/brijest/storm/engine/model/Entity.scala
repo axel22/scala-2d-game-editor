@@ -9,8 +9,8 @@ import org.triggerspace._
 
 trait EntityView extends Trait {
   def id: EntityId
-  
   def action(area: Area)(implicit ctx: Ctx): (Action, Trigger)
+  def pov(area: AreaView)(implicit ctx: Ctx): AreaView
 }
 
 

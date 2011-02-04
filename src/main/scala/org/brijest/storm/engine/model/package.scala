@@ -8,6 +8,11 @@ import org.triggerspace.ImmutableValue
 
 
 
+package model {
+  case class PlayerId(id: Long, chrid: EntityId)
+}
+
+
 package object model {
   
   /* area */
@@ -24,11 +29,9 @@ package object model {
   
   /* player */
   
-  type PlayerId = Long
+  def invalidPlayerId = PlayerId(-1L, invalidEntityId)
   
-  def invalidPlayerId = -1L
-  
-  def observerPlayerId = -2L
+  def observerPlayerId = PlayerId(-2L, invalidEntityId)
   
   /* various types */
   
