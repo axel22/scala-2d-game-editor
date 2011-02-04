@@ -43,7 +43,7 @@ case class CompositeAction(actions: Seq[Action]) extends Action {
 
 
 case class HaltPlayerCharacter(id: EntityId) extends Action {
-  def apply(a: Area)(implicit ctx: Ctx) = a.characters(id) match {
+  def apply(a: Area)(implicit ctx: Ctx) = a.characters.ids(id) match {
     case pc @ PlayerCharacter(_) => pc.order := DoNothing
     case c => illegalarg(c)
   }
@@ -52,12 +52,12 @@ case class HaltPlayerCharacter(id: EntityId) extends Action {
 
 case class MoveRegularCharacter(from: Pos, to: Pos) extends Action {
   def apply(a: Area)(implicit ctx: Ctx) {
-    a.characterlocs(from) match {
+    a.characters.locs(from) match {
       case rc @ RegularCharacter(_) =>
         if (a.isWalkable(to)) {
           rc.position := to
-          a.characterlocs.remove(from)
-          a.characterlocs(to) = rc
+          a.characters.locs.remove(from)
+          a.characters.locs(to) = rc
         } else illegalarg(to + " is not walkable.")
         
         rc match {
@@ -71,7 +71,7 @@ case class MoveRegularCharacter(from: Pos, to: Pos) extends Action {
 
 
 case class SetOrder(id: EntityId, order: Order) extends Action {
-  def apply(a: Area)(implicit ctx: Ctx) = a.characters(id) match {
+  def apply(a: Area)(implicit ctx: Ctx) = a.characters.ids(id) match {
     case o: Orders => o.order := order
     case x => illegalarg(id + " -> " + x)
   }

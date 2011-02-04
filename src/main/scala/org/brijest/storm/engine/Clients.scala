@@ -89,12 +89,16 @@ extends Transactors
       }
     }
     
-    def reregister() = pendingRegistration() match {
-      case Some(t) =>
-        debug("Reregistration for client %d".format(pid))
-        unregister()
-        register(t)
-      case None =>
+    def reregister() = {
+      pendingRegistration() match {
+        case Some(t) =>
+          debug("Reregistration for client %d".format(pid))
+          unregister()
+          register(t)
+        case None =>
+      }
+      
+      if (registeredWith().isTerminated) register(simulatorForPlayer(pid))
     }
     
     def sendCommands() = {
