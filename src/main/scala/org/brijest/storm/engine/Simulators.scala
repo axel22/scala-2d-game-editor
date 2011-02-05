@@ -68,8 +68,9 @@ extends Transactors
       debug("Simulation step for area " + aid)
       
       // get action for current entities
-      val current = schedule.dequeue()
-      for (eid <- current; e <- area.entity(eid)) {
+      while (schedule.length > 0 && schedule.front._1 == simtime()) {
+        val (_, eid) = schedule.dequeue()
+        val Some(e) = area.entity(eid)
         val (act, trig) = e.action(area)
         
         // perform and store action
@@ -81,14 +82,13 @@ extends Transactors
         trig match {
           case AfterTime(turns) => scheduleEntity(eid, turns)
           case NoTrigger => // the entity will not be simulated anymore
-        }
+        }        
       }
+      
+      simtime += 1
     }
     
-    def scheduleEntity(eid: EntityId, turns: Int) {
-      while (schedule.length <= turns) schedule.enqueue(Nil)
-      schedule(turns) = eid :: schedule(turns)
-    }
+    def scheduleEntity(eid: EntityId, turns: Int) = schedule enqueue (simtime() + turns, eid)
     
     def resolveTriggers() {
       while (triggers.length > 0) {
@@ -153,7 +153,8 @@ object Simulators {
     val actions = queue[(Long, EntityId, Action)]
     val triggers = queue[Trigger]
     val transactions = queue[Transaction]
-    val schedule = queue[List[EntityId]]
+    val simtime = cell(0L)
+    val schedule = priorityQueue[(Long, EntityId)](elemType[(Long, EntityId)], Ordering[(Long, EntityId)].reverse) // TODO change to wrapped ordering
     val paused = cell(false)
     val shouldStop = cell(false)
     
