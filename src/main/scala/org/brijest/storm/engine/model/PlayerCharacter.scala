@@ -7,8 +7,8 @@ import org.triggerspace._
 
 
 
-case class PlayerCharacter(i: EntityId)(t: Transactors)
-extends RegularCharacter(i, t) with Orders {
+case class PlayerCharacter(i: EntityId)(ii: InstInfo)
+extends RegularCharacter(i, ii) with Orders {
 pc =>
   
   val owner = cell[PlayerId](invalidPlayerId)
@@ -16,6 +16,8 @@ pc =>
   def manager = new OrderManager(pc)
   
   def pov(area: AreaView)(implicit ctx: Ctx) = area // TODO
+  
+  def instantiateCopy(ii: InstInfo) = new PlayerCharacter(i)(ii)
   
 }
 

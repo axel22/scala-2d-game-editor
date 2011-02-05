@@ -14,4 +14,4 @@ trait EntityView extends Trait {
 }
 
 
-abstract class Entity(val id: EntityId, t: Transactors) extends Struct(t) with EntityView
+abstract class Entity[Repr <: Entity[Repr]](val id: EntityId, ii: InstInfo) extends CopyStruct[Repr](ii) with EntityView

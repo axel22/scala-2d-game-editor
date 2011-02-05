@@ -19,7 +19,8 @@ trait CharacterView extends EntityView {
  *  They have controllers which control what they do - choose their next action
  *  depending on the current state.
  */
-abstract class Character(i: EntityId, t: Transactors) extends Entity(i, t) with BasicStats with CharacterView {
+abstract class Character(i: EntityId, ii: InstInfo)
+extends Entity[Character](i, ii) with BasicStats with CharacterView {
   val position = cell(Pos(0, 0))
   val dimensions = cell((1, 1))
   
@@ -27,13 +28,11 @@ abstract class Character(i: EntityId, t: Transactors) extends Entity(i, t) with 
   
   def manager: Manager
   
-  override def copy(implicit ctx: Ctx): Character = throw new UnsupportedOperationException
-  
 }
 
 
 object Character {
-  def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[Character]) Some(e.id) else None
+  def unapply(e: Entity[_]): Option[EntityId] = if (e.isInstanceOf[Character]) Some(e.id) else None
 }
 
 

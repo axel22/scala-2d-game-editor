@@ -12,16 +12,13 @@ import util.pathfinding.Path
  *  
  *  Most characters are of this type. A regular character takes 1x1 space.
  */
-abstract class RegularCharacter(i: EntityId, t: Transactors) extends Character(i, t) {
-  
-  
-  
+abstract class RegularCharacter(i: EntityId, ii: InstInfo) extends Character(i, ii) {
 }
 
 
 object RegularCharacter {
   
-  def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[RegularCharacter]) Some(e.id) else None
+  def unapply(e: Entity[_]): Option[EntityId] = if (e.isInstanceOf[RegularCharacter]) Some(e.id) else None
   
 }
 
