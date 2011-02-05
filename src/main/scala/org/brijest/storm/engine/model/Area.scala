@@ -34,20 +34,20 @@ case class CharacterTable(t: Transactors) extends Struct(t) with CharacterTableV
 
 trait ItemTableView extends Trait {
   def ids: immutable.Table[EntityId, Item]
-  def locs: immutable.Table[Pos, List[Item]]
+  def locs: immutable.Table[Pos, Queue[Item]]
 }
 
 
 case class ItemTable(t: Transactors) extends Struct(t) with ItemTableView {
   val ids = table[EntityId, Item]
-  val locs = table[Pos, List[Item]]
+  val locs = table[Pos, Queue[Item]]
   
   def copyFrom(that: ItemTable)(implicit ctx: Ctx) {
     ids.clear
     for ((eid, it) <- that.ids.iterator) ids.put(eid, it.copy)
     
     locs.clear
-    for ((pos, itlist) <- that.locs.iterator) locs.put(pos, itlist map { i => ids(i.id) })
+    for ((pos, itlist) <- that.locs.iterator) locs.put(pos, itlist.copy)
   }
 }
 
@@ -78,7 +78,7 @@ case class Area(t: Transactors) extends Struct(t) with AreaView {
   
   /* methods */
   
-  def copy(area: Area)(implicit ctx: Ctx): Unit = {
+  def copyFrom(area: Area)(implicit ctx: Ctx): Unit = {
     // id
     id := area.id()
     

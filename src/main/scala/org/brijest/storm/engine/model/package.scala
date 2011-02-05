@@ -9,7 +9,7 @@ import org.triggerspace.ImmutableValue
 
 
 package model {
-  case class PlayerId(id: Long, chrid: EntityId)
+  case class PlayerId(id: Long, chrid: EntityId) extends ImmutableValue
 }
 
 

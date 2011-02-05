@@ -3,10 +3,11 @@ package model
 
 
 
+import org.triggerspace.ImmutableValue
 
 
 
-sealed trait Trigger
+sealed trait Trigger extends ImmutableValue
 
 
 object NoTrigger extends Trigger
