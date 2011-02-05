@@ -59,7 +59,7 @@ self =>
   def characters: CharacterTableView
   def items: ItemTableView
   def neighbours: immutable.Table[Pos, AreaId]
-
+  
   def entities(implicit ctx: Ctx) = characters.ids.iterator.map(_._2) ++ items.ids.iterator.map(_._2)
   def entity(id: EntityId)(implicit ctx: Ctx): Option[EntityView] = characters.ids.get(id) match {
     case None => items.ids.get(id)
