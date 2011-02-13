@@ -20,7 +20,7 @@ trait Inputs {
   case class KeyPress(chr: Char) extends Input
   case class MouseClick(x: Int, y: Int, button: Mouse.Button) extends Input
   
-  def waitInputs(nanos: Long): Seq[Input]
+  def getInputs(): Seq[Input]
   
 }
 

@@ -13,14 +13,15 @@ trait Clients
 extends Transactors
    with Simulators
    with Screens
-   with Inputs
-{
+   with Inputs {
+self =>
   import Clients._
   
   /* client logic */
   
-  class Client(pid: PlayerId)(t: Transactors)
-  extends Transactor.Template[Info](t) with Logging {
+  class Client(pid: PlayerId)
+  extends Transactor.Template[Info] with Logging {
+    def transactors = self
     val model = struct(Info)
     import model._
     import logger._
@@ -29,28 +30,31 @@ extends Transactors
       // register with necessary core transactor
       initialize()
       
-      repeat {
-        // wait for new input, but no longer than frameLength
-        awaitCommands()
-        
-        // run pending actions to update area
-        updateArea()
-        
-        // update screen
-        updateScreen(appliedActions.iterator, area.characters.findFor(pid).pov(area))
-        
-        // clear pending actions
-        appliedActions.clear()
-        
-        // send all commands
-        sendCommands()
-        
-        // register with a new core transactor if necessary
-        reregister()
-        
-        if (shouldStop()) once {
-          terminate()
-        }
+    }
+    
+    def mainloop(): Unit = blocking (getInputs()) { inputs =>
+      // run pending actions to update area
+      updateArea()
+      
+      // update screen
+      updateScreen(appliedActions.iterator, area.characters.findFor(pid).pov(area))
+      
+      // process player inputs
+      processInputs(inputs)
+      
+      // clear pending actions
+      appliedActions.clear()
+      
+      // send all commands
+      sendCommands()
+      
+      // register with a new core transactor if necessary
+      reregister()
+      
+      if (shouldStop()) once {
+        terminate()
+      } else await(shouldStop, frameLengthNanos) {
+        mainloop()
       }
     }
     
@@ -66,14 +70,9 @@ extends Transactors
       register(t)
     }
     
-    def awaitCommands() = {
-      // TODO
-      // val inputs = await {
-      //   waitInputs(frameLengthNanos)
-      // }
-      
+    def processInputs(inputs: Seq[Input]) = {
       // turn inputs into commands
-      // for (c <- inputs map toCommand) commands.enqueue(c)
+      for (c <- inputs map toCommand) commands.enqueue(c)
     }
     
     def updateArea() = {

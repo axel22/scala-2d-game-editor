@@ -10,8 +10,8 @@ import model._
 
 trait Simulators
 extends Transactors
-   with Constants
-{
+   with Constants {
+self =>
   import Simulators._
   
   /* methods */
@@ -22,8 +22,10 @@ extends Transactors
   
   /* simulator logic */
   
-  class Simulator(aid: AreaId)(t: Transactors)
-  extends SimulatorLogic(t) with Logging {
+  class Simulator(aid: AreaId)
+  extends SimulatorLogic with Logging {
+    def transactors = self
+    
     val model = struct(Info)
     import model._
     import logger._
@@ -98,7 +100,7 @@ extends Transactors
 }
 
 
-abstract class SimulatorLogic(t: Transactors) extends Transactor.Template[Simulators.Info](t) with Logging {
+trait SimulatorLogic extends Transactor.Template[Simulators.Info] with Logging {
   import logger._
   import model._
   
@@ -127,7 +129,7 @@ abstract class SimulatorLogic(t: Transactors) extends Transactor.Template[Simula
   }
   
   private def scheduleEntity(eid: EntityId, turns: Int) = schedule enqueue (simtime() + turns, eid)
-
+  
   def resolveTriggers() {
     while (triggers.length > 0) {
       val t = triggers.dequeue()
