@@ -47,9 +47,11 @@ extends Transactors
         
         // register with a new core transactor if necessary
         reregister()
-      } until (shouldStop())
-      
-      terminate()
+        
+        if (shouldStop()) once {
+          terminate()
+        }
+      }
     }
     
     def initialize() {
@@ -65,12 +67,13 @@ extends Transactors
     }
     
     def awaitCommands() = {
-      val inputs = await {
-        waitInputs(frameLengthNanos)
-      }
+      // TODO
+      // val inputs = await {
+      //   waitInputs(frameLengthNanos)
+      // }
       
       // turn inputs into commands
-      for (c <- inputs map toCommand) commands.enqueue(c)
+      // for (c <- inputs map toCommand) commands.enqueue(c)
     }
     
     def updateArea() = {

@@ -23,36 +23,41 @@ extends Transactors
   /* simulator logic */
   
   class Simulator(aid: AreaId)(t: Transactors)
-  extends Transactor.Template[Info](t) with Logging {
+  extends SimulatorLogic(t) with Logging {
     val model = struct(Info)
     import model._
     import logger._
     
     def transact() {
       initialize()
+      simulate()
+    }
+    
+    def simulate(): Unit = await (shouldStop, turnLengthNanos) {
+      simulationStep()
       
-      repeat {
-        simulationStep()
-        
-        resolveTriggers()
-        
-        notifyClients()
-        
-        // clear action queue
-        actions.clear()
-        
-        // perform inter-simulator transactions
-        // (possibly adding new actions to the queue)
-        performTransactions()
-        
-        // check pause state
-        while (paused()) paused.await()
-        
-        // wait one period
-        shouldStop.await(turnLengthNanos)
-      } until (shouldStop())
+      resolveTriggers()
       
-      terminate()
+      notifyClients()
+      
+      // clear action queue
+      actions.clear()
+      
+      // perform inter-simulator transactions
+      // (possibly adding new actions to the queue)
+      performTransactions()
+      
+      // check pause state
+      if (paused()) pause()
+      
+      // wait one period
+      if (shouldStop()) once {
+        terminate()
+      } else restart
+    }
+    
+    def pause(): Unit = await (paused) {
+      if (paused()) restart else simulate()
     }
     
     def initialize() {
@@ -64,40 +69,6 @@ extends Transactors
       }
     }
     
-    def simulationStep() {
-      debug("Simulation step for area " + aid)
-      
-      // get action for current entities
-      while (schedule.length > 0 && schedule.front._1 == simtime()) {
-        val (_, eid) = schedule.dequeue()
-        val Some(e) = area.entity(eid)
-        val (act, trig) = e.action(area)
-        
-        // perform and store action
-        act(area)
-        actions.enqueue(actioncount(), eid, act)
-        actioncount += 1
-        
-        // install trigger
-        trig match {
-          case AfterTime(turns) => scheduleEntity(eid, turns)
-          case NoTrigger => // the entity will not be simulated anymore
-        }        
-      }
-      
-      simtime += 1
-    }
-    
-    def scheduleEntity(eid: EntityId, turns: Int) = schedule enqueue (simtime() + turns, eid)
-    
-    def resolveTriggers() {
-      while (triggers.length > 0) {
-        val t = triggers.dequeue()
-        // process trigger
-        // TODO
-      }
-    }
-    
     def notifyClients() = {
       debug("Notifying clients for area " + aid)
       
@@ -105,18 +76,6 @@ extends Transactors
       for (c <- clients.iterator) send (c) {
         implicit ctx => for (a <- as) c.model.actions.enqueue(a)
       }
-    }
-    
-    def performTransactions() = {
-      for (t <- transactions.iterator) {
-        // preprocess transactions
-        // TODO
-      }
-      
-      // checkout and do all transactions at once
-      // TODO
-      
-      transactions.clear()
     }
     
     def terminate() {
@@ -139,7 +98,56 @@ extends Transactors
 }
 
 
+abstract class SimulatorLogic(t: Transactors) extends Transactor.Template[Simulators.Info](t) with Logging {
+  import logger._
+  import model._
+  
+  def simulationStep() {
+    debug("Simulation step for area " + area.id())
+    
+    // get action for current entities
+    while (schedule.length > 0 && schedule.front._1 == simtime()) {
+      val (_, eid) = schedule.dequeue()
+      val Some(e) = area.entity(eid)
+      val (act, trig) = e.action(area)
+      
+      // perform and store action
+      act(area)
+      actions.enqueue(actioncount(), eid, act)
+      actioncount += 1
+      
+      // install trigger
+      trig match {
+        case AfterTime(turns) => scheduleEntity(eid, turns)
+        case NoTrigger => // the entity will not be simulated anymore
+      }        
+    }
+    
+    simtime += 1
+  }
+  
+  private def scheduleEntity(eid: EntityId, turns: Int) = schedule enqueue (simtime() + turns, eid)
 
+  def resolveTriggers() {
+    while (triggers.length > 0) {
+      val t = triggers.dequeue()
+      // process trigger
+      // TODO
+    }
+  }
+  
+  def performTransactions() = {
+    for (t <- transactions.iterator) {
+      // preprocess transactions
+      // TODO
+    }
+    
+    // checkout and do all transactions at once
+    // TODO
+    
+    transactions.clear()
+  }
+}
 
 
 object Simulators {
@@ -159,7 +167,7 @@ object Simulators {
     val shouldStop = cell(false)
     
     /* clients */
-    val clients = set[Transactor[Clients.Info]]
+    val clients = pile[Transactor[Clients.Info]]
   }
   
 }
