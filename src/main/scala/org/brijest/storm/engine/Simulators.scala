@@ -169,7 +169,7 @@ object Simulators {
     val shouldStop = cell(false)
     
     /* clients */
-    val clients = pile[Transactor[Clients.Info]]
+    val clients = table[Transactor[Clients.Info], Unit]
   }
   
 }
