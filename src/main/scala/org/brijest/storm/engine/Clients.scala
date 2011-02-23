@@ -100,7 +100,7 @@ self =>
         case None =>
       }
       
-      if (registeredWith().isTerminated) register(simulatorForPlayer(pid))
+      if (registeredWith().hasTerminated) register(simulatorForPlayer(pid))
     }
     
     def sendCommands() = {
