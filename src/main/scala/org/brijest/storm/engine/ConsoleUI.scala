@@ -8,11 +8,11 @@ import model._
 
 
 
-trait ConsoleUI extends UI with DelegatedShell {
+class ConsoleUI extends UI with DelegatedShell {
   
   def name = "Storm Enroute"
   
-  var delegateShell = null
+  var delegateShell: Shell = null
   
   var position = (0, 0)
   

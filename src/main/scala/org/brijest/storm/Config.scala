@@ -14,12 +14,20 @@ final class Config {
 
 object Config {
   
+  object ui {
+    val swingConsole = "swing-console"
+  }
+  
   val uis = List(
-    "swing-console"
+    ui.swingConsole
   )
   
+  object engine {
+    val local = "local"
+  }
+  
   val engines = List(
-    "local"
+    engine.local
   )
   
 }

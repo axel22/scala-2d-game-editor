@@ -16,6 +16,12 @@ package object storm {
   
   def unsupported(obj: Any*) = throw new UnsupportedOperationException(obj.mkString(", "))
   
+  def exit(msg: String): Nothing = {
+    Console.err.println(msg)
+    System.exit(1)
+    error("unreachable")
+  }
+  
   /* constants */
   
   object app {
