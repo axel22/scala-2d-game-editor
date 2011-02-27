@@ -18,7 +18,7 @@ self =>
   
   def simulatorForPlayer(playerCharacterId: PlayerId): Transactor[Info]
   
-  def serialize(siminfo: Simulators.Info): Unit
+  protected def saveAndUnregister(siminfo: Simulators.Info): Unit
   
   /* simulator logic */
   
@@ -75,7 +75,7 @@ self =>
       debug("Notifying clients for area " + aid)
       
       val as = actions.iterator.toSeq
-      for (c <- clients.iterator) send (c) {
+      for ((c, _) <- clients.iterator) async (c) {
         implicit ctx => for (a <- as) c.model.actions.enqueue(a)
       }
     }
@@ -87,10 +87,10 @@ self =>
       // TODO
       
       // serialize
-      serialize(model)
+      saveAndUnregister(model)
       
       // inform clients
-      for (c <- clients.iterator) send (c) {
+      for ((c, _) <- clients.iterator) async (c) {
         implicit ctx => c.model.shouldStop := (true)
       }
     }
@@ -108,7 +108,7 @@ trait SimulatorLogic extends Transactor.Template[Simulators.Info] with Logging {
     debug("Simulation step for area " + area.id())
     
     // get action for current entities
-    while (schedule.length > 0 && schedule.front._1 == simtime()) {
+    while (schedule.size > 0 && schedule.front._1 == simtime()) {
       val (_, eid) = schedule.dequeue()
       val Some(e) = area.entity(eid)
       val (act, trig) = e.action(area)
@@ -164,7 +164,7 @@ object Simulators {
     val triggers = queue[Trigger]
     val transactions = queue[Transaction]
     val simtime = cell(0L)
-    val schedule = priorityQueue[(Long, EntityId)](elemType[(Long, EntityId)], Ordering[(Long, EntityId)].reverse) // TODO change to wrapped ordering
+    val schedule = heap[(Long, EntityId)](elemType[(Long, EntityId)], Ordering[(Long, EntityId)].reverse) // TODO change to wrapped ordering
     val paused = cell(false)
     val shouldStop = cell(false)
     

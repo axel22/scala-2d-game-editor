@@ -55,7 +55,7 @@ case class ItemTable(t: Transactors) extends Struct(t) with ItemTableView {
 trait AreaView extends Trait {
 self =>
   def id: immutable.Cell[AreaId]
-  def terrain: immutable.Matrix[Slot]
+  def terrain: immutable.Quad[Slot]
   def characters: CharacterTableView
   def items: ItemTableView
   def neighbours: immutable.Table[Pos, AreaId]
@@ -71,7 +71,7 @@ self =>
 
 case class Area(t: Transactors) extends Struct(t) with AreaView {
   val id = cell(invalidAreaId)
-  val terrain = matrix(1, 1, Slot(HardRock, 0))
+  val terrain = quad(1, 1, Some(Slot(HardRock, 0)))
   val characters = struct(CharacterTable)
   val items = struct(ItemTable)
   val neighbours = table[Pos, AreaId]

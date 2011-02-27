@@ -12,8 +12,7 @@ import model._
 trait Clients
 extends Transactors
    with Simulators
-   with Screens
-   with Inputs {
+   with DelegatedUI {
 self =>
   import Clients._
   
@@ -72,14 +71,14 @@ self =>
     
     def processInputs(inputs: Seq[Input]) = {
       // turn inputs into commands
-      for (c <- inputs map toCommand) commands.enqueue(c)
+      for (Some(c) <- inputs map toCommand) commands.enqueue(c)
     }
     
     def updateArea() = {
       debug("Updating area for client %d - updates %s".format(pid, actions.iterator.mkString(", ")))
       
       var cont = true
-      while (cont && actions.length > 0) {
+      while (cont && actions.size > 0) {
         val (cnt, eid, a) = actions.front
         if (cnt > actioncount()) cont = false // TODO wrapping around
         else if (cnt == actioncount()) {
@@ -108,7 +107,7 @@ self =>
       
       val comm = commands.iterator.toSeq
       val t = registeredWith()
-      send (t) {
+      async (t) {
         implicit ctx => for (c <- comm) c(t.model.area, ctx)
       }
     }
@@ -130,7 +129,7 @@ self =>
         actioncount := s.model.actioncount()
         
         // register self
-        s.model.clients.add(thiz)
+        s.model.clients.put(thiz, ())
         registeredWith := s
       }
     }
@@ -148,9 +147,9 @@ self =>
   
   /* methods */
   
-  def toCommand(i: Input): Command = i match {
-    case KeyPress(c) => null // TODO critical
-    case MouseClick(x, y, b) => null // TODO critical
+  def toCommand(i: Input): Option[Command] = i match {
+    case KeyPress(c) => None // TODO critical
+    case MouseClick(x, y, b) => None // TODO critical
   }
   
 }
@@ -167,7 +166,7 @@ object Clients {
     
     /* updates */
     val actioncount = cell(0L)
-    val actions = priorityQueue[(Long, EntityId, Action)] // TODO wrapped ordering!
+    val actions = heap[(Long, EntityId, Action)] // TODO wrapped ordering!
     val appliedActions = queue[(EntityId, Action)]
     
     /* commands */

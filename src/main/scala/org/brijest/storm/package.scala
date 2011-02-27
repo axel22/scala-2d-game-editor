@@ -16,4 +16,11 @@ package object storm {
   
   def unsupported(obj: Any*) = throw new UnsupportedOperationException(obj.mkString(", "))
   
+  /* constants */
+  
+  object app {
+    val name = "Storm Enroute"
+    val command = "storm-enroute"
+  }
+  
 }
