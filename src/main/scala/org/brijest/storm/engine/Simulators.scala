@@ -1,4 +1,5 @@
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 
 
 
@@ -10,15 +11,18 @@ import model._
 
 trait Simulators
 extends Transactors
-   with Constants {
+   with Constants
+{
 self =>
   import Simulators._
   
   /* methods */
   
+  val config: Config
+  
   def simulatorForPlayer(playerCharacterId: PlayerId): Transactor[Info]
   
-  protected def saveAndUnregister(siminfo: Simulators.Info): Unit
+  protected def saveAndUnregister(id: AreaId, siminfo: Simulators.Info): Unit
   
   /* simulator logic */
   
@@ -75,7 +79,7 @@ self =>
       debug("Notifying clients for area " + aid)
       
       val as = actions.iterator.toSeq
-      for ((c, _) <- clients.iterator) async (c) {
+      for ((_, c) <- clients.iterator) async (c) {
         implicit ctx => for (a <- as) c.model.actions.enqueue(a)
       }
     }
@@ -87,10 +91,10 @@ self =>
       // TODO
       
       // serialize
-      saveAndUnregister(model)
+      saveAndUnregister(aid, model)
       
       // inform clients
-      for ((c, _) <- clients.iterator) async (c) {
+      for ((_, c) <- clients.iterator) async (c) {
         implicit ctx => c.model.shouldStop := (true)
       }
     }
@@ -169,7 +173,7 @@ object Simulators {
     val shouldStop = cell(false)
     
     /* clients */
-    val clients = table[Transactor[Clients.Info], Unit]
+    val clients = table[PlayerId, Transactor[Clients.Info]]
   }
   
 }

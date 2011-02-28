@@ -13,7 +13,7 @@ object Initializer {
   
   def apply(config: Config): Clients = config.engine match {
     case Config.engine.local =>
-      val clients = new local.LocalClients
+      val clients = new local.LocalClients(config)
       clients.delegateUI = createUI(config)
       clients
     case e => exit("Engine '%s' not recognized.".format(e))

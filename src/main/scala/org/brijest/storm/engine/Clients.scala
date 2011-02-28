@@ -12,9 +12,12 @@ import model._
 trait Clients
 extends Transactors
    with Simulators
-   with DelegatedUI {
+   with DelegatedUI
+{
 self =>
   import Clients._
+  
+  def clientLeft(pid: PlayerId): Unit
   
   /* client logic */
   
@@ -117,6 +120,9 @@ self =>
       
       // unregister
       unregister()
+      
+      // client leaving
+      clientLeft(pid)
     }
     
     def register(s: Transactor[Simulators.Info]) {
@@ -129,7 +135,7 @@ self =>
         actioncount := s.model.actioncount()
         
         // register self
-        s.model.clients.put(thiz, ())
+        s.model.clients.put(pid, thiz)
         registeredWith := s
       }
     }
@@ -139,7 +145,7 @@ self =>
       val s = registeredWith()
       if (s ne null) checkout (s) {
         implicit txn =>
-        s.model.clients.remove(thiz)
+        s.model.clients.remove(pid)
         registeredWith := null
       }
     }

@@ -8,6 +8,7 @@ package org.brijest.storm
 final class Config {
   var ui: String = _
   var engine: String = _
+  var savename: String = _
   var world: Option[String] = None
 }
 

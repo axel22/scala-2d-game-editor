@@ -1,4 +1,5 @@
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package impl.local
 
 
@@ -10,9 +11,14 @@ import model._
 
 
 
-class LocalClients
-extends LocalSimulators
+class LocalClients(c: Config)
+extends LocalSimulators(c)
    with Clients
 {
   var delegateUI: UI = _
+  
+  def clientLeft(pid: PlayerId) {
+    
+  }
+  
 }
