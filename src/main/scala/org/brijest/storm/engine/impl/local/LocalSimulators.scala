@@ -16,7 +16,8 @@ class LocalSimulators(val config: Config)
 extends Simulators
    with LockingTransactors
 {
-  // database?
+  // database
+  val db = new Database(config)
   
   val master = transactor(struct(Registry)) { reg =>
   }
@@ -46,3 +47,7 @@ extends Simulators
   }
   
 }
+
+
+
+

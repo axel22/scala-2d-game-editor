@@ -10,6 +10,7 @@ final class Config {
   var engine: String = _
   var savename: String = _
   var world: Option[String] = None
+  val basedir = System.getProperty("user.dir")
 }
 
 
