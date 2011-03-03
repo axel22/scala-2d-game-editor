@@ -18,7 +18,7 @@ extends LocalSimulators(c)
   var delegateUI: UI = _
   
   def clientLeft(pid: PlayerId) {
-    
+    // TODO
   }
   
 }

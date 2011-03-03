@@ -16,20 +16,34 @@ class LocalSimulators(val config: Config)
 extends Simulators
    with LockingTransactors
 {
+self =>
   // database
   val db = new Database(config)
   
-  val master = transactor(struct(Registry)) { reg =>
+  case class Master() extends Transactor.Template[Registry] {
+    def transactors = self
+    val model = struct(Registry)
+    def transact() {}
+    def newPlayer(pid: PlayerId): AreaId = {
+      0L // TODO
+    }
+    def revive(id: AreaId): Transactor[Simulators.Info] = {
+      null // TODO
+    }
   }
+  
+  val master = transactor(Master)
   
   def simulatorForPlayer(pid: PlayerId): Transactor[Simulators.Info] = {
     checkout (master) { implicit txn =>
       master.model.playerpositions.get(pid) match {
         case Some(areaid) => master.model.actives.get(areaid) match {
           case Some(t) => t
-          case None => null // TODO revive transactor
+          case None => master.revive(areaid)
         }
-        case None => null // TODO place player according to world rules
+        case None =>
+          val areaid = master.newPlayer(pid)
+          master.revive(areaid)
       }
     }
   }

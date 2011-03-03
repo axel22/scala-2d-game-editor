@@ -40,16 +40,24 @@ class Database(config: Config) {
     if (!rs.next()) error("Nonexisting area: %d".format(id))
     else {
       val blob = rs.getBlob(data)
-      // TODO use blob stream to construct an area
+      val bs = blob.getBinaryStream()
+      val ois = new java.io.ObjectInputStream(bs)
+      val area = ois.readObject().asInstanceOf[Area]
+      ois.close()
+      area
     }
   }
   
   def putArea(id: AreaId, area: Area) {
-    // TODO create blob from the area
+    val bs = new java.io.ByteArrayOutputStream()
+    val oos = new java.io.ObjectOutputStream(bs)
+    oos.writeObject(area)
+    
     update("delete from %s where %s = %d".format(tablename, areaid, id))
     val pstmt = conn.prepareStatement("insert into %s values (%d, ?)".format(tablename, areaid))
-    pstmt.setBinaryStream(1, null)
+    pstmt.setBinaryStream(1, new java.io.ByteArrayInputStream(bs.toByteArray))
     pstmt.execute()
+    oos.close()
   }
   
   def terminate() {
