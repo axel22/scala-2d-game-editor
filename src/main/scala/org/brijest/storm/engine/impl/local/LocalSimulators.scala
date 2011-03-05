@@ -24,26 +24,27 @@ self =>
     def transactors = self
     val model = struct(Registry)
     def transact() = await(model.terminateAll) {}
-    def newPlayer(pid: PlayerId): AreaId = {
+    def newPlayer(pid: PlayerId)(implicit ctx: ReceiverCtx): AreaId = {
       val areaid = world.initialPosition(pid)
       val t = forArea(areaid)
       checkout (t) { implicit txn =>
-        world.initialPlace(pid, t.model.area)
+        val entid = t.newEntityId
+        world.initialPlace(self, pid, t.model.area, entid)
       }
       areaid
     }
-    def revive(id: AreaId): Transactor[Simulators.Info] = {
+    def revive(id: AreaId)(implicit ctx: ReceiverCtx): Simulator = {
       val t = db.getInfo(id) match {
         case Some((area, state)) =>
           transactor(Simulator(area.id(), area, Some(state)))
         case None =>
-          val area = world.initializeArea(id)
+          val area = world.initializeArea(self, id)
           transactor(Simulator(area.id(), area, None))
       }
       model.actives.put(id, t)
       t
     }
-    def forArea(areaid: AreaId) = master.model.actives.get(areaid) match {
+    def forArea(areaid: AreaId)(implicit ctx: ReceiverCtx): Simulator = master.model.actives.get(areaid) match {
       case Some(t) => t
       case None => master.revive(areaid)
     }
@@ -70,7 +71,7 @@ self =>
   }
   
   case class Registry(t: Txs) extends Struct(t) {
-    val actives = table[AreaId, Transactor[Simulators.Info]]
+    val actives = table[AreaId, Simulator]
     val lastknownpositions = table[PlayerId, AreaId]
     val terminateAll = cell(false)
   }

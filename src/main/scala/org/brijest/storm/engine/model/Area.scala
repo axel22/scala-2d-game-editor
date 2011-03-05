@@ -22,6 +22,11 @@ case class CharacterTable(t: Transactors) extends Struct(t) with CharacterTableV
   val ids = table[EntityId, Character]
   val locs = table[Pos, Character]
   
+  def put(pos: Pos, c: Character)(implicit ctx: Ctx) {
+    ids(c.id) = c
+    locs(pos) = c
+  }
+  
   def copyFrom(that: CharacterTable)(implicit ctx: Ctx) {
     ids.clear
     for ((eid, chr) <- that.ids.iterator) ids.put(eid, chr.copy)
@@ -71,7 +76,7 @@ self =>
 
 case class Area(t: Transactors) extends Struct(t) with AreaView {
   val id = cell(invalidAreaId)
-  val terrain = quad(1, 1, Some(Slot(HardRock, 0)))
+  val terrain: Quad[Slot] = quad(1, 1, Some(HardRock))
   val characters = struct(CharacterTable)
   val items = struct(ItemTable)
   val neighbours = table[Pos, AreaId]

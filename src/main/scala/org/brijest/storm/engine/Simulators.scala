@@ -12,6 +12,7 @@ import model._
 trait Simulators
 extends Transactors
    with Constants
+   with Utils
 {
 self =>
   import Simulators._
@@ -36,6 +37,11 @@ self =>
     import model._
     import logger._
     import state._
+    
+    def newEntityId(implicit ctx: Ctx): (Long, Long) = {
+      entityCounter.+=(1)(implicitly[Numeric[Long]], ctx)
+      (area.id()(ctx), entityCounter()(ctx))
+    }
     
     def transact() {
       initialize()
@@ -170,6 +176,7 @@ object Simulators {
     val triggers = queue[Trigger]
     val simtime = cell(0L)
     val schedule = heap[(Long, EntityId)](elemType[(Long, EntityId)], Ordering[(Long, EntityId)].reverse) // TODO change to wrapped ordering
+    val entityCounter = cell(0L)
   }
   
   case class Info(a: Area, so: Option[State])(t: Transactors) extends Struct(t) {

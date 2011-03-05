@@ -53,7 +53,7 @@ case class HaltPlayerCharacter(id: EntityId) extends Action {
 case class MoveRegularCharacter(from: Pos, to: Pos) extends Action {
   def apply(a: Area)(implicit ctx: Ctx) {
     a.characters.locs(from) match {
-      case rc @ RegularCharacter(_) =>
+      case rc @ RegularCharacter(_, _) =>
         if (a.isWalkable(to)) {
           rc.position := to
           a.characters.locs.remove(from)

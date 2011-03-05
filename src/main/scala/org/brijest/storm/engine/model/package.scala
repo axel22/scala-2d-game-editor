@@ -23,9 +23,9 @@ package object model {
 
   /* entity */
   
-  type EntityId = Long
+  type EntityId = (Long, Long)
   
-  def invalidEntityId = -1L
+  def invalidEntityId = (-1L, -1L)
   
   /* player */
   
