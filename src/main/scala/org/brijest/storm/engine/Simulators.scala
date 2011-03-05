@@ -20,19 +20,22 @@ self =>
   
   val config: Config
   
+  val world: World
+  
   def simulatorForPlayer(playerCharacterId: PlayerId): Transactor[Info]
   
   protected def saveAndUnregister(id: AreaId, siminfo: Simulators.Info): Unit
   
   /* simulator logic */
   
-  class Simulator(aid: AreaId)
+  case class Simulator(aid: AreaId, area: Area, optstate: Option[State])
   extends SimulatorLogic with Logging {
     def transactors = self
     
-    val model = struct(Info)
+    val model = struct(Info(area, optstate))
     import model._
     import logger._
+    import state._
     
     def transact() {
       initialize()
@@ -107,6 +110,7 @@ self =>
 trait SimulatorLogic extends Transactor.Template[Simulators.Info] with Logging {
   import logger._
   import model._
+  import state._
   
   def simulationStep() {
     debug("Simulation step for area " + area.id())
@@ -126,6 +130,8 @@ trait SimulatorLogic extends Transactor.Template[Simulators.Info] with Logging {
       trig match {
         case AfterTime(turns) => scheduleEntity(eid, turns)
         case NoTrigger => // the entity will not be simulated anymore
+        case Transact(t) => // TODO enqueue transaction
+        case t => triggers.enqueue(t)
       }        
     }
     
@@ -158,17 +164,26 @@ trait SimulatorLogic extends Transactor.Template[Simulators.Info] with Logging {
 
 object Simulators {
   
-  case class Info(t: Transactors) extends Struct(t) {
-    /* data model */
-    val area = struct(Area)
-    
-    /* simulation state */
+  case class State(t: Transactors) extends Struct(t) {
     val actioncount = cell(0L)
     val actions = queue[(Long, EntityId, Action)]
     val triggers = queue[Trigger]
-    val transactions = queue[Transaction]
     val simtime = cell(0L)
     val schedule = heap[(Long, EntityId)](elemType[(Long, EntityId)], Ordering[(Long, EntityId)].reverse) // TODO change to wrapped ordering
+  }
+  
+  case class Info(a: Area, so: Option[State])(t: Transactors) extends Struct(t) {
+    /* data model */
+    val area = a
+    
+    /* simulation state - must be serialized */
+    val state = so match {
+      case Some(s) => s
+      case None => struct(State)
+    }
+    
+    /* helpers */
+    val transactions = queue[Transaction]
     val paused = cell(false)
     val shouldStop = cell(false)
     

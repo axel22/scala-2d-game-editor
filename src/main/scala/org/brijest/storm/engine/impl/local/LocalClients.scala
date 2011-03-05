@@ -11,8 +11,8 @@ import model._
 
 
 
-class LocalClients(c: Config)
-extends LocalSimulators(c)
+class LocalClients(c: Config, w: World)
+extends LocalSimulators(c, w)
    with Clients
 {
   var delegateUI: UI = _

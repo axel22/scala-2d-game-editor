@@ -21,7 +21,7 @@ self =>
   
   /* client logic */
   
-  class Client(pid: PlayerId)
+  case class Client(pid: PlayerId)
   extends Transactor.Template[Info] with Logging {
     def transactors = self
     val model = struct(Info)
@@ -132,7 +132,7 @@ self =>
         area copyFrom s.model.area
         
         // set action counter
-        actioncount := s.model.actioncount()
+        actioncount := s.model.state.actioncount()
         
         // register self
         s.model.clients.put(pid, thiz)
@@ -179,7 +179,7 @@ object Clients {
     val commands = queue[Command]
     
     /* client state related */
-    val shouldStop = cell(true)
+    val shouldStop = cell(false)
     
     /* registration */
     val registeredWith = cell[Transactor[Simulators.Info]]

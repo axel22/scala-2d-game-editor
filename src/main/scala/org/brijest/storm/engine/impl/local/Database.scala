@@ -8,6 +8,7 @@ import com.weiglewilczek.slf4s._
 import org.h2.jdbc._
 import java.io.File
 import model.{Area, AreaId}
+import Simulators.State
 
 
 class Database(config: Config) {
@@ -32,23 +33,28 @@ class Database(config: Config) {
   
   if (!existing) {
     update("create database %s".format(Database.name))
-    update("create table %s (%s bigint not null, %s blob, primary key (%s))".format(tablename, areaid, data, areaid))
+    update("create table %s (%s bigint not null, %s blob, %s blob, primary key (%s))".format(tablename, areaid, data, statedata, areaid))
   }
   
-  def getArea(id: AreaId) {
-    val rs = query("select %s, %s from %s where %s = %d".format(areaid, data, tablename, areaid, id))
-    if (!rs.next()) error("Nonexisting area: %d".format(id))
+  def getInfo(id: AreaId): Option[(Area, State)] = {
+    val rs = query("select %s, %s, %s from %s where %s = %d".format(areaid, data, statedata, tablename, areaid, id))
+    if (!rs.next()) None
     else {
-      val blob = rs.getBlob(data)
-      val bs = blob.getBinaryStream()
-      val ois = new java.io.ObjectInputStream(bs)
-      val area = ois.readObject().asInstanceOf[Area]
-      ois.close()
-      area
+      def deser[T](blob: java.sql.Blob) = {
+        val bs = blob.getBinaryStream()
+        val ois = new java.io.ObjectInputStream(bs)
+        val obj = ois.readObject().asInstanceOf[Area]
+        ois.close()
+        obj.asInstanceOf[T]
+      }
+      
+      val datablob = rs.getBlob(data)
+      val statedatablob = rs.getBlob(statedata)
+      Some(deser[Area](datablob), deser[State](statedatablob))
     }
   }
   
-  def putArea(id: AreaId, area: Area) {
+  def putInfo(id: AreaId, area: Area, state: State) {
     val bs = new java.io.ByteArrayOutputStream()
     val oos = new java.io.ObjectOutputStream(bs)
     oos.writeObject(area)
@@ -72,5 +78,6 @@ object Database {
   val tablename = "areas"
   val areaid = "id"
   val data = "data"
+  val statedata = "statedata"
 }
 

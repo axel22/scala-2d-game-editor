@@ -12,7 +12,7 @@ import model._
 
 
 
-class LocalSimulators(val config: Config)
+class LocalSimulators(val config: Config, val world: World)
 extends Simulators
    with LockingTransactors
 {
@@ -23,27 +23,41 @@ self =>
   case class Master() extends Transactor.Template[Registry] {
     def transactors = self
     val model = struct(Registry)
-    def transact() {}
+    def transact() = await(model.terminateAll) {}
     def newPlayer(pid: PlayerId): AreaId = {
-      0L // TODO
+      val areaid = world.initialPosition(pid)
+      val t = forArea(areaid)
+      checkout (t) { implicit txn =>
+        world.initialPlace(pid, t.model.area)
+      }
+      areaid
     }
     def revive(id: AreaId): Transactor[Simulators.Info] = {
-      null // TODO
+      val t = db.getInfo(id) match {
+        case Some((area, state)) =>
+          transactor(Simulator(area.id(), area, Some(state)))
+        case None =>
+          val area = world.initializeArea(id)
+          transactor(Simulator(area.id(), area, None))
+      }
+      model.actives.put(id, t)
+      t
+    }
+    def forArea(areaid: AreaId) = master.model.actives.get(areaid) match {
+      case Some(t) => t
+      case None => master.revive(areaid)
     }
   }
   
-  val master = transactor(Master)
+  val master = transactor(Master())
   
   def simulatorForPlayer(pid: PlayerId): Transactor[Simulators.Info] = {
     checkout (master) { implicit txn =>
-      master.model.playerpositions.get(pid) match {
-        case Some(areaid) => master.model.actives.get(areaid) match {
-          case Some(t) => t
-          case None => master.revive(areaid)
-        }
+      master.model.lastknownpositions.get(pid) match {
+        case Some(areaid) => master.forArea(areaid)
         case None =>
           val areaid = master.newPlayer(pid)
-          master.revive(areaid)
+          master.forArea(areaid)
       }
     }
   }
@@ -51,13 +65,14 @@ self =>
   protected def saveAndUnregister(id: AreaId, siminfo: Simulators.Info) {
     checkout (master) { implicit txn =>
       master.model.actives.remove(id)
-      // TODO save transactor state
+      db.putInfo(siminfo.area.id(), siminfo.area, siminfo.state)
     }
   }
   
   case class Registry(t: Txs) extends Struct(t) {
     val actives = table[AreaId, Transactor[Simulators.Info]]
-    val playerpositions = table[PlayerId, AreaId]
+    val lastknownpositions = table[PlayerId, AreaId]
+    val terminateAll = cell(false)
   }
   
 }
