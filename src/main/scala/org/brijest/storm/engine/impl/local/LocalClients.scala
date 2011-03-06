@@ -18,7 +18,13 @@ extends LocalSimulators(c, w)
   var delegateUI: UI = _
   
   def clientLeft(pid: PlayerId) {
-    // TODO
+    checkout (master) { implicit txn =>
+      master.model.terminateAll := true
+    }
   }
+  
+  def newPlayerId() = PlayerId(0L)
+  
+  def startClients() = transactor(Client(newPlayerId()))
   
 }

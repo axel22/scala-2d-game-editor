@@ -19,6 +19,8 @@ self =>
   
   def clientLeft(pid: PlayerId): Unit
   
+  def newPlayerId(): PlayerId
+  
   /* client logic */
   
   case class Client(pid: PlayerId)

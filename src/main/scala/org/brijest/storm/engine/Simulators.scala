@@ -23,7 +23,9 @@ self =>
   
   val world: World
   
-  def simulatorForPlayer(playerCharacterId: PlayerId): Transactor[Info]
+  def simulatorForPlayer(pid: PlayerId): Transactor[Info]
+  
+  protected def playerMovement(pid: PlayerId, from: AreaId, to: AreaId): Unit
   
   protected def saveAndUnregister(id: AreaId, siminfo: Simulators.Info): Unit
   
@@ -38,9 +40,9 @@ self =>
     import logger._
     import state._
     
-    def newEntityId(implicit ctx: Ctx): (Long, Long) = {
-      entityCounter.+=(1)(implicitly[Numeric[Long]], ctx)
-      (area.id()(ctx), entityCounter()(ctx))
+    def newEntityId(implicit ctx: ReceiverCtx): (Long, Long) = {
+      entityCounter += 1
+      (area.id(), entityCounter())
     }
     
     def transact() {

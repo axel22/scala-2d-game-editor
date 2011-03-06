@@ -12,7 +12,7 @@ trait CharacterTableView extends Trait {
   def locs: immutable.Table[Pos, CharacterView]
   
   def findFor(pid: PlayerId)(implicit ctx: Ctx) = ids.iterator map { _._2 } find {
-    case PlayerCharacter(pid.chrid) => true
+    case pc @ PlayerCharacter(`pid`, _) => true
     case _ => false
   } get
 }

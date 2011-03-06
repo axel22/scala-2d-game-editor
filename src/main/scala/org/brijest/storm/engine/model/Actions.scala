@@ -44,7 +44,7 @@ case class CompositeAction(actions: Seq[Action]) extends Action {
 
 case class HaltPlayerCharacter(id: EntityId) extends Action {
   def apply(a: Area)(implicit ctx: Ctx) = a.characters.ids(id) match {
-    case pc @ PlayerCharacter(_) => pc.order := DoNothing
+    case pc @ PlayerCharacter(_, _) => pc.order := DoNothing
     case c => illegalarg(c)
   }
 }

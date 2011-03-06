@@ -7,7 +7,7 @@ package impl.local
 import com.weiglewilczek.slf4s._
 import org.h2.jdbc._
 import java.io.File
-import model.{Area, AreaId}
+import model.{Area, AreaId, PlayerId}
 import Simulators.State
 
 
@@ -34,6 +34,7 @@ class Database(config: Config) {
   if (!existing) {
     update("create database %s".format(Database.name))
     update("create table %s (%s bigint not null, %s blob, %s blob, primary key (%s))".format(tablename, areaid, data, statedata, areaid))
+    update("create table %s (%s bigint not null, %s bigint not null, primary key (%s))".format(playerpos, pidcol, aidcol, pidcol))
   }
   
   def getInfo(id: AreaId): Option[(Area, State)] = {
@@ -66,6 +67,20 @@ class Database(config: Config) {
     oos.close()
   }
   
+  def putPlayerPos(pid: PlayerId, areaid: AreaId) {
+    update("delete from %s where %s = %d".format(playerpos, pidcol, pid.id))
+    update("insert into %s values (%d, %d)".format(playerpos, pid.id, areaid))
+  }
+  
+  def getPlayerPositions: Seq[(PlayerId, AreaId)] = {
+    val rs = query("select * from %s".format(playerpos))
+    val res = collection.mutable.ArrayBuffer[(PlayerId, AreaId)]()
+    while (rs.next) {
+      res += ((PlayerId(rs.getLong(pidcol)), rs.getLong(aidcol)))
+    }
+    res
+  }
+  
   def terminate() {
     conn.close()
   }
@@ -75,9 +90,14 @@ class Database(config: Config) {
 
 object Database {
   val name = "save"
+  
   val tablename = "areas"
   val areaid = "id"
   val data = "data"
   val statedata = "statedata"
+  
+  val playerpos = "playerpos"
+  val pidcol = "pid"
+  val aidcol = "areaid"
 }
 

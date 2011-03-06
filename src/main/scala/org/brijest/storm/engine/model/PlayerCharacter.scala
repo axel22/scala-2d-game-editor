@@ -7,7 +7,7 @@ import org.triggerspace._
 
 
 
-case class PlayerCharacter(i: EntityId)(ii: InstInfo)
+case class PlayerCharacter(pid: PlayerId, i: EntityId)(ii: InstInfo)
 extends RegularCharacter(i, ii) with Orders {
 pc =>
   
@@ -17,7 +17,7 @@ pc =>
   
   def pov(area: AreaView)(implicit ctx: Ctx) = area // TODO
   
-  def instantiateCopy(ii: InstInfo) = new PlayerCharacter(i)(ii)
+  def instantiateCopy(ii: InstInfo) = new PlayerCharacter(pid, i)(ii)
   
 }
 

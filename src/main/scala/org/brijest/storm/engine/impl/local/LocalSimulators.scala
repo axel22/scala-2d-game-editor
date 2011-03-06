@@ -12,7 +12,7 @@ import model._
 
 
 
-class LocalSimulators(val config: Config, val world: World)
+abstract class LocalSimulators(val config: Config, val world: World)
 extends Simulators
    with LockingTransactors
 {
@@ -20,10 +20,20 @@ self =>
   // database
   val db = new Database(config)
   
+  def startClients(): Unit
+  
   case class Master() extends Transactor.Template[Registry] {
     def transactors = self
     val model = struct(Registry)
-    def transact() = await(model.terminateAll) {}
+    def transact() = {
+      for ((pid, areaid) <- db.getPlayerPositions) model.lastknownpositions.put(pid, areaid)
+      startClients()
+      awaitCond(model.terminateAll) (_() == true) {
+        awaitCond(model.actives) (_.size == 0) {
+          for ((pid, a) <- model.lastknownpositions.iterator) db.putPlayerPos(pid, a)
+        }
+      }
+    }
     def newPlayer(pid: PlayerId)(implicit ctx: ReceiverCtx): AreaId = {
       val areaid = world.initialPosition(pid)
       val t = forArea(areaid)
@@ -68,6 +78,10 @@ self =>
       master.model.actives.remove(id)
       db.putInfo(siminfo.area.id(), siminfo.area, siminfo.state)
     }
+  }
+  
+  protected def playerMovement(pid: PlayerId, from: AreaId, to: AreaId) {
+    // TODO
   }
   
   case class Registry(t: Txs) extends Struct(t) {
