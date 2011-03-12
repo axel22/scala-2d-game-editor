@@ -16,3 +16,9 @@ target
 
 # managed libraries
 lib_managed/
+
+
+# deployment dir
+deploy/
+
+
