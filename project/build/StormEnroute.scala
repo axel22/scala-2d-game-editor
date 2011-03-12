@@ -22,8 +22,6 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   /* constants */
   
-  val deploy_dir = "deploy"
-  
   def scalavers = "2.8.1"
   
   def fullArtifactName(artname: String) = artname + "-" + version + "." + defaultMainArtifact.extension
@@ -32,7 +30,7 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   def artifactpath = "target" / ("scala_" + scalavers) / artifactname
   
-  def scalalib = "project" / "boot" / ("scala-" + scalavers) / "lib" / "scala-library.jar"
+  def scalalibpath = "project" / "boot" / ("scala-" + scalavers) / "lib" / "scala-library.jar"
   
   override def mainClass = Some("org.brijest.storm.StormEnroute")
   
@@ -67,17 +65,51 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     asyncs ::= (p, command)
   }
   
+  def copyDependencies(dir: Path) {
+    artifactpath.asFile #> (dir / artifactname).asFile !;
+    scalalibpath.asFile #> (dir / fileName(scalalibpath)).asFile !;
+    for (p <- classpath) {
+      p.asFile #> (dir / fileName(p)).asFile !;
+    }
+  }
+  
+  def fileName(f: Path) = f.asFile.getName
+  
+  def createRunScript(name: String, dir: Path, libdir: Path) {
+    val alljars = List(Deploy.dir / artifactname) ++ classpath ++ List(scalalibpath)
+    val startcommand = "java -cp %s %s %s".format(
+      alljars.map(fileName(_)).map(libdir.asFile.getName / _).mkString(":"),
+      mainClass.get,
+      "$@"
+    )
+    val startscript = (dir / name).asFile
+    "echo %s".format(startcommand) #> startscript !;
+    "chmod a+x %s".format(startscript) !;
+  }
+  
+  def createBaseDirRunScript(name: String, runscr: String, dir: Path) {
+    val f = new File(name)
+    "echo cd %s".format(dir) #> f !;
+    "echo ./%s $@".format(runscr) #>> f !;
+    "chmod a+x %s".format(name) !;
+  }
+  
+  object Deploy {
+    val stormcmd = "storm-enroute"
+    val dir = "deploy"
+    val libzdir = dir / "libz"
+  }
+  
   /* tasks */
   
   lazy val deployRun = task { args =>
     task {
-      runsync("mkdir %s".format(deploy_dir))
-      new File(artifactpath.toString) #> new File((deploy_dir / artifactname).toString) !;
-      runasync("java -cp %s %s %s".format(
-        (deploy_dir / artifactname) + ":" + classpath.mkString(":") + ":" + scalalib,
-        mainClass.get,
-        args.mkString(" ")
-      ))
+      runsync("mkdir %s".format(Deploy.dir))
+      runsync("mkdir %s".format(Deploy.libzdir))
+      copyDependencies(Deploy.libzdir)
+      createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir)
+      createBaseDirRunScript("deployrun", Deploy.stormcmd, Deploy.dir)
+      runasync("./deployrun %s".format(args.mkString(" ")))
       None
     } dependsOn (`package`)
   }

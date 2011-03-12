@@ -18,9 +18,9 @@ target
 lib_managed/
 
 
-# deployment dir
+# deployment stuff
 deploy/
-
+deployrun
 
 # database
 *.db
