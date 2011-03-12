@@ -22,3 +22,5 @@ lib_managed/
 deploy/
 
 
+# database
+*.db

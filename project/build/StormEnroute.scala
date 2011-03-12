@@ -74,7 +74,6 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
       runsync("mkdir %s".format(deploy_dir))
       new File(artifactpath.toString) #> new File((deploy_dir / artifactname).toString) !;
       runasync("java -cp %s %s %s".format(
-        "-Duser.dir=" + deploy_dir,
         (deploy_dir / artifactname) + ":" + classpath.mkString(":") + ":" + scalalib,
         mainClass.get,
         args.mkString(" ")
