@@ -4,11 +4,22 @@ Storm Enroute Architecture
 Layers:
 
  --------------
+| UI           |
+ --------------
 | Clients      |
- --------------
-| Simulators   |
- --------------
-| triggerspace |
- --------------
+ -------------- ----------
+| Simulators   | Models   |
+ -------------- ----------
+| triggerspace            |
+ -------------------------
 
 
+Model:
+
+Area {
+  Id
+  Terrain
+  CharacterTable
+  ItemTable
+  Neighbours
+}

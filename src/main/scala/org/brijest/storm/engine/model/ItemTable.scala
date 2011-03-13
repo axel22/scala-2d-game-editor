@@ -6,8 +6,7 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm
-package engine
+package org.brijest.storm.engine
 package model
 
 
@@ -16,7 +15,23 @@ import org.triggerspace._
 
 
 
-trait Transaction extends ImmutableValue {
-  def participants: List[Transactor[_]]
-  def transact: Unit
+trait ItemTableView extends Trait {
+  def ids: immutable.Table[EntityId, Item]
+  def locs: immutable.Table[Pos, Queue[Item]]
 }
+
+
+case class ItemTable(t: Transactors) extends Struct(t) with ItemTableView {
+  val ids = table[EntityId, Item]
+  val locs = table[Pos, Queue[Item]]
+  
+  def copyFrom(that: ItemTable)(implicit ctx: Ctx) {
+    ids.clear
+    for ((eid, it) <- that.ids.iterator) ids.put(eid, it.copy)
+    
+    locs.clear
+    for ((pos, itlist) <- that.locs.iterator) locs.put(pos, itlist.copy)
+  }
+}
+
+
