@@ -14,16 +14,17 @@ import model._
 
 abstract class LocalSimulators(val config: Config, val world: World)
 extends Simulators
-   with LockingTransactors
 {
 self =>
+  import txtors._
+  
   // database
   val db = new Database(config)
   
   def startClients(): Unit
   
   case class Master() extends Transactor.Template[Registry] {
-    def transactors = self
+    def transactors = txtors
     val model = struct(Registry)
     def transact() = {
       for ((pid, areaid) <- db.getPlayerPositions) model.lastknownpositions.put(pid, areaid)

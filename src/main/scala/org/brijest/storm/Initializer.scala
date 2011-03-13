@@ -3,10 +3,11 @@ package org.brijest.storm
 
 
 import org.brijest.bufferz.shells._
-
+import org.triggerspace._
 import engine._
 import engine.impl._
 import engine.model.World
+
 
 
 object Initializer {
@@ -25,7 +26,7 @@ object Initializer {
     // setup engine
     config.engine match {
       case engine.local =>
-        val clients = new local.LocalClients(config, createWorld(config))
+        val clients = new local.LocalClients(config, createWorld(config), new threadlocking2.LockingTransactors {})
         clients.delegateUI = createUI(config)
         clients
       case e => exit("Engine '%s' not recognized.".format(e))

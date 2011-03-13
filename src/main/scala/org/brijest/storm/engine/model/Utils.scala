@@ -6,7 +6,10 @@ import org.triggerspace._
 
 
 
-trait Utils extends Transactors {
+trait Utils {
+  
+  val txtors: Transactors
+  import txtors._
   
   def defaultArea(): Area = {
     val area = struct(Area)

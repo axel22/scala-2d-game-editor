@@ -11,10 +11,12 @@ import model._
 
 
 
-class LocalClients(c: Config, w: World)
+class LocalClients(c: Config, w: World, val txtors: Transactors)
 extends LocalSimulators(c, w)
    with Clients
 {
+  import txtors._
+  
   var delegateUI: UI = _
   
   def clientLeft(pid: PlayerId) {

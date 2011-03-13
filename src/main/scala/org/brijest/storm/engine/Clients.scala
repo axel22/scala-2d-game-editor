@@ -10,12 +10,12 @@ import model._
 
 
 trait Clients
-extends Transactors
-   with Simulators
+extends Simulators
    with DelegatedUI
 {
 self =>
   import Clients._
+  import txtors._
   
   def clientLeft(pid: PlayerId): Unit
   
@@ -25,7 +25,7 @@ self =>
   
   case class Client(pid: PlayerId)
   extends Transactor.Template[Info] with Logging {
-    def transactors = self
+    def transactors = txtors
     val model = struct(Info)
     import model._
     import logger._

@@ -10,14 +10,14 @@ import model._
 
 
 trait Simulators
-extends Transactors
-   with Constants
-   with Utils
+extends Constants
 {
 self =>
   import Simulators._
   
   /* methods */
+  
+  val txtors: Transactors
   
   val config: Config
   
@@ -29,11 +29,17 @@ self =>
   
   protected def saveAndUnregister(id: AreaId, siminfo: Simulators.Info): Unit
   
+  val utils: Utils = new Utils {
+    val txtors = self.txtors
+  }
+  
   /* simulator logic */
+  
+  import txtors._
   
   case class Simulator(aid: AreaId, area: Area, optstate: Option[State])
   extends SimulatorLogic with Logging {
-    def transactors = self
+    def transactors = txtors
     
     val model = struct(Info(area, optstate))
     import model._
