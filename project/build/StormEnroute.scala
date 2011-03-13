@@ -1,3 +1,9 @@
+/*     ______________  ___  __  ___                       *\
+**    / __/_  __/ __ \/ _ \/  |/  /   Storm Enroute       **
+**   _\ \  / / / /_/ / , _/ /|_/ /    (c) 2011            **
+**  /___/ /_/  \____/_/|_/_/  /_/                         **
+\*                                                        */
+
 
 
 import sbt._
@@ -77,13 +83,15 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   def createRunScript(name: String, dir: Path, libdir: Path) {
     val alljars = List(Deploy.dir / artifactname) ++ classpath ++ List(scalalibpath)
-    val startcommand = "java -cp %s %s %s".format(
-      alljars.map(fileName(_)).map(libdir.asFile.getName / _).mkString(":"),
+    val jardecl = "JARS=%s".format(alljars.map(fileName(_)).map(libdir.asFile.getName / _).mkString(":"))
+    val startcommand = "java -cp $JARS %s %s".format(
       mainClass.get,
       "$@"
     )
     val startscript = (dir / name).asFile
-    "echo %s".format(startcommand) #> startscript !;
+    "echo # Storm Enroute" #> startscript !;
+    "echo \n%s".format(jardecl) #>> startscript !;
+    "echo \n%s".format(startcommand) #>> startscript !;
     "chmod a+x %s".format(startscript) !;
   }
   
@@ -97,6 +105,7 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   object Deploy {
     val stormcmd = "storm-enroute"
     val dir = "deploy"
+    val savedir = dir / "saves"
     val libzdir = dir / "libz"
   }
   
@@ -104,6 +113,7 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   lazy val deployRun = task { args =>
     task {
+      runsync("rm -rf %s".format(Deploy.savedir))
       runsync("mkdir %s".format(Deploy.dir))
       runsync("mkdir %s".format(Deploy.libzdir))
       copyDependencies(Deploy.libzdir)
@@ -123,8 +133,8 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   }
   
   lazy val destroyAsyncs = task {
-    for ((p, c) <- asyncs) {
-      p.destroy()
+    for ((p, _) <- asyncs) {
+      p.destroy()[1;3C
     }
     asyncs = Nil
     None

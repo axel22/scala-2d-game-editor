@@ -63,7 +63,7 @@ self =>
     }
     
     def initialize() {
-      debug("Initializing client for player " + pid)
+      info("Initializing client for player " + pid)
       
       playerId := pid
       
@@ -80,7 +80,7 @@ self =>
     }
     
     def updateArea() = {
-      debug("Updating area for client %d - updates %s".format(pid, actions.iterator.mkString(", ")))
+      info("Updating area for client %d - updates %s".format(pid, actions.iterator.mkString(", ")))
       
       var cont = true
       while (cont && actions.size > 0) {
@@ -98,7 +98,7 @@ self =>
     def reregister() = {
       pendingRegistration() match {
         case Some(t) =>
-          debug("Reregistration for client %d".format(pid))
+          info("Reregistration for client %d".format(pid))
           unregister()
           register(t)
         case None =>
@@ -108,7 +108,7 @@ self =>
     }
     
     def sendCommands() = {
-      debug("Sending commands for client %d - commands: %s.".format(pid, commands.iterator.mkString(", ")))
+      info("Sending commands for client %d - commands: %s.".format(pid, commands.iterator.mkString(", ")))
       
       val comm = commands.iterator.toSeq
       val t = registeredWith()
@@ -118,7 +118,7 @@ self =>
     }
     
     def terminate() {
-      debug("Termination of client %d.".format(pid))
+      info("Termination of client %d.".format(pid))
       
       // unregister
       unregister()

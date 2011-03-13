@@ -12,6 +12,7 @@ final class Config {
   var logging: Option[String] = None
   var world: Option[String] = None
   val basedir = System.getProperty("user.dir")
+  val savedir = "saves"
 }
 
 

@@ -11,10 +11,11 @@ import model.{Area, AreaId, PlayerId}
 import Simulators.State
 
 
+
 class Database(config: Config) extends Logging {
   import logger._
   
-  val filename = "%s/%s".format(config.basedir, config.savename)
+  val filename = "%s/%s/%s".format(config.basedir, config.savedir, config.savename)
   val existing = (new File(filename + ".h2.db")).exists
   val url = "jdbc:h2:%s;FILE_LOCK=FS;PAGE_SIZE=1024;CACHE_SIZE=8192".format(filename)
   Class.forName("org.h2.Driver")
@@ -33,7 +34,7 @@ class Database(config: Config) extends Logging {
   }
   
   if (!existing) {
-    debug("creating new database")
+    info("creating new database")
     update("create table %s (%s bigint not null, %s blob, %s blob, primary key (%s))".format(tablename, areaid, data, statedata, areaid))
     update("create table %s (%s bigint not null, %s bigint not null, primary key (%s))".format(playerpos, pidcol, aidcol, pidcol))
   }

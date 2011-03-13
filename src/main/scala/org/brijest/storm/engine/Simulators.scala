@@ -78,7 +78,7 @@ self =>
     }
     
     def initialize() {
-      debug("Initializing simulator for area " + aid)
+      info("Initializing simulator for area " + aid)
       
       // install triggers
       for (t <- triggers.iterator) {
@@ -87,7 +87,7 @@ self =>
     }
     
     def notifyClients() = {
-      debug("Notifying clients for area " + aid)
+      info("Notifying clients for area " + aid)
       
       val as = actions.iterator.toSeq
       for ((_, c) <- clients.iterator) async (c) {
@@ -96,7 +96,7 @@ self =>
     }
     
     def terminate() {
-      debug("Terminating simulator for area " + aid)
+      info("Terminating simulator for area " + aid)
       
       // deinstall triggers
       // TODO
@@ -121,7 +121,7 @@ trait SimulatorLogic extends Transactor.Template[Simulators.Info] with Logging {
   import state._
   
   def simulationStep() {
-    debug("Simulation step for area " + area.id())
+    info("Simulation step for area " + area.id())
     
     // get action for current entities
     while (schedule.size > 0 && schedule.front._1 == simtime()) {

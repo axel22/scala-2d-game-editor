@@ -17,7 +17,8 @@ object Initializer {
     // setup debug info
     config.logging match {
       case Some(logging.screen) =>
-        java.util.logging.LogManager.getLogManager.readConfiguration(screenLogging)
+        import java.util.logging._
+        LogManager.getLogManager.readConfiguration(javaLoggingScreen)
       case _ => 
     }
     
@@ -44,12 +45,13 @@ object Initializer {
     case Some(_) => exit("Arbitrary worlds not yet supported.")
   }
   
-  private def screenLogging = {
+  private def javaLoggingScreen = {
     import java.io._
     val conf =
 """
 handlers=java.util.logging.ConsoleHandler
-.level=ALL
+.level=INFO
+java.util.logging.ConsoleHandler.level=INFO
 """
     new ByteArrayInputStream(conf.getBytes("UTF-8"))
   }
