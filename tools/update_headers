@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use File::Find;
+use Fcntl;
+
+$numargs=$#ARGV + 1;
+
+print "A total of $numargs arguments.\n";
+
+sub usage {
+  die "Usage: update_headers <old-header-file> <new-header-file> <source-extensions>\n";
+}
+
+if ($numargs != 3) {
+  usage;
+}
+
+$oldheader=$ARGV[0];
+$newheader=$ARGV[1];
+$extension=$ARGV[2];
+
+open(oldh, "<", $oldheader) or die "Can't tie to $oldheader: $!\n";
+open(newh, "<", $newheader) or die "Can't tie to $newheader: $!\n";
+
+$srcdir="../src/main/";
+$i=0;
+my $srcfile;
+
+find(\&processfile, $srcdir);
+
+sub processfile {
+    if ($_ =~ m/.*\.scala$/) {
+	$dir = $File::Find::dir;
+	printf("(%d)\tNow processing file => %s/%s\n", ++$i, $dir, $_);
+    }
+}
+
+#while (defined($srcfile = glob($srcdir."/*.$extension"))) {
+#    
+#}
+
+
