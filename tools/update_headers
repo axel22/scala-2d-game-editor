@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use File::Find;
+use Tie::File;
 use Fcntl;
 
 $numargs=$#ARGV + 1;
@@ -8,7 +9,19 @@ $numargs=$#ARGV + 1;
 print "A total of $numargs arguments.\n";
 
 sub usage {
-  die "Usage: update_headers <old-header-file> <new-header-file> <source-extensions>\n";
+    die "Usage: update_headers <old-header-file> <new-header-file> <source-extensions>\n";
+}
+
+sub readin {
+    $str = "";
+    open(FH, "<", $_[0]) or die "Can't tie to $_[0]: $!\n";
+    while (defined ($line = <FH>)) {
+	print "$line";
+	$str = "$str$line";
+    }
+    close FH;
+    
+    return $str;
 }
 
 if ($numargs != 3) {
@@ -19,8 +32,11 @@ $oldheader=$ARGV[0];
 $newheader=$ARGV[1];
 $extension=$ARGV[2];
 
-open(oldh, "<", $oldheader) or die "Can't tie to $oldheader: $!\n";
-open(newh, "<", $newheader) or die "Can't tie to $newheader: $!\n";
+print "Changing:\n";
+$oldh = readin($oldheader);
+print "to:\n";
+$newh = readin($newheader);
+
 
 $srcdir="../src/main/";
 $i=0;
@@ -29,14 +45,22 @@ my $srcfile;
 find(\&processfile, $srcdir);
 
 sub processfile {
-    if ($_ =~ m/.*\.scala$/) {
+    if ($_ =~ m/.*\.$extension$/) {
 	$dir = $File::Find::dir;
 	printf("(%d)\tNow processing file => %s/%s\n", ++$i, $dir, $_);
+	
+	$contents = readin($_);
+	
+	$contents =~ s/\Q$oldh/$newh/smg;
+	
+	open OUTFILE, ">", $_ or die "Could not open file. $!";
+	print OUTFILE ($contents);
+	close OUTFILE;
+	
+	print "$string\n";
     }
 }
 
-#while (defined($srcfile = glob($srcdir."/*.$extension"))) {
-#    
-#}
+
 
 
