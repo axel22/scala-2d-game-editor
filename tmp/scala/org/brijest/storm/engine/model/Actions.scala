@@ -12,8 +12,7 @@ package model
 
 
 
-import org.triggerspace._
-
+import components._
 
 
 
@@ -36,22 +35,22 @@ object Action {
 
 
 sealed trait Action extends ImmutableValue {
-  def apply(a: Area)(implicit ctx: Ctx): Unit
+  def apply(a: Area): Unit
 }
 
 
 object NoAction extends Action {
-  def apply(a: Area)(implicit ctx: Ctx) {}
+  def apply(a: Area) {}
 }
 
 
 case class CompositeAction(actions: Seq[Action]) extends Action {
-  def apply(a: Area)(implicit ctx: Ctx) = for (act <- actions) act(a)
+  def apply(a: Area) = for (act <- actions) act(a)
 }
 
 
 case class HaltPlayerCharacter(id: EntityId) extends Action {
-  def apply(a: Area)(implicit ctx: Ctx) = a.characters.ids(id) match {
+  def apply(a: Area) = a.characters.ids(id) match {
     case pc @ PlayerCharacter(_, _) => pc.order := DoNothing
     case c => illegalarg(c)
   }

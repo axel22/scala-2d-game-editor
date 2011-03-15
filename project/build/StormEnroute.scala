@@ -18,7 +18,6 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   /* subprojects */
   
   lazy val bufferz = project("subs" / "bufferz")
-  lazy val triggerspace = project("subs" / "triggerspace")
   
   /* dependencies */
   
@@ -44,16 +43,11 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   def classpath =
     unmanagedClasspath.get ++
     managedClasspath(Configurations.Runtime).get ++ 
-    subartifacts ++
-    subdependencies.get
+    subartifacts
   
   def subartifacts = List(
     bufferz.outputPath / fullArtifactName("bufferz_" + scalavers),
-    triggerspace.outputPath / fullArtifactName("triggerspace_" + scalavers)
   )
-  
-  def subdependencies =
-    "subs" / "bufferz" / "lib_managed" / ("scala_" + scalavers) ** "*.jar"
   
   /* helpers */
   

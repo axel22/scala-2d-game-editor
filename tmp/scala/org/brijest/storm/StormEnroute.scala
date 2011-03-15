@@ -20,9 +20,9 @@ object StormEnroute {
     val config = new Config
     val parser = new ConfigParser(config)
     
-    // if (parser.parse(args)) {
-    //   Initializer(config)
-    // }
+    if (parser.parse(args)) {
+      Initializer(config)
+    }
   }
   
 }

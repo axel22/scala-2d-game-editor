@@ -10,11 +10,10 @@ package org.brijest.storm
 
 
 
-import org.brijest.bufferz.shells._
-import org.triggerspace._
-import engine._
-import engine.impl._
-import engine.model.World
+// import org.brijest.bufferz.shells._
+// import engine._
+// import engine.impl._
+// import engine.model.World
 
 
 
@@ -22,47 +21,47 @@ object Initializer {
   
   import Config._
   
-  def apply(config: Config): Clients = {
-    // setup debug info
-    config.logging match {
-      case Some(logging.screen) =>
-        import java.util.logging._
-        LogManager.getLogManager.readConfiguration(javaLoggingScreen)
-      case _ => 
-    }
+//   def apply(config: Config): Clients = {
+//     // setup debug info
+//     config.logging match {
+//       case Some(logging.screen) =>
+//         import java.util.logging._
+//         LogManager.getLogManager.readConfiguration(javaLoggingScreen)
+//       case _ => 
+//     }
     
-    // setup engine
-    config.engine match {
-      case engine.local =>
-        val clients = new local.LocalClients(config, createWorld(config), new threadlocking2.LockingTransactors {})
-        clients.delegateUI = createUI(config)
-        clients
-      case e => exit("Engine '%s' not recognized.".format(e))
-    }
-  }
+//     // setup engine
+//     config.engine match {
+//       case engine.local =>
+//         val clients = new local.LocalClients(config, createWorld(config), new threadlocking2.LockingTransactors {})
+//         clients.delegateUI = createUI(config)
+//         clients
+//       case e => exit("Engine '%s' not recognized.".format(e))
+//     }
+//   }
   
-  private def createUI(config: Config): UI = config.ui match {
-    case ui.swingConsole =>
-      val ui = new ConsoleUI
-      ui.delegateShell = new SwingShell(app.name)
-      ui
-    case e => exit("User interface '%s' not recognized".format(e))
-  }
+//   private def createUI(config: Config): UI = config.ui match {
+//     case ui.swingConsole =>
+//       val ui = new ConsoleUI
+//       ui.delegateShell = new SwingShell(app.name)
+//       ui
+//     case e => exit("User interface '%s' not recognized".format(e))
+//   }
   
-  private def createWorld(config: Config): World = config.world match {
-    case None => new World.DefaultWorld
-    case Some(_) => exit("Arbitrary worlds not yet supported.")
-  }
+//   private def createWorld(config: Config): World = config.world match {
+//     case None => new World.DefaultWorld
+//     case Some(_) => exit("Arbitrary worlds not yet supported.")
+//   }
   
-  private def javaLoggingScreen = {
-    import java.io._
-    val conf =
-"""
-handlers=java.util.logging.ConsoleHandler
-.level=INFO
-java.util.logging.ConsoleHandler.level=INFO
-"""
-    new ByteArrayInputStream(conf.getBytes("UTF-8"))
-  }
+//   private def javaLoggingScreen = {
+//     import java.io._
+//     val conf =
+// """
+// handlers=java.util.logging.ConsoleHandler
+// .level=INFO
+// java.util.logging.ConsoleHandler.level=INFO
+// """
+//     new ByteArrayInputStream(conf.getBytes("UTF-8"))
+//   }
   
 }

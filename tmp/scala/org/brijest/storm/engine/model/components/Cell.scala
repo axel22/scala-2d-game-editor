@@ -6,26 +6,24 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
-package model
+package org.brijest.storm.engine.model.components
 
 
 
-import org.triggerspace._
-import Action._
 
 
 
-trait Manager {
+package immutable {
   
-  def action(area: Area)(implicit ctx: Ctx): (Action, Trigger)
+  trait Cell[+T] {
+    def apply(): T
+  }
   
 }
 
 
-class OrderManager(c: Character with Orders) extends Manager {
-  def action(area: Area)(implicit ctx: Ctx): (Action, Trigger) = {
-    val (action, nextOrder) = c.order().apply(c, area)
-    (composite(action, setOrder(c.id, nextOrder)), AfterTime(c.speed()))
-  }
+@serializable case class Cell[T](private var v: T) extends immutable.Cell[T] {
+  def this() = this(null.asInstanceOf[T])
+  def apply() = v
+  def :=(nv: T) = v = nv
 }

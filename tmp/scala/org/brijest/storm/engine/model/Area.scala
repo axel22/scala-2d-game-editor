@@ -10,12 +10,10 @@ package org.brijest.storm.engine
 package model
 
 
-
-import org.triggerspace._
-
+import components._
 
 
-trait AreaView extends Trait {
+trait AreaView {
 self =>
   def id: immutable.Cell[AreaId]
   def terrain: immutable.Quad[Slot]

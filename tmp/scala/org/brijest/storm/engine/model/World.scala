@@ -17,9 +17,9 @@ import org.triggerspace._
 
 trait World {
   def name: String
-  def initializeArea(t: Simulators, id: AreaId)(implicit ctx: Ctx): Area
+  def initializeArea(id: AreaId): Area
   def initialPosition(pid: PlayerId): AreaId
-  def initialPlace(s: Simulators, pid: PlayerId, area: Area, id: EntityId)(implicit ctx: Ctx): Unit
+  def initialPlace(pid: PlayerId, area: Area, id: EntityId): Unit
 }
 
 
@@ -27,9 +27,9 @@ object World {
   
   final class DefaultWorld extends World {
     def name = "D'Falta"
-    def initializeArea(s: Simulators, id: AreaId)(implicit ctx: Ctx) = s.utils.defaultArea()
+    def initializeArea(id: AreaId) = s.utils.defaultArea()
     def initialPosition(pid: PlayerId) = 0L
-    def initialPlace(s: Simulators, pid: PlayerId, area: Area, id: EntityId)(implicit ctx: Ctx) {
+    def initialPlace(pid: PlayerId, area: Area, id: EntityId) {
       // find a location to place him in
       val pc = s.txtors.cstruct(PlayerCharacter(pid, id))
       val (w, h) = area.terrain.dimensions
