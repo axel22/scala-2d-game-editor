@@ -15,7 +15,6 @@ package org.brijest.storm.engine.model
 
 package object components {
   
-  def cell[T] = new Cell[T]()
   def cell[T](v: T) = new Cell[T](v)
   def quad[T](w: Int, h: Int, default: (Int, Int) => Option[T]) = new Quad(w, h, default)
   def quad[T](w: Int, h: Int, d: Option[T]): Quad[T] = quad(w, h, (x, y) => d)
