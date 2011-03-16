@@ -6,17 +6,19 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine.model.components
+package org.brijest.storm.engine
+package model
 
 
 
-import collection._
+import components._
 
 
 
-package immutable {
-  trait Table[K, +V] extends Map[K, V]
+trait Manager {
+  
+  def action(area: AreaView): (Action, Trigger)
+  
 }
 
 
-@serializable class Table[K, V] extends mutable.HashMap[K, V] with immutable.Table[K, V]

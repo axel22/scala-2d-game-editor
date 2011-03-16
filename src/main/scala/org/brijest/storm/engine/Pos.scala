@@ -6,17 +6,15 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine.model.components
+package org.brijest.storm.engine
+package model
 
 
 
-import collection._
+import components.ImmutableValue
 
 
 
-package immutable {
-  trait Table[K, +V] extends Map[K, V]
+case class Pos(x: Int, y: Int) extends ImmutableValue {
+  def to(dir: Direction) = Direction.fromTo(this, dir)
 }
-
-
-@serializable class Table[K, V] extends mutable.HashMap[K, V] with immutable.Table[K, V]

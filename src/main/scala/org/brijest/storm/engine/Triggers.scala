@@ -6,17 +6,22 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine.model.components
+package org.brijest.storm.engine
+package model
 
 
 
-import collection._
+import components.ImmutableValue
 
 
 
-package immutable {
-  trait Table[K, +V] extends Map[K, V]
-}
+sealed trait Trigger extends ImmutableValue
 
 
-@serializable class Table[K, V] extends mutable.HashMap[K, V] with immutable.Table[K, V]
+object NoTrigger extends Trigger
+
+
+final case class AfterTime(turns: Int) extends Trigger
+
+
+// TODO final case class Transact(t: Transaction) extends Trigger

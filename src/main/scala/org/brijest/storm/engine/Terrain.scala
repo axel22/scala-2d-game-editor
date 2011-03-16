@@ -6,17 +6,35 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine.model.components
+package org.brijest.storm.engine
+package model
 
 
 
-import collection._
+import components._
 
 
 
-package immutable {
-  trait Table[K, +V] extends Map[K, V]
+trait Slot extends ImmutableValue {
+  def walkable: Boolean
+  def seethrough: Boolean
+  def height: Int
 }
 
 
-@serializable class Table[K, V] extends mutable.HashMap[K, V] with immutable.Table[K, V]
+class HardRock(val height: Int) extends Slot {
+  def walkable = false
+  def seethrough = false
+}
+
+
+class DungeonFloor(val height: Int) extends Slot {
+  def walkable = true
+  def seethrough = true
+}
+
+
+object HardRock0 extends HardRock(0)
+
+
+object DungeonFloor0 extends DungeonFloor(0)

@@ -6,17 +6,25 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine.model.components
+package org.brijest.storm.engine
+package model
 
 
 
-import collection._
+import components._
 
 
 
-package immutable {
-  trait Table[K, +V] extends Map[K, V]
+trait CharacterTableView extends Struct {
+  def ids: components.immutable.Table[EntityId, CharacterView]
+  def locs: components.immutable.Quad[CharacterView]
 }
 
 
-@serializable class Table[K, V] extends mutable.HashMap[K, V] with immutable.Table[K, V]
+class CharacterTable(w: Int, h: Int) extends CharacterTableView {
+  private val dflt = Some(null)
+  val ids = table[EntityId, Character]
+  val locs = quad[CharacterView](w, h, dflt)
+}
+
+

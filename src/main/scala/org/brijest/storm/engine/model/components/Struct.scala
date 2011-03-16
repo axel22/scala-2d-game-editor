@@ -10,13 +10,7 @@ package org.brijest.storm.engine.model.components
 
 
 
-import collection._
 
 
 
-package immutable {
-  trait Table[K, +V] extends Map[K, V]
-}
-
-
-@serializable class Table[K, V] extends mutable.HashMap[K, V] with immutable.Table[K, V]
+@serializable trait Struct
