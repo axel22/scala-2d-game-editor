@@ -15,11 +15,26 @@ import components._
 
 
 
-trait EntityView extends Struct {
-  def id: EntityId
-  def action(area: Area): (Action, Trigger)
-  def pov(area: AreaView): AreaView
+trait Slot extends Immutable {
+  def walkable: Boolean
+  def seethrough: Boolean
+  def height: Int
 }
 
 
-trait Entity extends EntityView
+class HardRock(val height: Int) extends Slot {
+  def walkable = false
+  def seethrough = false
+}
+
+
+class DungeonFloor(val height: Int) extends Slot {
+  def walkable = true
+  def seethrough = true
+}
+
+
+object HardRock0 extends HardRock(0)
+
+
+object DungeonFloor0 extends DungeonFloor(0)

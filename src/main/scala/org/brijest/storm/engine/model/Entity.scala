@@ -6,12 +6,20 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm
+package org.brijest.storm.engine
+package model
 
 
 
+import components._
 
 
-package object engine {
-  
+
+trait EntityView extends Struct {
+  def id: EntityId
+  def action(area: AreaView): (Action, Trigger)
+  def pov(area: AreaView): AreaView
 }
+
+
+trait Entity extends EntityView

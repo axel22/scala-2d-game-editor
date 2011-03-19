@@ -10,6 +10,7 @@ package org.brijest.storm.engine.model
 
 
 
+import collection._
 
 
 
@@ -21,5 +22,6 @@ package object components {
   def table[K, V] = new Table[K, V]
   def queue[T] = new Queue[T]
   def heap[T: Ordering] = new Heap[T]
+  def set[T]: mutable.Set[T] = new mutable.HashSet[T]
   
 }

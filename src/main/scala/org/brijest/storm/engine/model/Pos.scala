@@ -11,17 +11,9 @@ package model
 
 
 
-import components.ImmutableValue
 
 
 
-sealed trait Trigger extends ImmutableValue
-
-
-object NoTrigger extends Trigger
-
-
-final case class AfterTime(turns: Int) extends Trigger
-
-
-// TODO final case class Transact(t: Transaction) extends Trigger
+case class Pos(x: Int, y: Int) extends Immutable {
+  def to(dir: Direction) = Direction.fromTo(this, dir)
+}

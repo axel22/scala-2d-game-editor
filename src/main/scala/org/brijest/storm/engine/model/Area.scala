@@ -38,6 +38,8 @@ class Area extends AreaView {
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable
   val neighbours = table[Pos, AreaId]
+  
+  override def entity(id: EntityId) = super.entity(id).map(_.asInstanceOf[Entity])
 }
 
 

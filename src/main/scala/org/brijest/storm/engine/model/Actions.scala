@@ -34,7 +34,7 @@ object Action {
 }
 
 
-sealed trait Action extends ImmutableValue {
+sealed trait Action extends Immutable {
   def apply(a: Area): Unit
 }
 

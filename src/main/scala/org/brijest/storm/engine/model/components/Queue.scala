@@ -61,6 +61,7 @@ package immutable {
   final def apply(idx: Int) = start.apply(idx)
   final def enqueue(elem: T) = enq(elem)
   final def dequeue() = deq()
+  final def clear() = clr()
 }
 
 
