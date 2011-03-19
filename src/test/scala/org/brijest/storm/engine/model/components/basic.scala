@@ -82,7 +82,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
       val q = queue[Int]
       var i = 0
       while (i < many) {
-        q.iterator.toSeq should equal (0 until i)
+        assert(q.iterator.toSeq == (0 until i), i)
         
         q.enqueue(i)
         
@@ -179,7 +179,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
       for (x <- 0 until d; y <- 0 until d) q(x, y) = x * y
       
       q.size should equal (d * d)
-      for (x <- 0 until d; y <- 0 until d) q(x, y) should equal (x * y)
+      for (x <- 0 until d; y <- 0 until d) assert(q(x, y) == x * y, (x, y))
     }
     
     "have 32x32 elements after insertion" in {
@@ -205,7 +205,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
       q.size should equal (n)
       for (i <- 0 until n) {
         val (x, y) = convert(i)
-        q(x, y) should equal (i)
+        assert(q(x, y) == i, i)
       }
     }
     
@@ -283,11 +283,11 @@ class BasicTests extends WordSpec with ShouldMatchers {
       for (x <- 0 until sz; y <- 0 until sz) q(x, y) = x * y
       var count = sz * sz
       for (x <- 0 until sz; y <- 0 until sz) {
-        q(x, y) should equal (x * y)
+        assert(q(x, y) == (x * y), (x, y))
         q.remove(x, y)
-        q(x, y) should equal (-1)
+        assert(q(x, y) == (-1), (x, y))
         count -= 1
-        q.size should equal (count)
+        assert(q.size == (count), (x, y))
       }
       q.size should equal (0)
     }

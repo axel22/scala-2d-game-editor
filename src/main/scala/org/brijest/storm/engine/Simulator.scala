@@ -27,16 +27,6 @@ class Simulator(val area: Area) {
   private val simulating = set[EntityId]
   private val actions = queue[Action]
   
-  def time = simtime
-  
-  def lastActions: Seq[Action] = actions
-  
-  def actionCount = actioncount
-  
-  def canStep = eventqueue.nonEmpty
-  
-  def nextTime = eventqueue.max
-  
   def init() {
     actioncount = 0L
     simtime = zeroTime
@@ -44,10 +34,23 @@ class Simulator(val area: Area) {
     simulating.clear()
     actions.clear()
     
-    for (e <- area.entities) {
-      simulating.add(e.id)
-      eventqueue.enqueue((simtime, e.id))
-    }
+    for (e <- area.entities) enqueue(e.id, 0)
+  }
+  
+  def currentTime = simtime
+  
+  def lastActions: Seq[Action] = actions
+  
+  def actionCount = actioncount
+  
+  def nextEventTime = eventqueue.max
+  
+  def canStep = eventqueue.nonEmpty
+  
+  // pre: !simulating(eid)
+  private def enqueue(eid: EntityId, t: Time) {
+    simulating.add(eid)
+    eventqueue.enqueue((simtime + t, eid))
   }
   
   /** Performs one simulation step.
@@ -55,16 +58,21 @@ class Simulator(val area: Area) {
   def step() {
     actions.clear()
     
+    def awake(eid: EntityId, other: EntityId, t: Time) = if (!simulating(other)) enqueue(other, t)
+    
+    def processTrigger(eid: EntityId, trig: Trigger): Unit = trig match {
+      case NullTrigger => simulating.remove(eid)
+      case Sleep(t) => eventqueue.enqueue((simtime + t, eid))
+      case Awake(other, t) => awake(eid, other, t)
+      case Composite(trigz) => for (t <- trigz) processTrigger(eid, t)
+    }
+    
     def doAction(e: Entity) {
       val (act, trig) = e.action(e.pov(area))
       act(area)
       actions.enqueue(act)
       actioncount += 1
-      
-      trig match {
-        case NoTrigger => simulating.remove(e.id)
-        case AfterTime(t) => eventqueue.enqueue((simtime + t, e.id))
-      }
+      processTrigger(e.id, trig)
     }
     
     while (eventqueue.nonEmpty && eventqueue.max._1 == simtime) {
