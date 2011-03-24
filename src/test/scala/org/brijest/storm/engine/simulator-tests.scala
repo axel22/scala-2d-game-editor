@@ -6,22 +6,24 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm
+package org.brijest.storm.engine
 
 
 
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
+import model._
 
 
-package object engine {
+
+class SimulatorTests extends WordSpec with ShouldMatchers {
   
-  type Time = Long
-  
-  def zeroTime = 0L
-  
-  object WrapAroundTime extends Ordering[Time] {
-    def compare(x: Time, y: Time) = math.signum(y - x).toInt
+  "Simulator" should {
+    
+    "be created" in {
+      val simulator = new Simulator(Area.testArea)
+    }
+    
   }
-  
-  def unsupported = throw new UnsupportedOperationException
   
 }

@@ -42,6 +42,9 @@ object Character {
 }
 
 
-
+object NoCharacter extends Character(invalidEntityId) {
+  def manager = NoManager
+  def pov(a: AreaView) = unsupported
+}
 
 

@@ -36,12 +36,19 @@ class Area extends AreaView {
   val id = cell(invalidAreaId)
   val terrain: Quad[Slot] = quad(1, 1, Some(HardRock0))
   val characters = new CharacterTable(1, 1)
-  val items = new ItemTable
+  val items = new ItemTable(1, 1)
   val neighbours = table[Pos, AreaId]
   
   override def entity(id: EntityId) = super.entity(id).map(_.asInstanceOf[Entity])
 }
 
 
-
+object Area {
+  
+  def testArea: Area = {
+    val area = new Area
+    area
+  }
+  
+}
 

@@ -22,9 +22,9 @@ trait CharacterTableView extends Struct {
 
 
 class CharacterTable(w: Int, h: Int) extends CharacterTableView {
-  private val dflt = Some(null)
+  private val dflt = Some(NoCharacter)
   val ids = table[EntityId, Character]
-  val locs = quad[CharacterView](w, h, dflt)
+  val locs = quad[Character](w, h, dflt)
 }
 
 

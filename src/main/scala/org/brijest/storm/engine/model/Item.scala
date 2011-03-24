@@ -19,4 +19,23 @@ import components._
 trait ItemView extends EntityView
 
 
-abstract class Item(val id: EntityId) extends Entity with ItemView
+abstract class Item extends Entity with ItemView {
+  val id: EntityId
+}
+
+
+object Item {
+  
+  case class TestItem(id: EntityId) extends Item {
+    def action(a: AreaView) = (NoAction, NullTrigger);
+    def pov(a: AreaView) = a
+  }
+  
+}
+
+
+object NoItem extends Item {
+  val id = invalidEntityId
+  def pov(a: AreaView) = unsupported
+  def action(area: AreaView) = unsupported
+}

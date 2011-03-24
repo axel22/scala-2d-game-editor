@@ -22,3 +22,6 @@ trait Manager {
 }
 
 
+object NoManager extends Manager {
+  def action(area: AreaView) = unsupported
+}

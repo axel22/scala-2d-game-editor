@@ -17,11 +17,24 @@ import components._
 
 trait ItemTableView extends Struct {
   def ids: components.immutable.Table[EntityId, ItemView]
+  def locs: components.immutable.Quad[ItemView]
 }
 
 
-class ItemTable extends ItemTableView {
+class ItemTable(w: Int, h: Int) extends ItemTableView {
+  private val dflt = Some(NoItem)
   val ids = table[EntityId, Item]
+  val locs = quad[Item](w, h, dflt)
+  
+  def insertItem(x: Int, y: Int, it: Item) {
+    assert(!ids.contains(it.id))
+    assert(locs(x, y) == NoItem)
+    
+    ids(it.id) = it
+    locs(x, y) = it
+  }
+  
+  
 }
 
 
