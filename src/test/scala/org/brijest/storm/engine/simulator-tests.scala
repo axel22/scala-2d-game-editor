@@ -57,11 +57,42 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
     }
     
     "simulate a simple test character" in {
-      val s = new Simulator(Area.simpleTestArea)
+      val area = Area.emptyArea
+      area.terrain.default = (x, y) => Some(DungeonFloor0)
+      area.insert(PlayerCharacter.simpleTestCharacter(PlayerId(0l)))
+      val s = new Simulator(area)
       val (acn, acts) = s.step()
       
       acts.length should equal (1)
       acts(0) should equal (NoAction)
+    }
+    
+    "move a character along a path" in {
+      val area = Area.emptyArea
+      area.terrain.default = (x, y) => Some(DungeonFloor0)
+      area.resize(10, 10)
+      val pc = PlayerCharacter.simpleTestCharacter(PlayerId(0l))
+      pc.order := MoveAlongPath(util.pathfinding.Path(List(Dir.south, Dir.south, Dir.east)))
+      area.insert(pc)
+      val s = new Simulator(area)
+      
+      val (_, acts) = s.step()
+      s.time should equal (1)
+      area.isWalkable(0, 0) should equal (true)
+      acts(0) should equal (MoveRC(Pos(0, 0), Pos(0, 1)))
+      area.terrain(0, 1).walkable should equal (true)
+      area.characters.locs.apply(0, 1) should equal (pc)
+      pc.pos() should equal (Pos(0, 1))
+      
+      s.step()
+      s.time should equal (2)
+      area.characters.locs.apply(0, 2) should equal (pc)
+      pc.pos() should equal (Pos(0, 2))
+      
+      s.step()
+      s.time should equal (3)
+      area.characters.locs.apply(1, 2) should equal (pc)
+      pc.pos() should equal (Pos(1, 2))
     }
     
   }

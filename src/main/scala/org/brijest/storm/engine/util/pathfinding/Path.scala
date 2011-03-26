@@ -16,16 +16,16 @@ import model._
 
 
 
-case class Path(var lst: List[Direction]) {
+case class Path(lst: List[Dir]) {
   
   def hasNext = lst != Nil
   
   def next(pos: Pos): Pos = lst match {
-    case x :: xs =>
-      lst = xs
-      pos.to(x)
+    case x :: xs => pos.to(x)
     case Nil => throw new NoSuchElementException
   }
+  
+  def tail = Path(lst.tail)
   
 }
 

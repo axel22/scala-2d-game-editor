@@ -72,7 +72,7 @@ class AreaTests extends WordSpec with ShouldMatchers {
     "be inserted into" in {
       val tab = new CharacterTable(10, 10)
       val c = PlayerCharacter.simpleTestCharacter(PlayerId(0l))
-      c.position := Pos(5, 5)
+      c.pos := Pos(5, 5)
       tab.insert(c)
       tab.locs(4, 4) should equal (NoCharacter)
       tab.locs(5, 5) should equal (c)

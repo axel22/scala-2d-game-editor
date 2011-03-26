@@ -18,7 +18,9 @@ package model
  *  
  *  Most characters are of this type. A regular character takes 1x1 space.
  */
-abstract class RegularCharacter extends Character
+abstract class RegularCharacter extends Character {
+  override def isRC: Boolean = true
+}
 
 
 object RegularCharacter {

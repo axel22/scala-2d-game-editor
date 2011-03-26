@@ -16,7 +16,10 @@ import components._
 
 
 
-trait ItemView extends EntityView
+trait ItemView extends EntityView {
+  final def isCharacter = false
+  final def isItem = true
+}
 
 
 abstract class Item extends Entity with ItemView {

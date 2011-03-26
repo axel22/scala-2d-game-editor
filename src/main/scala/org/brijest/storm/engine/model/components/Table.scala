@@ -19,4 +19,10 @@ package immutable {
 }
 
 
-@serializable class Table[K, V] extends mutable.HashMap[K, V] with immutable.Table[K, V]
+@serializable class Table[K, V] extends mutable.HashMap[K, V] with immutable.Table[K, V] {
+  private var dflt: Option[V] = None
+  def defaultVal = dflt
+  def defaultVal_=(opt: Option[V]) = dflt = opt
+  
+  override def default(key: K): V = dflt.get
+}

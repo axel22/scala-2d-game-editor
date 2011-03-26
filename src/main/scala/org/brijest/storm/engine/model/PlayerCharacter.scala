@@ -24,17 +24,18 @@ pc =>
   
   val management = cell[Manager](new OrderManager(pc))
   
-  val basicstats = cell[BasicStats](BasicStats.default)
+  val basicstats = cell[BasicStats](BasicStats.withDelay(1))
   
   def manager = management()
   
   def pov(area: AreaView) = area // TODO
   
+  override def isPC: Boolean = true
 }
 
 
 object PlayerCharacter {
   
-  def simpleTestCharacter(pid: PlayerId) = PlayerCharacter(pid, (0l, 0l))
+  def simpleTestCharacter(pid: PlayerId) = new PlayerCharacter(pid, (0l, 0l))
   
 }

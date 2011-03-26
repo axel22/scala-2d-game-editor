@@ -17,8 +17,11 @@ import components._
 
 
 trait CharacterView extends EntityView {
-  def position: components.immutable.Cell[Pos]
+  def pos: components.immutable.Cell[Pos]
   def dimensions: components.immutable.Cell[(Int, Int)]
+  
+  final def isCharacter = true
+  final def isItem = false
 }
 
 
@@ -28,11 +31,11 @@ trait CharacterView extends EntityView {
  *  depending on the current state.
  */
 abstract class Character extends Entity with CharacterView {
-  val position = cell(Pos(0, 0))
+  val pos = cell(Pos(0, 0))
   val dimensions = cell((1, 1))
   
   def foreachPos(f: (Int, Int) => Unit) {
-    var Pos(x, y) = position()
+    var Pos(x, y) = pos()
     val sx = x
     val maxx = x + dimensions()._1
     val maxy = y + dimensions()._2
@@ -57,7 +60,7 @@ object Character {
 }
 
 
-object NoCharacter extends Character {
+case object NoCharacter extends Character {
   val id = invalidEntityId
   def manager = NoManager
   def pov(a: AreaView) = unsupported()

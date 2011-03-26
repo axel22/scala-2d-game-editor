@@ -19,6 +19,11 @@ trait EntityView extends Struct {
   def id: EntityId
   def action(area: AreaView): (Action, Trigger)
   def pov(area: AreaView): AreaView
+  
+  def isCharacter: Boolean
+  def isItem: Boolean
+  def isRC: Boolean = false
+  def isPC: Boolean = false
 }
 
 

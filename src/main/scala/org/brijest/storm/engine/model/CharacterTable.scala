@@ -26,6 +26,8 @@ class CharacterTable(w: Int, h: Int) extends CharacterTableView {
   val ids = table[EntityId, Character]
   val locs = quad[Character](w, h, dflt)
   
+  ids.defaultVal = dflt
+  
   def insert(c: Character) {
     assert(!ids.contains(c.id))
     c.foreachPos((x, y) => assert(locs(x, y) == NoCharacter))
@@ -33,7 +35,13 @@ class CharacterTable(w: Int, h: Int) extends CharacterTableView {
     ids(c.id) = c
     c.foreachPos((x, y) => locs(x, y) = c)
   }
-
+  
+  def resize(w: Int, h: Int) {
+    locs.dimensions = (w, h)
+    
+    for ((_, c) <- ids) c.foreachPos((x, y) => locs(x, y) = c)
+  }
+  
 }
 
 

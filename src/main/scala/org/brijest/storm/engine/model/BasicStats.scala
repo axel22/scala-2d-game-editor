@@ -24,4 +24,8 @@ object BasicStats {
   def default = new BasicStats {
     def delay = 10
   }
+  
+  def withDelay(i: Int) = new BasicStats {
+    def delay = i
+  }
 }

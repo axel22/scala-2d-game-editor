@@ -43,9 +43,9 @@ package object model {
   
   /* various types */
   
-  type Direction = Int
+  type Dir = Int
   
-  object Direction {
+  object Dir {
     def north = 8
     def northwest = 7
     def northeast = 9
@@ -55,8 +55,8 @@ package object model {
     def southwest = 1
     def southeast = 3
 
-    def fromTo(pos: Pos, dir: Direction): Pos = fromTo(pos.x, pos.y, dir)
-    def fromTo(x: Int, y: Int, dir: Direction): Pos = (dir: @switch) match {
+    def fromTo(pos: Pos, dir: Dir): Pos = fromTo(pos.x, pos.y, dir)
+    def fromTo(x: Int, y: Int, dir: Dir): Pos = (dir: @switch) match {
       case 8 => Pos(x, y - 1)
       case 7 => Pos(x - 1, y - 1)
       case 9 => Pos(x + 1, y - 1)

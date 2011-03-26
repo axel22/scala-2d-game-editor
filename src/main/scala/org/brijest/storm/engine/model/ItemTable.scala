@@ -23,8 +23,11 @@ trait ItemTableView extends Struct {
 
 class ItemTable(w: Int, h: Int) extends ItemTableView {
   private val dflt = Some(NoItem)
+  private var rawlocs = quad[Item](w, h, dflt)
+  
   val ids = table[EntityId, Item]
-  val locs = quad[Item](w, h, dflt)
+  
+  def locs = rawlocs
   
   def insert(x: Int, y: Int, it: Item) {
     assert(!ids.contains(it.id))
@@ -32,6 +35,14 @@ class ItemTable(w: Int, h: Int) extends ItemTableView {
     
     ids(it.id) = it
     locs(x, y) = it
+  }
+  
+  def resize(w: Int, h: Int) {
+    val old = rawlocs
+    rawlocs = quad[Item](w, h, dflt)
+    old.foreach {
+      (x, y, item) => rawlocs(x, y) = item
+    }
   }
   
 }

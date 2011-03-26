@@ -21,13 +21,19 @@ object Action {
     def compare(a1: Action, a2: Action) = 0
   }
   
+  // higher order
+  
   def composite(actions: Action*) = CompositeAction(actions)
   
   def nothing = NoAction
   
-  // def halt(id: EntityId) = HaltPlayerCharacter(id)
+  def cond(c: AreaView => Boolean)(action: Action) = Conditional(c, action)
   
-  // def move(from: Pos, to: Pos) = MoveRegularCharacter(from, to)
+  // basic
+  
+  def haltpc(id: EntityId) = HaltPC(id)
+  
+  def moverc(from: Pos, to: Pos) = MoveRC(from, to)
   
   // def setOrder(id: EntityId, order: Order) = SetOrder(id, order)
   
@@ -49,37 +55,32 @@ case class CompositeAction(actions: Seq[Action]) extends Action {
 }
 
 
-// case class HaltPlayerCharacter(id: EntityId) extends Action {
-//   def apply(a: Area) = a.characters.ids(id) match {
-//     case pc @ PlayerCharacter(_, _) => pc.order := DoNothing
-//     case c => illegalarg(c)
-//   }
-// }
+case class Conditional(c: AreaView => Boolean, action: Action) extends Action {
+  def apply(a: Area) = if (c(a)) action(a)
+}
+
+
+case class HaltPC(id: EntityId) extends Action {
+  def apply(a: Area) = a.character(id) match {
+    case pc: PlayerCharacter => pc.order := DoNothing
+    case c => illegalarg(c)
+  }
+}
   
 
-// case class MoveRegularCharacter(from: Pos, to: Pos) extends Action {
-//   def apply(a: Area)(implicit ctx: Ctx) {
-//     a.characters.locs(from) match {
-//       case rc @ RegularCharacter(_, _) =>
-//         if (a.isWalkable(to)) {
-//           rc.position := to
-//           a.characters.locs.remove(from)
-//           a.characters.locs(to) = rc
-//         } else illegalarg(to + " is not walkable.")
-        
-//         rc match {
-//           case o: Orders => o.order 
-//           case _ => 
-//         }
-//       case _ => illegalarg(from + ", " + to)
-//     }
-//   }
-// }
+case class MoveRC(from: Pos, to: Pos) extends Action {
+  def apply(a: Area) {
+    a.character(from) match {
+      case rc: RegularCharacter => a.move(rc, to)
+      case _ => illegalarg(from + ", " + to)
+    }
+  }
+}
 
 
 // case class SetOrder(id: EntityId, order: Order) extends Action {
-//   def apply(a: Area)(implicit ctx: Ctx) = a.characters.ids(id) match {
-//     case o: Orders => o.order := order
+//   def apply(a: Area) = a.characters.ids(id) match {
+//     case pc: PlayerCharacter => o.order := order
 //     case x => illegalarg(id + " -> " + x)
 //   }
 // }

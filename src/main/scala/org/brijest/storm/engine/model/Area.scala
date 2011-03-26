@@ -28,18 +28,62 @@ self =>
     case None => items.ids.get(id)
     case opt => opt
   } 
-  def isWalkable(pos: Pos) = terrain(pos.x, pos.y).walkable && (characters.locs.apply(pos.x, pos.y) == null)
+  final def isWalkable(pos: Pos): Boolean = isWalkable(pos.x, pos.y)
+  final def isWalkable(x: Int, y: Int) = isWalkableTerrain(x, y) && (characters.locs.apply(x, y) == NoCharacter)
+  final def isWalkableTerrain(x: Int, y: Int) = terrain(x, y).walkable
 }
 
 
 class Area extends AreaView {
+  private var rawterrain: Quad[Slot] = quad(1, 1, Some(HardRock0))
   val id = cell(invalidAreaId)
-  val terrain: Quad[Slot] = quad(1, 1, Some(HardRock0))
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable(1, 1)
   val neighbours = table[Pos, AreaId]
   
+  def terrain = rawterrain
+  
   override def entity(id: EntityId) = super.entity(id).map(_.asInstanceOf[Entity])
+  
+  def character(id: EntityId): Character = characters.ids(id)
+  
+  def character(x: Int, y: Int): Character = characters.locs(x, y)
+  
+  def character(p: Pos): Character = characters.locs(p.x, p.y)
+  
+  def insert(x: Int, y: Int, item: Item) {
+    items.insert(x, y, item)
+  }
+  
+  def insert(c: Character) {
+    c.foreachPos((x, y) => assert(isWalkableTerrain(x, y)))
+    characters.insert(c)
+  }
+  
+  def move(rc: RegularCharacter, to: Pos): Unit = assert(tryMove(rc, to))
+  
+  def tryMove(rc: RegularCharacter, to: Pos) = {
+    assert(characters.ids contains rc.id)
+    
+    if (!isWalkable(to)) false else {
+      val from = rc.pos()
+      characters.locs.remove(from.x, from.y)
+      characters.locs(to.x, to.y) = rc
+      rc.pos := to
+      true
+    }
+  }
+  
+  def resize(w: Int, h: Int) {
+    characters.resize(w, h)
+    items.resize(w, h)
+    val old = rawterrain
+    rawterrain.dimensions = (w, h);
+    old.foreach {
+      (x, y, t) => rawterrain(x, y) = t
+    }
+  }
+  
 }
 
 
@@ -47,12 +91,13 @@ object Area {
   
   def emptyArea: Area = {
     val area = new Area
+    area.terrain.default
     area
   }
   
   def simpleTestArea: Area = {
     val area = new Area
-    area.items.insert(0, 0, Item.SimpleTestItem((0L, 0L)))
+    area.insert(0, 0, Item.SimpleTestItem((0L, 0L)))
     area
   }
   

@@ -12,6 +12,7 @@ package model
 
 
 import util.pathfinding.Path
+import Action._
 
 
 
@@ -27,18 +28,16 @@ case object DoNothing extends Order {
 }
 
 
-// case class Move(path: Path, destination: Pos) extends Order {
-//   def apply(gc: Character with Orders, area: Area)(implicit ctx: Ctx) = {
-//     val pos = gc.position()
-//     path.nextPos(pos) match {
-//       case Some(next) =>
-//         // check if walkable
-//         if (area.isWalkable(next)) (MoveRegularCharacter(pos, next), Move(path.tail, destination))
-//         else (HaltPlayerCharacter(gc.id), DoNothing) // TODO maybe we'll be smarter later
-//       case None => (HaltPlayerCharacter(gc.id), DoNothing)
-//     }
-//   }
-// }
+case class MoveAlongPath(path: Path) extends Order {
+  def apply(c: Character, area: AreaView) = {
+    val pos = c.pos()
+    if (path.hasNext) {
+      val next = path.next(pos)
+      if (area.isWalkable(next)) (moverc(pos, next), MoveAlongPath(path.tail))
+      else (haltpc(c.id), DoNothing) // maybe we'll be smarter about this later
+    } else (haltpc(c.id), DoNothing)
+  }
+}
 
 
 

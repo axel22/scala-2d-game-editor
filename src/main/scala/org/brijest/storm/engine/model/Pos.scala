@@ -15,5 +15,5 @@ package model
 
 
 case class Pos(x: Int, y: Int) extends Immutable {
-  def to(dir: Direction) = Direction.fromTo(this, dir)
+  def to(dir: Dir) = Dir.fromTo(this, dir)
 }
