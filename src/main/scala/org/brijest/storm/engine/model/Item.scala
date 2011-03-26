@@ -36,6 +36,6 @@ object Item {
 
 object NoItem extends Item {
   val id = invalidEntityId
-  def pov(a: AreaView) = unsupported
-  def action(area: AreaView) = unsupported
+  def pov(a: AreaView) = unsupported()
+  def action(area: AreaView) = unsupported()
 }

@@ -52,7 +52,7 @@ object Area {
   
   def simpleTestArea: Area = {
     val area = new Area
-    area.items.insertItem(0, 0, Item.SimpleTestItem((0L, 0L)))
+    area.items.insert(0, 0, Item.SimpleTestItem((0L, 0L)))
     area
   }
   

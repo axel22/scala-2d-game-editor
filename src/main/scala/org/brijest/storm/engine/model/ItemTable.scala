@@ -26,14 +26,13 @@ class ItemTable(w: Int, h: Int) extends ItemTableView {
   val ids = table[EntityId, Item]
   val locs = quad[Item](w, h, dflt)
   
-  def insertItem(x: Int, y: Int, it: Item) {
+  def insert(x: Int, y: Int, it: Item) {
     assert(!ids.contains(it.id))
     assert(locs(x, y) == NoItem)
     
     ids(it.id) = it
     locs(x, y) = it
   }
-  
   
 }
 

@@ -7,19 +7,26 @@
 \*                                            www.storm-enroute.com       */
 
 package org.brijest.storm.engine
-package model
+package util
+package pathfinding
 
 
 
-import org.triggerspace._
+import model._
 
 
 
-trait EntityView extends Trait {
-  def id: EntityId
-  def action(area: Area)(implicit ctx: Ctx): (Action, Trigger)
-  def pov(area: AreaView)(implicit ctx: Ctx): AreaView
+case class Path(var lst: List[Direction]) {
+  
+  def hasNext = lst != Nil
+  
+  def next(pos: Pos): Pos = lst match {
+    case x :: xs =>
+      lst = xs
+      pos.to(x)
+    case Nil => throw new NoSuchElementException
+  }
+  
 }
 
 
-abstract class Entity[Repr <: Entity[Repr]](val id: EntityId, ii: InstInfo) extends CopyStruct[Repr](ii) with EntityView

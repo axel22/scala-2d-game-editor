@@ -49,10 +49,19 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
       val s = new Simulator(Area.simpleTestArea)
       for (i <- 1 until 100) {
         val (acn, acts) = s.step()
+        
         s.time should equal (i)
         acts.length should equal (1)
         acts(0) should equal (NoAction)
       }
+    }
+    
+    "simulate a simple test character" in {
+      val s = new Simulator(Area.simpleTestArea)
+      val (acn, acts) = s.step()
+      
+      acts.length should equal (1)
+      acts(0) should equal (NoAction)
     }
     
   }

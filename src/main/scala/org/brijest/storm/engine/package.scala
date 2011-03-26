@@ -22,6 +22,6 @@ package object engine {
     def compare(x: Time, y: Time) = math.signum(y - x).toInt
   }
   
-  def unsupported = throw new UnsupportedOperationException
+  def unsupported() = throw new UnsupportedOperationException
   
 }

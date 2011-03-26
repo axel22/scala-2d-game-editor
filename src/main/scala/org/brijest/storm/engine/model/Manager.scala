@@ -16,12 +16,22 @@ import components._
 
 
 trait Manager {
-  
   def action(area: AreaView): (Action, Trigger)
-  
 }
 
 
+object Manager
+
+
 object NoManager extends Manager {
-  def action(area: AreaView) = unsupported
+  def action(area: AreaView) = unsupported()
+}
+
+
+class OrderManager(pc: PlayerCharacter) extends Manager {
+  def action(area: AreaView) = {
+    val (act, nextord) = pc.order().apply(pc, area)
+    pc.order := nextord
+    (act, Sleep(pc.basicstats().delay))
+  }
 }

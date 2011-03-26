@@ -61,6 +61,7 @@ class Simulator(val area: Area) {
       case NullTrigger => simulating.remove(eid)
       case Sleep(t) => eventqueue.enqueue((simtime + t, eid))
       case Awake(other, t) => awake(eid, other, t)
+      case Transact(txn) => unsupported() // yet to be implemented
       case Composite(trigz) => for (t <- trigz) processTrigger(eid, t)
     }
     

@@ -1,4 +1,3 @@
-
 /*    ______________  ___  __  ___  _____  _____  ____  __  ____________  *\
 **   / __/_  __/ __ \/ _ \/  |/  / / __/ |/ / _ \/ __ \/ / / /_  __/ __/  **
 **  _\ \  / / / /_/ / , _/ /|_/ / / _//    / , _/ /_/ / /_/ / / / / _/    **
@@ -12,21 +11,30 @@ package model
 
 
 
-import org.triggerspace._
-import Action._
+import components._
 
 
 
-trait Manager {
+case class PlayerCharacter(pid: PlayerId, id: EntityId) extends RegularCharacter {
+pc =>
   
-  def action(area: Area)(implicit ctx: Ctx): (Action, Trigger)
+  val order = cell[Order](DoNothing)
+  
+  val owner = cell[PlayerId](invalidPlayerId)
+  
+  val management = cell[Manager](new OrderManager(pc))
+  
+  val basicstats = cell[BasicStats](BasicStats.default)
+  
+  def manager = management()
+  
+  def pov(area: AreaView) = area // TODO
   
 }
 
 
-class OrderManager(c: Character with Orders) extends Manager {
-  def action(area: Area)(implicit ctx: Ctx): (Action, Trigger) = {
-    val (action, nextOrder) = c.order().apply(c, area)
-    (composite(action, setOrder(c.id, nextOrder)), AfterTime(c.speed()))
-  }
+object PlayerCharacter {
+  
+  def simpleTestCharacter(pid: PlayerId) = PlayerCharacter(pid, (0l, 0l))
+  
 }

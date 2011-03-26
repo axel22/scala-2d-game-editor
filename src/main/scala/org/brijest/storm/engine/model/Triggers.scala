@@ -38,7 +38,7 @@ final case class Awake(eid: EntityId, after: Long) extends Trigger {
 }
 
 
-// TODO final case class Transact(t: Transaction) extends Trigger
+final case class Transact(t: Transaction) extends Trigger
 
 
 final case class Composite(trigz: Seq[Trigger]) extends Trigger {

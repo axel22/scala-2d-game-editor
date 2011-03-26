@@ -11,22 +11,31 @@ package model
 
 
 
-import org.triggerspace._
 
 
 
-case class PlayerCharacter(pid: PlayerId, i: EntityId)(ii: InstInfo)
-extends RegularCharacter(i, ii) with Orders {
-pc =>
-  
-  val owner = cell[PlayerId](invalidPlayerId)
-  
-  def manager = new OrderManager(pc)
-  
-  def pov(area: AreaView)(implicit ctx: Ctx) = area // TODO
-  
-  def instantiateCopy(ii: InstInfo) = new PlayerCharacter(pid, i)(ii)
-  
+/** A regular character.
+ *  
+ *  Most characters are of this type. A regular character takes 1x1 space.
+ */
+abstract class RegularCharacter extends Character
+
+
+object RegularCharacter {
+  def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[RegularCharacter]) Some(e.id) else None
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

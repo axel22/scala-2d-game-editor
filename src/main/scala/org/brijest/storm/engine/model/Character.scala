@@ -27,9 +27,24 @@ trait CharacterView extends EntityView {
  *  Each has a manager which controls what they do - choose their next action
  *  depending on the current state.
  */
-abstract class Character(val id: EntityId) extends Entity with CharacterView {
+abstract class Character extends Entity with CharacterView {
   val position = cell(Pos(0, 0))
   val dimensions = cell((1, 1))
+  
+  def foreachPos(f: (Int, Int) => Unit) {
+    var Pos(x, y) = position()
+    val sx = x
+    val maxx = x + dimensions()._1
+    val maxy = y + dimensions()._2
+    while (y < maxy) {
+      while (x < maxx) {
+        f(x, y)
+        x += 1
+      }
+      x = sx
+      y += 1
+    }
+  }
   
   def action(area: AreaView) = manager.action(area)
   
@@ -42,9 +57,10 @@ object Character {
 }
 
 
-object NoCharacter extends Character(invalidEntityId) {
+object NoCharacter extends Character {
+  val id = invalidEntityId
   def manager = NoManager
-  def pov(a: AreaView) = unsupported
+  def pov(a: AreaView) = unsupported()
 }
 
 

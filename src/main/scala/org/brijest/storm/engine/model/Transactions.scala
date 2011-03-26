@@ -12,11 +12,11 @@ package model
 
 
 
-import org.triggerspace._
+import components._
 
 
 
-trait Transaction extends ImmutableValue {
-  def participants: List[Transactor[_]]
-  def transact: Unit
+trait Transaction extends Immutable {
+  def participants: Seq[AreaId]
+  def transact(local: AreaView, others: Map[AreaId, Area]): Map[AreaId, Action]
 }
