@@ -34,6 +34,11 @@ class BasicTests extends WordSpec with ShouldMatchers {
   
   "Queue" should {
     
+    "be equal to the empty sequence" in {
+      val q = queue[Int]
+      q should equal (Nil)
+    }
+    
     "enqueue and dequeue an element" in {
       val q = queue[Int]
       q.enqueue(7)

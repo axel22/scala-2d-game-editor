@@ -45,8 +45,14 @@ class Area extends AreaView {
 
 object Area {
   
-  def testArea: Area = {
+  def emptyArea: Area = {
     val area = new Area
+    area
+  }
+  
+  def simpleTestArea: Area = {
+    val area = new Area
+    area.items.insertItem(0, 0, Item.SimpleTestItem((0L, 0L)))
     area
   }
   

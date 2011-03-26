@@ -25,27 +25,23 @@ class Simulator(val area: Area) {
   private var simtime = zeroTime
   private val eventqueue = heap[(Time, EntityId)]
   private val simulating = set[EntityId]
-  private val actions = queue[Action]
   
   def init() {
     actioncount = 0L
     simtime = zeroTime
     eventqueue.clear()
     simulating.clear()
-    actions.clear()
     
     for (e <- area.entities) enqueue(e.id, 0)
   }
   
-  def currentTime = simtime
+  init()
   
-  def lastActions: Seq[Action] = actions
+  def time = simtime
   
-  def actionCount = actioncount
+  def nextEventAt = eventqueue.max._1
   
-  def nextEventTime = eventqueue.max
-  
-  def canStep = eventqueue.nonEmpty
+  def hasNextEvent = eventqueue.nonEmpty
   
   // pre: !simulating(eid)
   private def enqueue(eid: EntityId, t: Time) {
@@ -55,8 +51,9 @@ class Simulator(val area: Area) {
   
   /** Performs one simulation step.
    */
-  def step() {
-    actions.clear()
+  def step() = {
+    val acnt = actioncount
+    val actions = queue[Action]
     
     def awake(eid: EntityId, other: EntityId, t: Time) = if (!simulating(other)) enqueue(other, t)
     
@@ -84,6 +81,8 @@ class Simulator(val area: Area) {
     }
     
     simtime += 1
+    
+    (acnt, actions)
   }
   
 }

@@ -26,8 +26,8 @@ abstract class Item extends Entity with ItemView {
 
 object Item {
   
-  case class TestItem(id: EntityId) extends Item {
-    def action(a: AreaView) = (NoAction, NullTrigger);
+  case class SimpleTestItem(id: EntityId) extends Item {
+    def action(a: AreaView) = (NoAction, Sleep(1));
     def pov(a: AreaView) = a
   }
   
