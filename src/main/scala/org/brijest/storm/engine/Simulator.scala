@@ -49,6 +49,10 @@ class Simulator(val area: Area) {
     eventqueue.enqueue((simtime + t, eid))
   }
   
+  def apply(a: Action) = a(area)
+  
+  def apply(as: Action*) = for (a <- as) a(area)
+  
   /** Performs one simulation step.
    */
   def step() = {

@@ -72,9 +72,14 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
       area.terrain.default = (x, y) => Some(DungeonFloor0)
       area.resize(10, 10)
       val pc = PlayerCharacter.simpleTestCharacter(PlayerId(0l))
-      pc.order := MoveAlongPath(util.pathfinding.Path(List(Dir.south, Dir.south, Dir.east)))
       area.insert(pc)
       val s = new Simulator(area)
+      
+      val setord = Action.setOrder(
+        (0l, 0l),
+        MoveAlongPath(util.pathfinding.Path(List(Dir.south, Dir.south, Dir.east)))
+      )
+      s.apply(setord)
       
       val (_, acts) = s.step()
       s.time should equal (1)

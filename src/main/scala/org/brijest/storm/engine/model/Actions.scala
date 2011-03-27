@@ -35,7 +35,7 @@ object Action {
   
   def moverc(from: Pos, to: Pos) = MoveRC(from, to)
   
-  // def setOrder(id: EntityId, order: Order) = SetOrder(id, order)
+  def setOrder(id: EntityId, order: Order) = SetOrder(id, order)
   
 }
 
@@ -69,18 +69,16 @@ case class HaltPC(id: EntityId) extends Action {
   
 
 case class MoveRC(from: Pos, to: Pos) extends Action {
-  def apply(a: Area) {
-    a.character(from) match {
-      case rc: RegularCharacter => a.move(rc, to)
-      case _ => illegalarg(from + ", " + to)
-    }
+  def apply(a: Area) = a.character(from) match {
+    case rc: RegularCharacter => a.move(rc, to)
+    case _ => illegalarg(from + ", " + to)
   }
 }
 
 
-// case class SetOrder(id: EntityId, order: Order) extends Action {
-//   def apply(a: Area) = a.characters.ids(id) match {
-//     case pc: PlayerCharacter => o.order := order
-//     case x => illegalarg(id + " -> " + x)
-//   }
-// }
+case class SetOrder(id: EntityId, order: Order) extends Action {
+  def apply(a: Area) = a.characters.ids(id) match {
+    case pc: PlayerCharacter => pc.order := order
+    case x => illegalarg(id + " -> " + x)
+  }
+}
