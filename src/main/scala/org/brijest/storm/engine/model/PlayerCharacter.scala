@@ -28,9 +28,12 @@ pc =>
   
   def manager = management()
   
-  def pov(area: AreaView) = area // TODO
+  def basicStats = basicstats()
   
   override def isPC: Boolean = true
+  
+  def pov(area: AreaView) = area // TODO
+  
 }
 
 

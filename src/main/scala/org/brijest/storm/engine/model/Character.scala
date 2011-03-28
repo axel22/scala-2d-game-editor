@@ -52,6 +52,9 @@ abstract class Character extends Entity with CharacterView {
   def action(area: AreaView) = manager.action(area)
   
   def manager: Manager
+  
+  def canWalk(from: Slot, to: Slot): Boolean
+  
 }
 
 
@@ -64,6 +67,7 @@ case object NoCharacter extends Character {
   val id = invalidEntityId
   def manager = NoManager
   def pov(a: AreaView) = unsupported()
+  def canWalk(from: Slot, to: Slot) = unsupported()
 }
 
 

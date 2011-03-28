@@ -33,7 +33,9 @@ case class MoveAlongPath(path: Path) extends Order {
     val pos = c.pos()
     if (path.hasNext) {
       val next = path.next(pos)
-      if (area.isWalkable(next)) (moverc(pos, next), MoveAlongPath(path.tail))
+      val from = area.terrain(pos.x, pos.y)
+      val to = area.terrain(next.x, next.y)
+      if (area.isWalkable(next) && c.canWalk(from, to)) (moverc(pos, next), MoveAlongPath(path.tail))
       else (haltpc(c.id), DoNothing) // maybe we'll be smarter about this later
     } else (haltpc(c.id), DoNothing)
   }

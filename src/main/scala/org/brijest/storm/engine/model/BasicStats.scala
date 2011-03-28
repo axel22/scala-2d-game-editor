@@ -17,15 +17,18 @@ import components._
 
 trait BasicStats {
   def delay: Int
+  def heightStride: Int
 }
 
 
 object BasicStats {
   def default = new BasicStats {
     def delay = 10
+    def heightStride = 2
   }
   
   def withDelay(i: Int) = new BasicStats {
     def delay = i
+    def heightStride = 2
   }
 }

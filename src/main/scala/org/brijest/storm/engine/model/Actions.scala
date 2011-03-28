@@ -69,6 +69,8 @@ case class HaltPC(id: EntityId) extends Action {
   
 
 case class MoveRC(from: Pos, to: Pos) extends Action {
+  assert(from adjacent to)
+  
   def apply(a: Area) = a.character(from) match {
     case rc: RegularCharacter => a.move(rc, to)
     case _ => illegalarg(from + ", " + to)

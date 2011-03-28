@@ -20,6 +20,9 @@ package model
  */
 abstract class RegularCharacter extends Character {
   override def isRC: Boolean = true
+  
+  def basicStats: BasicStats
+  def canWalk(from: Slot, to: Slot) = math.abs(from.height - to.height) <= basicStats.heightStride
 }
 
 
