@@ -101,5 +101,23 @@ object Area {
     area
   }
   
+  def defaultArea(): Area = {
+    val area = new Area
+    val (w, h) = (60, 30);
+    
+    area.resize(w, h);
+    area.terrain.default = (x, y) => Some(DungeonFloor0);
+    for (x <- 0 until w) {
+      area.terrain(x, 0) = HardRock0
+      area.terrain(x, h - 1) = HardRock0
+    }
+    for (y <- 1 until (h - 1)) {
+      area.terrain(0, y) = HardRock0
+      area.terrain(w - 1, y) = HardRock0
+    }
+    
+    area
+  }
+  
 }
 
