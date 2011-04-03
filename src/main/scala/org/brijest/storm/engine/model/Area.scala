@@ -35,11 +35,17 @@ self =>
 
 
 class Area extends AreaView {
+  private val entitycount = cell(0l)
   private var rawterrain: Quad[Slot] = quad(1, 1, Some(HardRock0))
   val id = cell(invalidAreaId)
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable(1, 1)
   val neighbours = table[Pos, AreaId]
+  
+  def newEntityId() = {
+    entitycount += 1
+    (id(), entitycount())
+  }
   
   def terrain = rawterrain
   
@@ -56,7 +62,7 @@ class Area extends AreaView {
   }
   
   def insert(c: Character) {
-    c.foreachPos((x, y) => assert(isWalkableTerrain(x, y)))
+    c.foreachPos((x, y) => assert(isWalkable(x, y), (x, y)))
     characters.insert(c)
   }
   

@@ -46,7 +46,7 @@ class AreaTests extends WordSpec with ShouldMatchers {
       val it = new Item.SimpleTestItem((0l, 0l))
       area.items.insert(0, 0, it)
       area.entities.next() should equal (it)
-      area.items.locs(0, 0) should equal (it)
+      area.items.locs(0, 0) should equal (List(it))
     }
     
     "have a test item" in {
@@ -62,7 +62,7 @@ class AreaTests extends WordSpec with ShouldMatchers {
       val tab = new ItemTable(1, 1)
       val it = Item.SimpleTestItem((0l, 0l))
       tab.insert(0, 0, it)
-      tab.locs(0, 0) should equal (it)
+      tab.locs(0, 0) should equal (List(it))
     }
     
   }

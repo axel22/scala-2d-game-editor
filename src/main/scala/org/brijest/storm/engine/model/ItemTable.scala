@@ -17,13 +17,13 @@ import components._
 
 trait ItemTableView extends Struct {
   def ids: components.immutable.Table[EntityId, ItemView]
-  def locs: components.immutable.Quad[ItemView]
+  def locs: components.immutable.Quad[List[ItemView]]
 }
 
 
 class ItemTable(w: Int, h: Int) extends ItemTableView {
-  private val dflt = Some(NoItem)
-  private var rawlocs = quad[Item](w, h, dflt)
+  private val dflt = Some(Nil)
+  private var rawlocs = quad[List[Item]](w, h, dflt)
   
   val ids = table[EntityId, Item]
   
@@ -31,15 +31,14 @@ class ItemTable(w: Int, h: Int) extends ItemTableView {
   
   def insert(x: Int, y: Int, it: Item) {
     assert(!ids.contains(it.id))
-    assert(locs(x, y) == NoItem)
     
     ids(it.id) = it
-    locs(x, y) = it
+    locs(x, y) = it :: locs(x, y)
   }
   
   def resize(w: Int, h: Int) {
     val old = rawlocs
-    rawlocs = quad[Item](w, h, dflt)
+    rawlocs = quad[List[Item]](w, h, dflt)
     old.foreach {
       (x, y, item) => rawlocs(x, y) = item
     }

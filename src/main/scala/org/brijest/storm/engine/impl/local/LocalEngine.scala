@@ -12,14 +12,29 @@ package impl.local
 
 
 
-import model.World
+import model._
+import collection._
 
 
 
-class LocalEngine(config: Config, w: World) extends Engine {
+class LocalEngine(config: Config, val player: Player, w: World) extends Engine {
+  val playeruis = mutable.ArrayBuffer[UI]()
+  @volatile var running = true
+  
   class SimulationThread extends Thread("Local simulator") {
+    val area = w.initializeArea(w.initialPosition(player))
+    val sim = new Simulator(area)
+    
     override def run() {
-      // TODO
+      w.initialPlace(player, area)
+      sim.init()
+      playeruis.foreach(_.refresh(area))
+      
+      while (running) {
+        val (_, actions) = sim.step()
+        playeruis.foreach(_.update(actions, area))
+        Thread.sleep(10)
+      }
     }
   }
   
@@ -28,6 +43,13 @@ class LocalEngine(config: Config, w: World) extends Engine {
   def start() = simthr.start()
   
   def awaitTermination() = simthr.join()
+  
+  def listen(ui: UI) = playeruis += ui
+  
+  def send(m: Engine.Msg) = m match {
+    case Engine.End => running = false
+    case _ => // drop message
+  }
 }
 
 

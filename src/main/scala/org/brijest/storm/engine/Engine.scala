@@ -10,10 +10,22 @@ package org.brijest.storm.engine
 
 
 
+import model.Player
 
 
 
 trait Engine {
   def start(): Unit
+  def send(m: Engine.Msg): Unit
+  def listen(ui: UI)
+  def player: Player
   def awaitTermination(): Unit
+}
+
+
+object Engine {
+  
+  type Msg = String
+  val End = "end"
+  
 }

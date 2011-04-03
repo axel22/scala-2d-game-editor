@@ -15,6 +15,7 @@ import model._
 
 
 trait UI {
-  var position: (Int, Int)
-  def updateScreen(actions: Seq[(EntityId, Action)], area: AreaView): Unit
+  var pos: (Int, Int)
+  def refresh(area: AreaView): Unit
+  def update(actions: Seq[Action], area: AreaView): Unit
 }

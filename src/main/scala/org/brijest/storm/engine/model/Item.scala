@@ -32,6 +32,8 @@ object Item {
   case class SimpleTestItem(id: EntityId) extends Item {
     def action(a: AreaView) = (NoAction, Sleep(1));
     def pov(a: AreaView) = a
+    def chr = '~'
+    def color = 0xffffff00
   }
   
 }
@@ -41,4 +43,6 @@ object NoItem extends Item {
   val id = invalidEntityId
   def pov(a: AreaView) = unsupported()
   def action(area: AreaView) = unsupported()
+  def chr = '?'
+  def color = 0xffffff00
 }

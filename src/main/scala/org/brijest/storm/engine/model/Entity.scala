@@ -20,6 +20,8 @@ trait EntityView extends Struct {
   def action(area: AreaView): (Action, Trigger)
   def pov(area: AreaView): AreaView
   
+  def chr: Char
+  def color: Int
   def isCharacter: Boolean
   def isItem: Boolean
   def isRC: Boolean = false

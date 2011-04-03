@@ -10,9 +10,11 @@ package org.brijest.storm
 
 
 
+
+import org.brijest.bufferz._
 import org.brijest.bufferz.shells._
 import engine._
-import engine.model.World
+import engine.model.{World, Player}
 
 
 
@@ -30,21 +32,24 @@ object Initializer {
       case _ => 
     }
     
+    // setup ui
+    val ui = createUI(config)
+    
     // setup engine
     val ng = config.engine match {
-      case engine.local => new local.LocalEngine(config, createWorld(config))
+      case engine.local => new local.LocalEngine(config, Player.default(model.defaultPlayerId), createWorld(config))
       case e => exit("Engine '%s' not recognized.".format(e))
     }
     
-    val ui = createUI(config)
+    // start engine
+    ng.listen(ui)
+    ng.start()
     
     new Client(ng, ui)
   }
   
   private def createUI(config: Config): UI = config.ui match {
-    case ui.swingConsole =>
-      val ui = new ConsoleUI(new SwingShell(app.name))
-      ui
+    case ui.swingConsole => new ConsoleUI(new SwingStandaloneShell(app.name) with Buffers)
     case e => exit("User interface '%s' not recognized".format(e))
   }
   

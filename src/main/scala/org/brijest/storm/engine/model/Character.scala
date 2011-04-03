@@ -68,6 +68,8 @@ case object NoCharacter extends Character {
   def manager = NoManager
   def pov(a: AreaView) = unsupported()
   def canWalk(from: Slot, to: Slot) = unsupported()
+  def chr = '@'
+  def color = 0xffffff00
 }
 
 

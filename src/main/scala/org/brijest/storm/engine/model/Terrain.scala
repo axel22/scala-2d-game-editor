@@ -19,18 +19,24 @@ trait Slot extends Immutable {
   def walkable: Boolean
   def seethrough: Boolean
   def height: Int
+  def chr: Char
+  def color: Int
 }
 
 
 class HardRock(val height: Int) extends Slot {
   def walkable = false
   def seethrough = false
+  def chr = '#'
+  def color = 0x55555500
 }
 
 
 class DungeonFloor(val height: Int) extends Slot {
   def walkable = true
   def seethrough = true
+  def chr = '.'
+  def color = 0x55555500
 }
 
 

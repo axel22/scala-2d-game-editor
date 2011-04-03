@@ -26,4 +26,5 @@ package immutable {
   def this() = this(null.asInstanceOf[T])
   def apply() = v
   def :=(nv: T) = v = nv
+  def +=(nv: T)(implicit n: Numeric[T]) = v = n.plus(v, nv)
 }

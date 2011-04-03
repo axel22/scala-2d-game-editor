@@ -19,21 +19,16 @@ case class PlayerCharacter(pid: PlayerId, id: EntityId) extends RegularCharacter
 pc =>
   
   val order = cell[Order](DoNothing)
-  
   val owner = cell[PlayerId](invalidPlayerId)
-  
   val management = cell[Manager](new OrderManager(pc))
-  
   val basicstats = cell[BasicStats](BasicStats.withDelay(1))
   
   def manager = management()
-  
   def basicStats = basicstats()
-  
   override def isPC: Boolean = true
-  
   def pov(area: AreaView) = area // TODO
-  
+  def chr = '@'
+  def color = 0x0000ff00
 }
 
 

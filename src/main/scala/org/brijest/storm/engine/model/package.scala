@@ -41,6 +41,8 @@ package object model {
   
   def observerPlayerId = PlayerId(-2L)
   
+  def defaultPlayerId = PlayerId(0)
+  
   /* various types */
   
   type Dir = Int
