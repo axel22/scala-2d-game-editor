@@ -101,9 +101,8 @@ object Area {
     area
   }
   
-  def defaultArea(): Area = {
+  def emptyDungeon(w: Int, h: Int): Area = {
     val area = new Area
-    val (w, h) = (60, 30);
     
     area.resize(w, h);
     area.terrain.default = (x, y) => Some(DungeonFloor0);

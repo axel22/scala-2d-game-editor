@@ -26,7 +26,7 @@ object World {
   
   final class DefaultWorld extends World {
     def name = "D'Falta"
-    def initializeArea(id: AreaId) = Area.defaultArea()
+    def initializeArea(id: AreaId) = Area.emptyDungeon(60, 30)
     def initialPosition(p: Player) = 0L
     def initialPlace(p: Player, area: Area, id: EntityId) {
       // find a location to place him in
