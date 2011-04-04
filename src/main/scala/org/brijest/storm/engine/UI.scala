@@ -18,4 +18,5 @@ trait UI {
   var pos: (Int, Int)
   def refresh(area: AreaView): Unit
   def update(actions: Seq[Action], area: AreaView): Unit
+  def message(msg: String): Unit
 }

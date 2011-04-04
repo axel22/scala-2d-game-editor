@@ -23,6 +23,10 @@ package model {
 
 package object model {
   
+  def within(x: Int, y: Int, w: Int, h: Int) = x >= 0 && x < w && y >= 0 && y < h
+  
+  def within(x: Int, y: Int, dims: (Int, Int)): Boolean = within(x, y, dims._1, dims._2)
+  
   /* area */
   
   type AreaId = Long

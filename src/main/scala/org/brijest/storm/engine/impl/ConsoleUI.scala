@@ -21,11 +21,14 @@ class ConsoleUI(val shell: Shell with Buffers) extends UI {
   var pos = (0, 0);
   
   import shell._
+  val messagebox = Mini(2).setText("Messages appear here. A lot of text. A lot, lot of text... And more.")
+  val stats = Mini().setText("Stats appear here.")
+  val conditions = Mini().setText("Miscellaneous conditions.")
   val screen = Composite(List(
-    Mini(2).setText("Messages appear here. A lot of text. A lot of text. A lot of text. A lot of text... And more."),
+    messagebox,
     Canvas(MapDrawer),
-    Mini().setText("Some additional text."),
-    Mini().setText("Some text.")
+    stats,
+    conditions
   ))
   
   private def redraw(area: AreaView) = {
@@ -38,15 +41,18 @@ class ConsoleUI(val shell: Shell with Buffers) extends UI {
   
   object MapDrawer extends shell.Drawer {
     var area: AreaView = null
-    def draw(x0: Int, y0: Int, w: Int, h: Int) = for (x <- pos._1 until (pos._1 + w); y <- pos._2 until (pos._2 + h)) {
-      val c = area.characters.locs(x, y)
-      if (c != NoCharacter) shell.print(x0 + x, y0 + y, c.chr, shell.toColor(c.color))
-      else {
-        val items = area.items.locs(x, y)
-        if (items != Nil) shell.print(x0 + x, y0 + y, items.head.chr, shell.toColor(items.head.color))
+    def draw(x0: Int, y0: Int, w: Int, h: Int) = {
+      val dims = area.terrain.dimensions
+      for (x <- pos._1 until (pos._1 + w); y <- pos._2 until (pos._2 + h)) if (within(x, y, dims)) {
+        val c = area.characters.locs(x, y)
+        if (c != NoCharacter) shell.print(x0 + x, y0 + y, c.chr, shell.toColor(c.color))
         else {
-          val slot = area.terrain(x, y)
-          shell.print(x0 + x, y0 + y, slot.chr, shell.toColor(slot.color))
+          val items = area.items.locs(x, y)
+          if (items != Nil) shell.print(x0 + x, y0 + y, items.head.chr, shell.toColor(items.head.color))
+          else {
+            val slot = area.terrain(x, y)
+            shell.print(x0 + x, y0 + y, slot.chr, shell.toColor(slot.color))
+          }
         }
       }
     }
@@ -55,4 +61,6 @@ class ConsoleUI(val shell: Shell with Buffers) extends UI {
   def refresh(area: AreaView) = redraw(area)
   
   def update(actions: Seq[Action], area: AreaView) = redraw(area)
+  
+  def message(msg: String) = messagebox.text = msg
 }
