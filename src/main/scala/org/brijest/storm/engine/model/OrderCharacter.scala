@@ -7,21 +7,34 @@
 \*                                            www.storm-enroute.com       */
 
 package org.brijest.storm.engine
+package model
 
 
 
-import model.Player
+import components._
 
 
 
-trait Engine {
-  def start(): Unit
-  def script(m: String): Unit
-  def listen(ui: UI)
-  def player: Player
-  def awaitTermination(): Unit
+/** A regular character.
+ *  
+ *  Most characters are of this type. A regular character takes 1x1 space.
+ */
+abstract class OrderCharacter extends RegularCharacter {
+oc =>
+  val order = cell[Order](DoNothing)
+  val management = cell[Manager](new OrderManager(oc))
+  
+  def manager = management()
 }
 
 
-object Engine {
+object OrderCharacter {
+  def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[OrderCharacter]) Some(e.id) else None
 }
+
+
+
+
+
+
+

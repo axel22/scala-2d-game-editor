@@ -31,7 +31,7 @@ object Action {
   
   // basic
   
-  def haltpc(id: EntityId) = HaltPC(id)
+  def haltoc(id: EntityId) = HaltOC(id)
   
   def moverc(from: Pos, to: Pos) = MoveRC(from, to)
   
@@ -60,9 +60,9 @@ case class Conditional(c: AreaView => Boolean, action: Action) extends Action {
 }
 
 
-case class HaltPC(id: EntityId) extends Action {
+case class HaltOC(id: EntityId) extends Action {
   def apply(a: Area) = a.character(id) match {
-    case pc: PlayerCharacter => pc.order := DoNothing
+    case oc: OrderCharacter => oc.order := DoNothing
     case c => illegalarg(c)
   }
 }

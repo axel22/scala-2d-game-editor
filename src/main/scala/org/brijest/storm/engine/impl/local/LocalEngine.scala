@@ -12,14 +12,22 @@ package impl.local
 
 
 
-import model._
+import scala.util.parsing.combinator._
+import scala.concurrent.SyncVar
 import collection._
+import model._
 
 
 
 class LocalEngine(config: Config, val player: Player, w: World) extends Engine {
-  val playeruis = mutable.ArrayBuffer[UI]()
-  @volatile var running = true
+engine =>
+  private val playeruis = mutable.ArrayBuffer[UI]()
+  @volatile private var running = true
+  @volatile private var paused = false
+  
+  def isPaused = paused
+  
+  /* simulation thread */
   
   class SimulationThread extends Thread("Local simulator") {
     val area = w.initializeArea(w.initialPosition(player))
@@ -34,6 +42,9 @@ class LocalEngine(config: Config, val player: Player, w: World) extends Engine {
         val (_, actions) = sim.step()
         playeruis.foreach(_.update(actions, area))
         Thread.sleep(10)
+        engine.synchronized {
+          while (paused) engine.wait()
+        }
       }
     }
   }
@@ -46,10 +57,54 @@ class LocalEngine(config: Config, val player: Player, w: World) extends Engine {
   
   def listen(ui: UI) = playeruis += ui
   
-  def send(m: Engine.Msg) = m match {
-    case Engine.End => running = false
-    case _ => // drop message
+  /* scripting */
+  
+  object dsl extends syntactical.StandardTokenParsers {
+    val global = mutable.HashMap[String, List[Any] => Any](
+      "end" -> {
+        xs => engine.synchronized {
+          paused = false
+          running = false
+          engine.notify()
+        }
+      },
+      "pause" -> {
+        xs => engine.synchronized {
+          if (running) {
+            paused = true
+            engine.notify()
+          }
+        }
+      },
+      "resume" -> {
+        xs => engine.synchronized {
+          paused = false
+          engine.notify()
+        }
+      }
+    )
+    
+    def interpret(m: String) = script(new lexical.Scanner(m)) match {
+      case Success(obj, _) => obj
+      case Failure(msg, _) => /*sys.*/error(msg)
+      case Error(msg, _) => /*sys.*/error(msg)
+    }
+    
+    /* language */
+    
+    lexical.delimiters ++= List("(", ")", ",")
+    
+    def script: Parser[Any] = expression
+    def expression: Parser[Any] = functioncall
+    def functioncall: Parser[Any] = ident ~ argslist ^^ {
+      case func ~ args => global(func)(args)
+    }
+    def argslist = "(" ~> repsep(expression, ",") <~ ")" ^^ {
+      case os: List[Any] => os
+    }
   }
+  
+  def script(m: String) = dsl.interpret(m)
 }
 
 

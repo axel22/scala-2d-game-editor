@@ -28,10 +28,10 @@ object NoManager extends Manager {
 }
 
 
-class OrderManager(pc: PlayerCharacter) extends Manager {
+class OrderManager(oc: OrderCharacter) extends Manager {
   def action(area: AreaView) = {
-    val (act, nextord) = pc.order().apply(pc, area)
-    pc.order := nextord
-    (act, Sleep(pc.basicstats().delay))
+    val (act, nextord) = oc.order().apply(oc, area)
+    oc.order := nextord
+    (act, Sleep(oc.basicStats.delay))
   }
 }
