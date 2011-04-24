@@ -55,17 +55,20 @@ self =>
     var area: AreaView = null
     def draw(x0: Int, y0: Int, w: Int, h: Int) = {
       val dims = area.terrain.dimensions
-      for (x <- pos._1 until (pos._1 + w); y <- pos._2 until (pos._2 + h)) if (within(x, y, dims)) {
-        val c = area.characters.locs(x, y)
-        if (c != NoCharacter) shell.print(x0 + x, y0 + y, c.chr, shell.toColor(c.color))
-        else {
-          val items = area.items.locs(x, y)
-          if (items != Nil) shell.print(x0 + x, y0 + y, items.head.chr, shell.toColor(items.head.color))
+      for (x <- pos._1 until (pos._1 + w); y <- pos._2 until (pos._2 + h)) {
+        val (xp, yp) = (x0 + x - pos._1, y0 + y - pos._2);
+        if (within(x, y, dims)) {
+          val c = area.characters.locs(x, y)
+          if (c != NoCharacter) shell.print(xp, yp, c.chr, shell.toColor(c.color))
           else {
-            val slot = area.terrain(x, y)
-            shell.print(x0 + x, y0 + y, slot.chr, shell.toColor(slot.color))
+            val items = area.items.locs(x, y)
+            if (items != Nil) shell.print(xp, yp, items.head.chr, shell.toColor(items.head.color))
+            else {
+              val slot = area.terrain(x, y)
+              shell.print(xp, yp, slot.chr, shell.toColor(slot.color))
+            }
           }
-        }
+        } else shell.print(xp, yp, ' ', Color.black)
       }
     }
   }
@@ -91,7 +94,7 @@ self =>
     
     private def emitempty() = engine.map(_.push(EmptyCommand))
     
-    def keyPress(chr: Char, mods: Int) = if (mods == 0) chr match {
+    def keyPress(kp: KeyPressed) = if (kp.mods == 0) kp.chr match {
       case 'y' => emitorder(Move(Dir.northwest))
       case 'u' => emitorder(Move(Dir.north))
       case 'i' => emitorder(Move(Dir.northeast))
@@ -102,7 +105,19 @@ self =>
       case ',' => emitorder(Move(Dir.southeast))
       case ' ' => emitscript("togglePause()")
       case _ =>
-        message("Unknown command: %c".format(chr))
+        message("Unknown command: %c".format(kp.chr))
+        emitempty()
+    } else if (shell.withCtrl(kp.mods)) kp.chr.toInt match {
+      case 25  => pos += (-1, -1); emitempty()
+      case 21  => pos += (0, -1); emitempty()
+      case 9   => pos += (1, -1); emitempty()
+      case 8   => pos += (-1, 0); emitempty()
+      case 11  => pos += (1, 0); emitempty()
+      case 14  => pos += (-1, 1); emitempty()
+      case 13  => pos += (0, 1); emitempty()
+      case ',' => pos += (1, 1); emitempty()
+      case _ =>
+        message("Unknown command: C-%c [%d]".format(kp.chr, kp.chr.toInt))
         emitempty()
     }
     def mousePress(x: Int, y: Int, b: Int) {
@@ -114,7 +129,7 @@ self =>
   val commands = mutable.ArrayBuffer[Command]()
   
   shell.listen {
-    case KeyPressed(chr, mods) => uistate.keyPress(chr, mods)
+    case kp @ KeyPressed(chr, mods) => uistate.keyPress(kp)
     case MousePressed(x, y, b) => uistate.mousePress(x, y, b)
     case _ =>
   }

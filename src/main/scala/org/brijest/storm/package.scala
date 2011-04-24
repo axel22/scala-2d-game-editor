@@ -30,6 +30,12 @@ package object storm {
     error("unreachable")
   }
   
+  /* pimps */
+  
+  implicit def pair2numeric[T: Numeric](p: (T, T)) = new {
+    def +(q: (T, T)) = (implicitly[Numeric[T]].plus(p._1, q._1), implicitly[Numeric[T]].plus(p._2, q._2))
+  }
+  
   /* constants */
   
   object app {
