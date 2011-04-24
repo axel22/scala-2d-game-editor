@@ -17,8 +17,10 @@ import model._
 trait UI {
   var pos: (Int, Int)
   var playerId: PlayerId
-  def refresh(area: AreaView): Unit
-  def update(actions: Seq[Action], area: AreaView): Unit
+  var engine: Option[Engine]
+  def refresh(area: AreaView, state: Engine.State): Unit
+  def update(actions: Seq[Action], area: AreaView, state: Engine.State): Unit
   def message(msg: String): Unit
-  def flushCommands(): Seq[Command]
 }
+
+

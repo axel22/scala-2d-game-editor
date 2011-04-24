@@ -39,6 +39,16 @@ class EngineTests extends WordSpec with ShouldMatchers {
       eng.awaitTermination()
     }
     
+    "be toggle the pause state through a script" in {
+      val eng = new LocalEngine(new Config, Player.default(PlayerId(0L)), new World.DefaultWorld)
+      eng.start()
+      eng.script("togglePause()")
+      assert(eng.isPaused)
+      eng.script("togglePause()")
+      eng.script("end()")
+      eng.awaitTermination()
+    }
+    
   }
   
 }

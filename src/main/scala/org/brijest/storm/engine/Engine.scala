@@ -16,6 +16,7 @@ import model.Player
 
 trait Engine {
   def start(): Unit
+  def push(comm: Command): Unit
   def script(m: String): Unit
   def listen(ui: UI)
   def player: Player
@@ -24,4 +25,7 @@ trait Engine {
 
 
 object Engine {
+  trait State {
+    def isPaused: Boolean
+  }
 }

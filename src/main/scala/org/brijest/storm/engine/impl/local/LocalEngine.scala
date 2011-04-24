@@ -19,9 +19,10 @@ import model._
 
 
 
-class LocalEngine(config: Config, val player: Player, w: World) extends Engine {
+class LocalEngine(config: Config, val player: Player, w: World) extends Engine with Engine.State {
 engine =>
   private val playeruis = mutable.ArrayBuffer[UI]()
+  private val commands = mutable.ArrayBuffer[Command]()
   @volatile private var running = true
   @volatile private var paused = false
   
@@ -32,29 +33,41 @@ engine =>
   class SimulationThread extends Thread("Local simulator") {
     val area = w.initializeArea(w.initialPosition(player))
     val sim = new Simulator(area)
+    val pc = w.initialPlace(player, area)
     
     override def run() {
-      val pc = w.initialPlace(player, area)
       sim.init()
-      playeruis.foreach(_.refresh(area))
+      playeruis.foreach(_.refresh(area, engine))
       
       while (running) {
         /* collect inputs */
-        for (ui <- playeruis; comm <- ui.flushCommands()) comm match {
-          case OrderCommand(plid, o) => pc.order := o
-        }
+        processCommands()
         
         /* step through simulation */
         val (_, actions) = sim.step()
         
         /* update screens */
-        playeruis.foreach(_.update(actions, area))
+        playeruis.foreach(_.update(actions, area, engine))
         
         /* wait */
         Thread.sleep(10)
         engine.synchronized {
-          while (paused) engine.wait()
+          while (paused) {
+            processCommands()
+            playeruis.foreach(_.update(actions, area, engine))
+            engine.wait()
+          }
         }
+      }
+    }
+    
+    private def processCommands() {
+      engine.synchronized {
+        for (comm <- commands) comm match {
+          case OrderCommand(plid, o) => pc.order := o
+          case ScriptCommand(s) => script(s)
+        }
+        commands.clear()
       }
     }
   }
@@ -68,6 +81,11 @@ engine =>
   def listen(ui: UI) = {
     playeruis += ui
     ui.playerId = player.id
+  }
+  
+  def push(comm: Command) = engine.synchronized {
+    commands += comm
+    engine.notify()
   }
   
   /* scripting */
@@ -93,6 +111,14 @@ engine =>
         xs => engine.synchronized {
           paused = false
           engine.notify()
+        }
+      },
+      "togglePause" -> {
+        xs => engine.synchronized {
+          if (running) {
+            paused = !paused
+            engine.notify()
+          }
         }
       }
     )

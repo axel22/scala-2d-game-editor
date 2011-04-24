@@ -21,6 +21,7 @@ import model._
 class ConsoleUI(val shell: Shell with Buffers) extends UI {
 self =>
   var pos = (0, 0);
+  var engine: Option[Engine] = None
   private var plid = invalidPlayerId
   def playerId = synchronized { plid }
   def playerId_=(p: PlayerId) = synchronized { plid = p }
@@ -30,7 +31,7 @@ self =>
   import shell._
   val messagebox = Mini(2).setText("Messages appear here. A lot of text. A lot, lot of text... And more.")
   val stats = Mini().setText("Stats appear here.")
-  val conditions = Mini().setText("Miscellaneous conditions.")
+  val conditions = Mini().setText("")
   val screen = Composite(List(
     messagebox,
     Canvas(MapDrawer),
@@ -40,10 +41,12 @@ self =>
   
   /* drawing */
   
-  private def redraw(area: AreaView) = {
+  private def redraw(area: AreaView, s: Engine.State) = {
     MapDrawer.area = area
     screen.display(0, 0, width, height)
     MapDrawer.area = null
+    
+    conditions.text = conditionText(s)
     
     shell.flush()
   }
@@ -67,20 +70,24 @@ self =>
     }
   }
   
-  def refresh(area: AreaView) = redraw(area)
+  def refresh(area: AreaView, s: Engine.State) = redraw(area, s)
   
-  def update(actions: Seq[Action], area: AreaView) = redraw(area)
+  def update(actions: Seq[Action], area: AreaView, s: Engine.State) = redraw(area, s)
   
   def message(msg: String) = messagebox.text = msg
+  
+  def conditionText(s: Engine.State) = {
+    if (s.isPaused) "<Pause>" else "       "
+  }
   
   /* ui state */
   
   object uistate {
     val state = 'normal
     
-    private def emitorder(o: Order) = self.synchronized {
-      commands += OrderCommand(playerId, o)
-    }
+    private def emitorder(o: Order) = engine.map(_.push(OrderCommand(playerId, o)))
+    
+    private def emitscript(s: String) = engine.map(_.push(ScriptCommand(s)))
     
     def keyPress(chr: Char, mods: Int) = if (mods == 0) chr match {
       case 'y' => emitorder(Move(Dir.northwest))
@@ -91,6 +98,7 @@ self =>
       case 'n' => emitorder(Move(Dir.southwest))
       case 'm' => emitorder(Move(Dir.south))
       case ',' => emitorder(Move(Dir.southeast))
+      case ' ' => emitscript("togglePause()")
       case _ => message("Unknown command: %c".format(chr))
     }
     def mousePress(x: Int, y: Int, b: Int) {

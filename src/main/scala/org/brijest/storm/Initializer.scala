@@ -43,6 +43,7 @@ object Initializer {
     
     // start engine
     ng.listen(ui)
+    ui.engine = Some(ng)
     ng.start()
     
     new Client(ng, ui)
