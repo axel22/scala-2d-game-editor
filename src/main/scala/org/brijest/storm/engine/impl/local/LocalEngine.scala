@@ -34,13 +34,23 @@ engine =>
     val sim = new Simulator(area)
     
     override def run() {
-      w.initialPlace(player, area)
+      val pc = w.initialPlace(player, area)
       sim.init()
       playeruis.foreach(_.refresh(area))
       
       while (running) {
+        /* collect inputs */
+        for (ui <- playeruis; comm <- ui.flushCommands()) comm match {
+          case OrderCommand(plid, o) => pc.order := o
+        }
+        
+        /* step through simulation */
         val (_, actions) = sim.step()
+        
+        /* update screens */
         playeruis.foreach(_.update(actions, area))
+        
+        /* wait */
         Thread.sleep(10)
         engine.synchronized {
           while (paused) engine.wait()
@@ -55,7 +65,10 @@ engine =>
   
   def awaitTermination() = simthr.join()
   
-  def listen(ui: UI) = playeruis += ui
+  def listen(ui: UI) = {
+    playeruis += ui
+    ui.playerId = player.id
+  }
   
   /* scripting */
   

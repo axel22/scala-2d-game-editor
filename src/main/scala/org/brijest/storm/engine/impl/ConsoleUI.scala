@@ -12,13 +12,20 @@ package impl
 
 
 
+import collection._
 import org.brijest.bufferz._
 import model._
 
 
 
 class ConsoleUI(val shell: Shell with Buffers) extends UI {
+self =>
   var pos = (0, 0);
+  private var plid = invalidPlayerId
+  def playerId = synchronized { plid }
+  def playerId_=(p: PlayerId) = synchronized { plid = p }
+  
+  /* layout */
   
   import shell._
   val messagebox = Mini(2).setText("Messages appear here. A lot of text. A lot, lot of text... And more.")
@@ -30,6 +37,8 @@ class ConsoleUI(val shell: Shell with Buffers) extends UI {
     stats,
     conditions
   ))
+  
+  /* drawing */
   
   private def redraw(area: AreaView) = {
     MapDrawer.area = area
@@ -63,4 +72,44 @@ class ConsoleUI(val shell: Shell with Buffers) extends UI {
   def update(actions: Seq[Action], area: AreaView) = redraw(area)
   
   def message(msg: String) = messagebox.text = msg
+  
+  /* ui state */
+  
+  object uistate {
+    val state = 'normal
+    
+    private def emitorder(o: Order) = self.synchronized {
+      commands += OrderCommand(playerId, o)
+    }
+    
+    def keyPress(chr: Char, mods: Int) = if (mods == 0) chr match {
+      case 'y' => emitorder(Move(Dir.northwest))
+      case 'u' => emitorder(Move(Dir.north))
+      case 'i' => emitorder(Move(Dir.northeast))
+      case 'h' => emitorder(Move(Dir.west))
+      case 'k' => emitorder(Move(Dir.east))
+      case 'n' => emitorder(Move(Dir.southwest))
+      case 'm' => emitorder(Move(Dir.south))
+      case ',' => emitorder(Move(Dir.southeast))
+      case _ => message("Unknown command: %c".format(chr))
+    }
+    def mousePress(x: Int, y: Int, b: Int) {
+    }
+  }
+  
+  /* inputs */
+  
+  val commands = mutable.ArrayBuffer[Command]()
+  
+  shell.listen {
+    case KeyPressed(chr, mods) => uistate.keyPress(chr, mods)
+    case MousePressed(x, y, b) => uistate.mousePress(x, y, b)
+    case _ =>
+  }
+  
+  def flushCommands(): Seq[Command] = synchronized {
+    val comms = commands.toList
+    commands.clear()
+    comms
+  }
 }

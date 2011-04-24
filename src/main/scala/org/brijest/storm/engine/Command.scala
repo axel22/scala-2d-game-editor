@@ -14,11 +14,9 @@ import model._
 
 
 
-trait UI {
-  var pos: (Int, Int)
-  var playerId: PlayerId
-  def refresh(area: AreaView): Unit
-  def update(actions: Seq[Action], area: AreaView): Unit
-  def message(msg: String): Unit
-  def flushCommands(): Seq[Command]
-}
+trait Command
+
+
+case class OrderCommand(plid: PlayerId, order: Order) extends Command
+
+

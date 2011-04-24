@@ -18,7 +18,7 @@ trait World {
   def name: String
   def initializeArea(id: AreaId): Area
   def initialPosition(p: Player): AreaId
-  def initialPlace(p: Player, area: Area): Unit
+  def initialPlace(p: Player, area: Area): PlayerCharacter
 }
 
 
@@ -28,7 +28,7 @@ object World {
     def name = "D'Falta"
     def initializeArea(id: AreaId) = Area.emptyDungeon(60, 30)
     def initialPosition(p: Player) = 0L
-    def initialPlace(p: Player, area: Area) {
+    def initialPlace(p: Player, area: Area): PlayerCharacter = {
       // find a location to place him in
       val pc = p.createPlayerCharacter(area.newEntityId())
       val (w, h) = area.terrain.dimensions
@@ -39,7 +39,7 @@ object World {
         if (area.isWalkable(x, y)) {
           pc.pos := Pos(x, y)
           area.insert(pc)
-          return;
+          return pc
         }
       }
       error("could not place character " + area.id())
