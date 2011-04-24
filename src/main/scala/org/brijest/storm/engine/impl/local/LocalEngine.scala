@@ -15,11 +15,12 @@ package impl.local
 import scala.util.parsing.combinator._
 import scala.concurrent.SyncVar
 import collection._
+import com.weiglewilczek.slf4s._
 import model._
 
 
 
-class LocalEngine(config: Config, val player: Player, w: World) extends Engine with Engine.State {
+class LocalEngine(config: Config, val player: Player, w: World) extends Engine with Engine.State with Logging {
 engine =>
   private val playeruis = mutable.ArrayBuffer[UI]()
   private val commands = mutable.ArrayBuffer[Command]()
@@ -55,7 +56,7 @@ engine =>
           while (paused) {
             processCommands()
             playeruis.foreach(_.update(actions, area, engine))
-            engine.wait()
+            if (paused) engine.wait()
           }
         }
       }
@@ -66,6 +67,7 @@ engine =>
         for (comm <- commands) comm match {
           case OrderCommand(plid, o) => pc.order := o
           case ScriptCommand(s) => script(s)
+          case EmptyCommand => // do nothing
         }
         commands.clear()
       }

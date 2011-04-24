@@ -112,17 +112,21 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   /* tasks */
   
+  lazy val deploy = task {
+    runsync("rm -rf %s".format(Deploy.savedir))
+    runsync("mkdir %s".format(Deploy.dir))
+    runsync("mkdir %s".format(Deploy.libzdir))
+    copyDependencies(Deploy.libzdir)
+    createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir)
+    createBaseDirRunScript("deployrun", Deploy.stormcmd, Deploy.dir)
+    None
+  } dependsOn (`package`)
+  
   lazy val deployRun = task { args =>
     task {
-      runsync("rm -rf %s".format(Deploy.savedir))
-      runsync("mkdir %s".format(Deploy.dir))
-      runsync("mkdir %s".format(Deploy.libzdir))
-      copyDependencies(Deploy.libzdir)
-      createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir)
-      createBaseDirRunScript("deployrun", Deploy.stormcmd, Deploy.dir)
       runasync("./deployrun %s".format(args.mkString(" ")))
       None
-    } dependsOn (`package`)
+    } dependsOn (deploy)
   }
   
   lazy val listAsyncs = task {

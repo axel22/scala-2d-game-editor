@@ -19,7 +19,7 @@ case class PlayerCharacter(pid: PlayerId, id: EntityId) extends OrderCharacter {
 pc =>
   
   val owner = cell[PlayerId](invalidPlayerId)
-  val basicstats = cell[BasicStats](BasicStats.withDelay(1))
+  val basicstats = cell[BasicStats](BasicStats.withDelay(10))
   
   def basicStats = basicstats()
   override def isPC: Boolean = true

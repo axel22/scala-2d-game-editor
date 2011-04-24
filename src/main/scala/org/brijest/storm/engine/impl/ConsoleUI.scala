@@ -89,6 +89,8 @@ self =>
     
     private def emitscript(s: String) = engine.map(_.push(ScriptCommand(s)))
     
+    private def emitempty() = engine.map(_.push(EmptyCommand))
+    
     def keyPress(chr: Char, mods: Int) = if (mods == 0) chr match {
       case 'y' => emitorder(Move(Dir.northwest))
       case 'u' => emitorder(Move(Dir.north))
@@ -99,7 +101,9 @@ self =>
       case 'm' => emitorder(Move(Dir.south))
       case ',' => emitorder(Move(Dir.southeast))
       case ' ' => emitscript("togglePause()")
-      case _ => message("Unknown command: %c".format(chr))
+      case _ =>
+        message("Unknown command: %c".format(chr))
+        emitempty()
     }
     def mousePress(x: Int, y: Int, b: Int) {
     }

@@ -23,7 +23,7 @@ trait BasicStats {
 
 object BasicStats {
   def default = new BasicStats {
-    def delay = 10
+    def delay = 20
     def heightStride = 2
   }
   
