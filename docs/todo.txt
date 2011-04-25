@@ -1,0 +1,11 @@
+
+TODO LIST:
+- separate rules system
+- hit points
+- stats
+- melee attacks
+- inventory
+- pick up items
+- equip items
+- weight
+- different areas
