@@ -6,30 +6,15 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
-package model
+package org.brijest.storm
+package engine.model
+package rules
 
 
 
-import components._
 
 
 
-trait Player {
-  def id: PlayerId
+trait RuleSet {
   def name: String
-  def createPlayerCharacter(id: EntityId)(rs: rules.RuleSet): PlayerCharacter
 }
-
-
-object Player {
-  
-  def default(pid: PlayerId) = new Player {
-    def id = pid
-    def name = "Default player"
-    def createPlayerCharacter(id: EntityId)(rs: rules.RuleSet) = new PlayerCharacter(pid, id)(rs)
-  }
-  
-}
-
-

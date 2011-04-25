@@ -1,6 +1,5 @@
 
 TODO LIST:
-- separate rules system
 - hit points
 - stats
 - melee attacks
@@ -9,3 +8,7 @@ TODO LIST:
 - equip items
 - weight
 - different areas
+
+
+DONE:
+- separate rules packages

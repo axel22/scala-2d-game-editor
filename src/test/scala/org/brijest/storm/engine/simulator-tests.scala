@@ -59,7 +59,7 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
     "simulate a simple test character" in {
       val area = Area.emptyArea
       area.terrain.default = (x, y) => Some(DungeonFloor0)
-      area.insert(PlayerCharacter.simpleTestCharacter(PlayerId(0l)))
+      area.insert(PlayerCharacter.simpleTestCharacter(PlayerId(0l))(model.rules.enroute.EnrouteRuleSet))
       val s = new Simulator(area)
       val (acn, acts) = s.step()
       
@@ -71,7 +71,7 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
       val area = Area.emptyArea
       area.terrain.default = (x, y) => Some(DungeonFloor0)
       area.resize(10, 10)
-      val pc = PlayerCharacter.simpleTestCharacter(PlayerId(0l))
+      val pc = PlayerCharacter.simpleTestCharacter(PlayerId(0l))(model.rules.enroute.EnrouteRuleSet)
       area.insert(pc)
       val s = new Simulator(area)
       
@@ -89,13 +89,13 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
       area.characters.locs.apply(0, 1) should equal (pc)
       pc.pos() should equal (Pos(0, 1))
       
-      s.step()
-      s.time should equal (2)
+      for (i <- 0 until BasicStats.default.delay) s.step()
+      s.time should equal (BasicStats.default.delay + 1)
       area.characters.locs.apply(0, 2) should equal (pc)
       pc.pos() should equal (Pos(0, 2))
       
-      s.step()
-      s.time should equal (3)
+      for (i <- 0 until BasicStats.default.delay) s.step()
+      s.time should equal (BasicStats.default.delay * 2 + 1)
       area.characters.locs.apply(1, 2) should equal (pc)
       pc.pos() should equal (Pos(1, 2))
     }

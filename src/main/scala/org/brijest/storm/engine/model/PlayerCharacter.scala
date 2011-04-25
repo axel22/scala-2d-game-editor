@@ -15,11 +15,11 @@ import components._
 
 
 
-case class PlayerCharacter(pid: PlayerId, id: EntityId) extends OrderCharacter {
+case class PlayerCharacter(pid: PlayerId, id: EntityId)(rs: rules.RuleSet) extends OrderCharacter {
 pc =>
   
   val owner = cell[PlayerId](invalidPlayerId)
-  val basicstats = cell[BasicStats](BasicStats.withDelay(10))
+  val basicstats = cell[BasicStats](BasicStats.default)
   
   def basicStats = basicstats()
   override def isPC: Boolean = true
@@ -31,6 +31,6 @@ pc =>
 
 object PlayerCharacter {
   
-  def simpleTestCharacter(pid: PlayerId) = new PlayerCharacter(pid, (0l, 0l))
+  def simpleTestCharacter(pid: PlayerId)(rs: rules.RuleSet) = new PlayerCharacter(pid, (0l, 0l))(rs)
   
 }
