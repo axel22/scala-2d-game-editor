@@ -22,6 +22,7 @@ trait CharacterView extends EntityView {
   
   final def isCharacter = true
   final def isItem = false
+  def foreach(f: CharacterView => Unit) = f(this)
 }
 
 
@@ -70,6 +71,7 @@ case object NoCharacter extends Character {
   def canWalk(from: Slot, to: Slot) = unsupported()
   def chr = '@'
   def color = 0xffffff00
+  override def foreach(ev: CharacterView => Unit): Unit = {}
 }
 
 

@@ -18,6 +18,7 @@ import components._
 trait CharacterTableView extends Struct {
   def ids: components.immutable.Table[EntityId, CharacterView]
   def locs: components.immutable.Quad[CharacterView]
+  def pcs: components.immutable.Table[PlayerId, EntityId]
 }
 
 
@@ -25,6 +26,7 @@ class CharacterTable(w: Int, h: Int) extends CharacterTableView {
   private val dflt = Some(NoCharacter)
   val ids = table[EntityId, Character]
   val locs = quad[Character](w, h, dflt)
+  val pcs = table[PlayerId, EntityId]
   
   ids.defaultVal = dflt
   
@@ -34,6 +36,10 @@ class CharacterTable(w: Int, h: Int) extends CharacterTableView {
     
     ids(c.id) = c
     c.foreachPos((x, y) => locs(x, y) = c)
+    c match {
+      case pc @ PlayerCharacter(plid, id) => pcs(plid) = id
+      case _ => // do nothing
+    }
   }
   
   def resize(w: Int, h: Int) {

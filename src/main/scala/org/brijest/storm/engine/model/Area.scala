@@ -28,6 +28,7 @@ self =>
     case None => items.ids.get(id)
     case opt => opt
   } 
+  def playerCharacter(playerId: PlayerId): CharacterView = characters.ids(characters.pcs(playerId))
   final def isWalkable(pos: Pos): Boolean = isWalkable(pos.x, pos.y)
   final def isWalkable(x: Int, y: Int) = isWalkableTerrain(x, y) && (characters.locs.apply(x, y) == NoCharacter)
   final def isWalkableTerrain(x: Int, y: Int) = terrain(x, y).walkable
@@ -52,6 +53,10 @@ class Area extends AreaView {
   override def entity(id: EntityId) = super.entity(id).map(_.asInstanceOf[Entity])
   
   def character(id: EntityId): Character = characters.ids(id)
+  
+  override def playerCharacter(playerId: PlayerId): PlayerCharacter = super.playerCharacter(playerId) match {
+    case pc @ PlayerCharacter(_, _) => pc
+  }
   
   def character(x: Int, y: Int): Character = characters.locs(x, y)
   

@@ -42,6 +42,8 @@ self =>
   /* drawing */
   
   private def redraw(area: AreaView, s: Engine.State) = {
+    uistate.center(area)
+    
     MapDrawer.area = area
     screen.display(0, 0, width, height)
     MapDrawer.area = null
@@ -86,7 +88,13 @@ self =>
   /* ui state */
   
   object uistate {
-    val state = 'normal
+    var state = 'normal
+    var mustCenter = false
+    
+    def center(area: AreaView) = if (mustCenter) for (ng <- engine; pc <- area.playerCharacter(ng.player.id)) {
+      pos = pc.pos().toPair - (shell.width / 2, shell.height / 2)
+      mustCenter = false
+    }
     
     private def emitorder(o: Order) = engine.map(_.push(OrderCommand(playerId, o)))
     
@@ -116,6 +124,7 @@ self =>
       case 14  => pos += (-1, 1); emitempty()
       case 13  => pos += (0, 1); emitempty()
       case ',' => pos += (1, 1); emitempty()
+      case 10 => mustCenter = true; emitempty()
       case _ =>
         message("Unknown command: C-%c [%d]".format(kp.chr, kp.chr.toInt))
         emitempty()

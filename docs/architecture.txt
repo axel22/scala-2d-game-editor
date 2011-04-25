@@ -4,15 +4,13 @@ Storm Enroute Architecture
 Layers:
 
  -----------------------------
-| Clients                     |
+| UIs                         |
  -----------------------------
-| Simulators                  |
- -------------- --------------
 | Engine       | Custom rules |
  -------------- ---------- ---
-| Model                   |
+| Model, simulator        |
  -------------------------
-| basic APIs              |
+| bufferz, components     |
  -------------------------
 
 
