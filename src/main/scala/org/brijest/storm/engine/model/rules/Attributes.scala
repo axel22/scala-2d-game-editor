@@ -9,25 +9,22 @@
 package org.brijest.storm
 package engine.model
 package rules
-package enroute
 
 
 
 
 
 
-object EnrouteRuleSet extends RuleSet
-with EnrouteAttributeRules
-{
-  def name = "Enroute Ruleset"
+trait Attributes extends BasicStats {
+  def apply(s: Symbol): Int
+  def delay = apply('delay)
+  def heightStride = apply('heightStride)
 }
 
 
-trait EnrouteAttributeRules {
-  def newAttributes = Attributes(
-    'delay -> 20,
-    'heightStride -> 2,
-    'hits -> 10,
-    'maxhits -> 10
-  )
+object Attributes {
+  def apply(xs: (Symbol, Int)*) = new Attributes {
+    val attrmap = xs.toMap
+    def apply(s: Symbol) = attrmap(s)
+  }
 }

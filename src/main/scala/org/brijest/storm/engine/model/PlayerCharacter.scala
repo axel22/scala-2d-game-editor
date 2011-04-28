@@ -19,7 +19,7 @@ case class PlayerCharacter(pid: PlayerId, id: EntityId)(rs: rules.RuleSet) exten
 pc =>
   
   val owner = cell[PlayerId](invalidPlayerId)
-  val basicstats = cell[BasicStats](BasicStats.default)
+  val basicstats = cell[BasicStats](rs.newAttributes)
   
   def basicStats = basicstats()
   override def isPC: Boolean = true
@@ -30,7 +30,5 @@ pc =>
 
 
 object PlayerCharacter {
-  
   def simpleTestCharacter(pid: PlayerId)(rs: rules.RuleSet) = new PlayerCharacter(pid, (0l, 0l))(rs)
-  
 }
