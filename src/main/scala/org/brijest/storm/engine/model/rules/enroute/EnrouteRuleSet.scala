@@ -16,6 +16,18 @@ package enroute
 
 
 
-object EnrouteRuleSet extends RuleSet {
+object EnrouteRuleSet extends RuleSet
+with EnrouteAttributeRules
+{
   def name = "Enroute Ruleset"
+}
+
+
+trait EnrouteAttributeRules {
+  def newAttributes = Attributes(
+    'delay -> 20,
+    'heightStride -> 2,
+    'hits -> 10,
+    'maxhits -> 10
+  )
 }
