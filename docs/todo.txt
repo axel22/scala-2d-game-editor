@@ -1,14 +1,15 @@
 
 TODO LIST:
-- hit points
-- stats
-- melee attacks
+- attributes
 - inventory
 - pick up items
 - equip items
 - weight
+- melee attacks
 - different areas
 
 
 DONE:
 - separate rules packages
+- hit points
+- stats
