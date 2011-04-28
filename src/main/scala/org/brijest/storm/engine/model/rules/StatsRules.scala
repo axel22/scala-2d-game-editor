@@ -15,6 +15,6 @@ package rules
 
 
 
-trait AttributeRules {
-  def newAttributes: Attributes
+trait StatsRules {
+  def newStats: Stats
 }

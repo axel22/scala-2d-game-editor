@@ -17,17 +17,16 @@ package enroute
 
 
 object EnrouteRuleSet extends RuleSet
-with EnrouteAttributeRules
+with EnrouteStatsRules
 {
   def name = "Enroute Ruleset"
 }
 
 
-trait EnrouteAttributeRules {
-  def newAttributes = Attributes(
-    'delay -> 20,
-    'heightStride -> 2,
-    'hits -> 10,
-    'maxhits -> 10
-  )
+trait EnrouteStatsRules {
+  def newStats = Stats(
+    'delay -> Nat(20),
+    'heightStride -> Nat(2),
+    'HP -> Fract(10, 10)
+  )('HP)
 }

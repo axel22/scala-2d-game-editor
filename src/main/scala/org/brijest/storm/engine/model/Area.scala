@@ -28,7 +28,7 @@ self =>
     case None => items.ids.get(id)
     case opt => opt
   } 
-  def playerCharacter(playerId: PlayerId): CharacterView = characters.ids(characters.pcs(playerId))
+  def playerCharacter(playerId: PlayerId): PlayerCharacterView = characters.ids(characters.pcs(playerId)).asInstanceOf[PlayerCharacterView]
   final def isWalkable(pos: Pos): Boolean = isWalkable(pos.x, pos.y)
   final def isWalkable(x: Int, y: Int) = isWalkableTerrain(x, y) && (characters.locs.apply(x, y) == NoCharacter)
   final def isWalkableTerrain(x: Int, y: Int) = terrain(x, y).walkable

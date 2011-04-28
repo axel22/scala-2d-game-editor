@@ -15,6 +15,6 @@ package rules
 
 
 
-trait RuleSet extends AttributeRules {
+trait RuleSet extends StatsRules {
   def name: String
 }

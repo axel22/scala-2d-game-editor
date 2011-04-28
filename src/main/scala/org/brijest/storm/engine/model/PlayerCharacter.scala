@@ -15,13 +15,20 @@ import components._
 
 
 
-case class PlayerCharacter(pid: PlayerId, id: EntityId)(rs: rules.RuleSet) extends OrderCharacter {
+trait PlayerCharacterView extends CharacterView {
+  def owner: immutable.Cell[PlayerId]
+  def stats: rules.Stats
+}
+
+
+case class PlayerCharacter(pid: PlayerId, id: EntityId)(rs: rules.RuleSet) extends OrderCharacter with PlayerCharacterView {
 pc =>
   
   val owner = cell[PlayerId](invalidPlayerId)
-  val basicstats = cell[BasicStats](rs.newAttributes)
+  val charstats = cell[rules.Stats](rs.newStats)
   
-  def basicStats = basicstats()
+  def stats = charstats()
+  def basicStats = charstats()
   override def isPC: Boolean = true
   def pov(area: AreaView) = area // TODO
   def chr = '@'

@@ -30,7 +30,7 @@ self =>
   
   import shell._
   val messagebox = Mini(2).setText("Messages appear here. A lot of text. A lot, lot of text... And more.")
-  val stats = Mini().setText("Stats appear here.")
+  val stats = Mini().setText("")
   val conditions = Mini().setText("")
   val screen = Composite(List(
     messagebox,
@@ -48,7 +48,12 @@ self =>
     screen.display(0, 0, width, height)
     MapDrawer.area = null
     
-    conditions.text = conditionText(s)
+    conditions.text = conditionText(area, s)
+    
+    statsText(area, s) match {
+      case Some(txt) => stats.text = txt
+      case None =>
+    }
     
     shell.flush()
   }
@@ -81,8 +86,14 @@ self =>
   
   def message(msg: String) = messagebox.text = msg
   
-  def conditionText(s: Engine.State) = {
+  def conditionText(area: AreaView, s: Engine.State) = {
     if (s.isPaused) "<Pause>" else "       "
+  }
+  
+  def statsText(area: AreaView, s: Engine.State) = for (ng <- engine) yield {
+    val pc = area.playerCharacter(ng.player.id)
+    val ms = for (stat <- pc.stats.mainstats) yield "%s: %s".format(stat.name, pc.stats(stat).niceString)
+    ms mkString "  "
   }
   
   /* ui state */
