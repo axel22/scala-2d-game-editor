@@ -11,27 +11,13 @@ package model
 
 
 
-import components._
+import rules.{Stats, Inventory}
 
 
 
-trait Manager {
-  def action(area: AreaView): (Action, Trigger)
-}
-
-
-object Manager
-
-
-object NoManager extends Manager {
-  def action(area: AreaView) = unsupported()
-}
-
-
-class OrderManager(oc: OrderCharacter) extends Manager {
-  def action(area: AreaView) = {
-    val (act, nextord) = oc.order().apply(oc, area)
-    oc.order := nextord
-    (act, Sleep(oc.stats.delay))
-  }
+/** A character with common ruleset functionality.
+ */
+abstract class RulesetCharacter extends Character {
+  def stats: Stats
+  def inventory: Inventory
 }

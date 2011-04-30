@@ -19,6 +19,7 @@ import components._
 trait ItemView extends EntityView {
   final def isCharacter = false
   final def isItem = true
+  def weight: Int
 }
 
 
@@ -30,6 +31,7 @@ abstract class Item extends Entity with ItemView {
 object Item {
   
   case class SimpleTestItem(id: EntityId) extends Item {
+    def weight = 1
     def action(a: AreaView) = (NoAction, Sleep(1));
     def pov(a: AreaView) = a
     def chr = '~'
@@ -41,6 +43,7 @@ object Item {
 
 object NoItem extends Item {
   val id = invalidEntityId
+  def weight = unsupported()
   def pov(a: AreaView) = unsupported()
   def action(area: AreaView) = unsupported()
   def chr = '?'

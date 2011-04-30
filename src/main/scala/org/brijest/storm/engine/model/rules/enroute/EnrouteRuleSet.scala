@@ -13,20 +13,37 @@ package enroute
 
 
 
+import collection._
 
 
 
 object EnrouteRuleSet extends RuleSet
 with EnrouteStatsRules
+with EnrouteInventoryRules
 {
   def name = "Enroute Ruleset"
 }
 
 
 trait EnrouteStatsRules {
-  def newStats = Stats(
+  def newStats = Stats(newBasicStats.all ++ newMainStats.all ++ newAttributes.all)
+  def newBasicStats = Stats(
     'delay -> Nat(20),
-    'heightStride -> Nat(2),
-    'HP -> Fract(10, 10)
-  )('HP)
+    'heightStride -> Nat(2)
+  )
+  def newMainStats = Stats(
+    'HP -> new Fract(10, 10) with Main
+  )
+  def newAttributes = Stats(
+    'ST -> new Nat(10) with Attribute
+  )
+}
+
+
+trait EnrouteInventoryRules {
+  def newInventory = new Inventory {
+    val items = mutable.Set[Item]()
+  }
+  def canMove(weight: Int, encumbrance: Int, c: Character) = weight < encumbrance
+  def delayModifier(weight: Int, encumbrance: Int, c: Character) = 1
 }

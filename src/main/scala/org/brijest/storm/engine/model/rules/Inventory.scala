@@ -6,32 +6,17 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
-package model
+package org.brijest.storm
+package engine.model
+package rules
 
 
 
-import components._
+import collection._
 
 
 
-trait Manager {
-  def action(area: AreaView): (Action, Trigger)
-}
-
-
-object Manager
-
-
-object NoManager extends Manager {
-  def action(area: AreaView) = unsupported()
-}
-
-
-class OrderManager(oc: OrderCharacter) extends Manager {
-  def action(area: AreaView) = {
-    val (act, nextord) = oc.order().apply(oc, area)
-    oc.order := nextord
-    (act, Sleep(oc.stats.delay))
-  }
+trait Inventory {
+  def items: mutable.Set[Item]
+  def totalWeight: Int = items.foldLeft(0)(_ + _.weight)
 }

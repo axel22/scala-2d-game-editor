@@ -18,11 +18,10 @@ package model
  *  
  *  Most characters are of this type. A regular character takes 1x1 space.
  */
-abstract class RegularCharacter extends Character {
+abstract class RegularCharacter extends RulesetCharacter {
   override def isRC: Boolean = true
   
-  def basicStats: BasicStats
-  def canWalk(from: Slot, to: Slot) = math.abs(from.height - to.height) <= basicStats.heightStride
+  def canWalk(from: Slot, to: Slot) = math.abs(from.height - to.height) <= stats.heightStride
 }
 
 

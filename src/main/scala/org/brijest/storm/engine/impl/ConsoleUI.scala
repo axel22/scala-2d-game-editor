@@ -26,18 +26,13 @@ self =>
   def playerId = synchronized { plid }
   def playerId_=(p: PlayerId) = synchronized { plid = p }
   
-  /* layout */
+  /* main layout */
   
   import shell._
   val messagebox = Mini(2).setText("Messages appear here. A lot of text. A lot, lot of text... And more.")
+  val attribs = Mini().setText("")
   val stats = Mini().setText("")
   val conditions = Mini().setText("")
-  val screen = Composite(List(
-    messagebox,
-    Canvas(MapDrawer),
-    stats,
-    conditions
-  ))
   
   /* drawing */
   
@@ -45,15 +40,14 @@ self =>
     uistate.center(area)
     
     MapDrawer.area = area
-    screen.display(0, 0, width, height)
+    uistate.screen.display(0, 0, width, height)
     MapDrawer.area = null
     
-    conditions.text = conditionText(area, s)
+    attribsText(area, s).map(attribs.text = _)
     
-    statsText(area, s) match {
-      case Some(txt) => stats.text = txt
-      case None =>
-    }
+    statsText(area, s).map(stats.text = _)
+    
+    conditions.text = conditionText(area, s)
     
     shell.flush()
   }
@@ -92,15 +86,33 @@ self =>
   
   def statsText(area: AreaView, s: Engine.State) = for (ng <- engine) yield {
     val pc = area.playerCharacter(ng.player.id)
-    val ms = for (stat <- pc.stats.mainstats) yield "%s: %s".format(stat.name, pc.stats(stat).niceString)
+    val ms = for ((nm, stat) <- pc.stats.main) yield "%s: %s".format(nm.name, stat.niceString)
     ms mkString "  "
+  }
+  
+  def attribsText(area: AreaView, s: Engine.State) = for (ng <- engine) yield {
+    val pc = area.playerCharacter(ng.player.id)
+    val att = for ((nm, stat) <- pc.stats.attributes) yield "%s: %s".format(nm.name, stat.niceString)
+    att mkString " "
   }
   
   /* ui state */
   
   object uistate {
-    var state = 'normal
+    var state = 'main
     var mustCenter = false
+    var screen = mainScreen
+    
+    private def mainScreen = Composite(List(
+      messagebox,
+      Canvas(MapDrawer),
+      attribs,
+      stats,
+      conditions
+    ))
+    
+    private def inventoryScreen = Composite(List(
+    ))
     
     def center(area: AreaView) = if (mustCenter) for (ng <- engine; pc <- area.playerCharacter(ng.player.id)) {
       pos = pc.pos().toPair - (shell.width / 2, shell.height / 2)
@@ -113,32 +125,53 @@ self =>
     
     private def emitempty() = engine.map(_.push(EmptyCommand))
     
-    def keyPress(kp: KeyPressed) = if (kp.mods == 0) kp.chr match {
-      case 'y' => emitorder(Move(Dir.northwest))
-      case 'u' => emitorder(Move(Dir.north))
-      case 'i' => emitorder(Move(Dir.northeast))
-      case 'h' => emitorder(Move(Dir.west))
-      case 'k' => emitorder(Move(Dir.east))
-      case 'n' => emitorder(Move(Dir.southwest))
-      case 'm' => emitorder(Move(Dir.south))
-      case ',' => emitorder(Move(Dir.southeast))
-      case ' ' => emitscript("togglePause()")
-      case _ =>
-        message("Unknown command: %c".format(kp.chr))
-        emitempty()
-    } else if (shell.withCtrl(kp.mods)) kp.chr.toInt match {
-      case 25  => pos += (-1, -1); emitempty()
-      case 21  => pos += (0, -1); emitempty()
-      case 9   => pos += (1, -1); emitempty()
-      case 8   => pos += (-1, 0); emitempty()
-      case 11  => pos += (1, 0); emitempty()
-      case 14  => pos += (-1, 1); emitempty()
-      case 13  => pos += (0, 1); emitempty()
-      case ',' => pos += (1, 1); emitempty()
-      case 10 => mustCenter = true; emitempty()
-      case _ =>
-        message("Unknown command: C-%c [%d]".format(kp.chr, kp.chr.toInt))
-        emitempty()
+    def keyPress(kp: KeyPressed) = state match {
+      case 'main =>
+        if (shell.noMods(kp.mods)) kp.chr.toInt match {
+          case 55  => emitorder(Move(Dir.northwest))
+          case 56  => emitorder(Move(Dir.north))
+          case 57  => emitorder(Move(Dir.northeast))
+          case 117 => emitorder(Move(Dir.west))
+          case 111 => emitorder(Move(Dir.east))
+          case 106 => emitorder(Move(Dir.southwest))
+          case 107 => emitorder(Move(Dir.south))
+          case 108 => emitorder(Move(Dir.southeast))
+          case ' ' => emitscript("togglePause()")
+          case _ =>
+            message("Unknown command: %c [%d]".format(kp.chr, kp.chr.toInt))
+            emitempty()
+        } else if (shell.withCtrl(kp.mods) && !shell.withAlt(kp.mods)) kp.chr.toInt match {
+          case _ =>
+            message("Unknown command: C-%c [%d]".format(kp.chr, kp.chr.toInt))
+            emitempty()
+        } else if (!shell.withCtrl(kp.mods) && shell.withAlt(kp.mods)) kp.chr.toInt match {
+          case 55  => pos += (-1, -1); emitempty()
+          case 56  => pos += (0, -1); emitempty()
+          case 57  => pos += (1, -1); emitempty()
+          case 117 => pos += (-1, 0); emitempty()
+          case 111 => pos += (1, 0); emitempty()
+          case 106 => pos += (-1, 1); emitempty()
+          case 107 => pos += (0, 1); emitempty()
+          case 108 => pos += (1, 1); emitempty()
+          case 105 => mustCenter = true; emitempty()
+          case 101 =>
+            state = 'inventory
+            screen = inventoryScreen
+            emitempty()
+          case _ =>
+            message("Unknown command: M-%c [%d]".format(kp.chr, kp.chr.toInt))
+            emitempty()
+        }
+      case 'inventory =>
+        if (shell.noMods(kp.mods)) kp.chr.toInt match {
+          case 27  =>
+            state = 'main
+            screen = mainScreen
+            emitempty()
+          case _ =>
+            message("Unknown command: %c [%d]".format(kp.chr, kp.chr.toInt))
+            emitempty()
+        }
     }
     def mousePress(x: Int, y: Int, b: Int) {
     }
@@ -151,7 +184,7 @@ self =>
   shell.listen {
     case kp @ KeyPressed(chr, mods) => uistate.keyPress(kp)
     case MousePressed(x, y, b) => uistate.mousePress(x, y, b)
-    case _ =>
+    case _ => // do nothing
   }
   
   def flushCommands(): Seq[Command] = synchronized {

@@ -15,6 +15,6 @@ package rules
 
 
 
-trait RuleSet extends StatsRules {
+trait RuleSet extends StatsRules with InventoryRules {
   def name: String
 }
