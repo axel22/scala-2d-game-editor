@@ -20,19 +20,13 @@ import model._
 
 class ConsoleUI(val shell: Shell with Buffers) extends UI {
 self =>
+  import shell._
+  
   var pos = (0, 0);
   var engine: Option[Engine] = None
   private var plid = invalidPlayerId
   def playerId = synchronized { plid }
   def playerId_=(p: PlayerId) = synchronized { plid = p }
-  
-  /* main layout */
-  
-  import shell._
-  val messagebox = Mini(2).setText("Messages appear here. A lot of text. A lot, lot of text... And more.")
-  val attribs = Mini().setText("")
-  val stats = Mini().setText("")
-  val conditions = Mini().setText("")
   
   /* drawing */
   
@@ -40,14 +34,12 @@ self =>
     uistate.center(area)
     
     MapDrawer.area = area
-    uistate.screen.display(0, 0, width, height)
+    uistate.screen.display(0, 0, shell.width, shell.height)
     MapDrawer.area = null
     
-    attribsText(area, s).map(attribs.text = _)
-    
-    statsText(area, s).map(stats.text = _)
-    
-    conditions.text = conditionText(area, s)
+    attribsText(area, s).map(uistate.attribs.text = _)
+    statsText(area, s).map(uistate.stats.text = _)
+    uistate.conditions.text = conditionText(area, s)
     
     shell.flush()
   }
@@ -78,7 +70,7 @@ self =>
   
   def update(actions: Seq[Action], area: AreaView, s: Engine.State) = redraw(area, s)
   
-  def message(msg: String) = messagebox.text = msg
+  def message(msg: String) = uistate.messagebox.text = msg
   
   def conditionText(area: AreaView, s: Engine.State) = {
     if (s.isPaused) "<Pause>" else "       "
@@ -103,6 +95,13 @@ self =>
     var mustCenter = false
     var screen = mainScreen
     
+    /* main layout */
+    
+    lazy val messagebox = Mini(2).setText("Messages appear here. A lot of text. A lot, lot of text... And more.")
+    lazy val attribs = Mini().setText("")
+    lazy val stats = Mini().setText("")
+    lazy val conditions = Mini().setText("")
+    
     private def mainScreen = Composite(List(
       messagebox,
       Canvas(MapDrawer),
@@ -111,7 +110,13 @@ self =>
       conditions
     ))
     
+    lazy val inventory = Listing()
+    inventory.list = for (i <- 0 until 20) yield Mini().setText("  Item %d".format(i))
+    
     private def inventoryScreen = Composite(List(
+      Mini().setText("[[995500]]====== [[ffff00]]Inventory [[995500]]======"),
+      inventory,
+      messagebox
     ))
     
     def center(area: AreaView) = if (mustCenter) for (ng <- engine; pc <- area.playerCharacter(ng.player.id)) {
