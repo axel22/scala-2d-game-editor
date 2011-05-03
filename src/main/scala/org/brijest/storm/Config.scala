@@ -36,10 +36,12 @@ object Config {
   
   object ui {
     val swingConsole = "swing-console"
+    val swingSprites = "swing-sprites"
   }
   
   val uis = List(
-    ui.swingConsole
+    ui.swingConsole,
+    ui.swingSprites
   )
   
   object engine {
