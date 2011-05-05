@@ -12,6 +12,7 @@ package model
 
 
 import components._
+import annotation.switch
 
 
 
@@ -21,7 +22,15 @@ trait Slot extends Immutable {
   def height: Int
   def chr: Char
   def color: Int
-  def group: String
+  def identifier: Int
+}
+
+
+object Slot {
+  def idents(id: Int) = (id: @switch) match {
+    case 0x00000000 => ("dungeon", "rock")
+    case 0x00000001 => ("dungeon", "floor")
+  }
 }
 
 
@@ -30,7 +39,7 @@ class HardRock(val height: Int) extends Slot {
   def seethrough = false
   def chr = '#'
   def color = 0x55555500
-  def group = "dungeon"
+  def identifier = 0x00000000
 }
 
 
@@ -39,7 +48,7 @@ class DungeonFloor(val height: Int) extends Slot {
   def seethrough = true
   def chr = '.'
   def color = 0x55555500
-  def group = "dungeon"
+  def identifier = 0x00000001
 }
 
 
