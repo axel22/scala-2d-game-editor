@@ -99,7 +99,7 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
       val wdt = w * swdt
       val hgt = h * shgt
       val img = new BufferedImage(wdt, hgt, BufferedImage.TYPE_4BYTE_ABGR)
-      img.createGraphics.drawImage(ts, x * swdt, y * swdt, x * swdt + wdt, y * hgt + hgt, 0, 0, wdt, hgt, null, null)
+      img.createGraphics.drawImage(ts, 0, 0, wdt, hgt, x * swdt, y * swdt, x * swdt + wdt, y * hgt + hgt, null, null)
       val sprite = new SwingSprite(img, wdt, hgt, xoff * swdt, yoff * shgt)
       spritez.put(id, new SoftReference(sprite))
       sprite
