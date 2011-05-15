@@ -30,7 +30,7 @@ self =>
   /* drawing */
   
   private def redraw(area: AreaView, s: Engine.State) = {
-    uistate.center(area)
+    uistate.Main.center(area)
     
     MapDrawer.area = area
     uistate.screen.display(0, 0, shell.width, shell.height)
@@ -72,7 +72,7 @@ self =>
   def message(msg: String) = uistate.messagebox.text = msg
   
   def conditionText(area: AreaView, s: Engine.State) = {
-    if (s.isPaused) "<Pause>" else "       "
+    if (s.isPaused) "<pause>" else "       "
   }
   
   def statsText(area: AreaView, s: Engine.State) = for (ng <- engine) yield {
@@ -90,47 +90,28 @@ self =>
   /* ui state */
   
   object uistate {
-    var state = 'main
-    var mustCenter = false
-    var screen = mainScreen
-    
-    /* main layout */
-    
-    lazy val messagebox = Mini(2).setText("Messages appear here. A lot of text. A lot, lot of text... And more.")
-    lazy val attribs = Mini().setText("")
-    lazy val stats = Mini().setText("")
-    lazy val conditions = Mini().setText("")
-    
-    private def mainScreen = Composite(List(
-      messagebox,
-      Canvas(MapDrawer),
-      attribs,
-      stats,
-      conditions
-    ))
-    
-    lazy val inventory = Listing()
-    inventory.list = for (i <- 0 until 20) yield Mini().setText("  Item %d".format(i))
-    
-    private def inventoryScreen = Composite(List(
-      Mini().setText("[[995500]]====== [[ffff00]]Inventory [[995500]]======"),
-      inventory,
-      messagebox
-    ))
-    
-    def center(area: AreaView) = if (mustCenter) for (ng <- engine; pc <- area.playerCharacter(ng.player.id)) {
-      pos = pc.pos().toPair - (shell.width / 2, shell.height / 2)
-      mustCenter = false
+    trait State {
+      def mousePress(x: Int, y: Int, b: Int): Unit
+      def keyPress(kp: KeyPressed): Unit
+      def buffer: Buffer
     }
     
-    private def emitorder(o: Order) = engine.map(_.push(OrderCommand(playerId, o)))
-    
-    private def emitscript(s: String) = engine.map(_.push(ScriptCommand(s)))
-    
-    private def emitempty() = engine.map(_.push(EmptyCommand))
-    
-    def keyPress(kp: KeyPressed) = state match {
-      case 'main =>
+    object Main extends State {
+      var mustCenter = false
+      
+      def buffer = Composite(List(
+        messagebox,
+        Canvas(MapDrawer),
+        attribs,
+        stats,
+        conditions
+      ))
+      def center(area: AreaView) = if (mustCenter) for (ng <- engine; pc <- area.playerCharacter(ng.player.id)) {
+        pos = pc.pos().toPair - (shell.width / 2, shell.height / 2)
+        mustCenter = false
+      }
+      def mousePress(x: Int, y: Int, b: Int) {}
+      def keyPress(kp: KeyPressed) {
         if (shell.noMods(kp.mods)) kp.chr.toInt match {
           case 55  => emitorder(Move(Dir.northwest))
           case 56  => emitorder(Move(Dir.north))
@@ -159,26 +140,84 @@ self =>
           case 108 => pos += (1, 1); emitempty()
           case 105 => mustCenter = true; emitempty()
           case 101 =>
-            state = 'inventory
-            screen = inventoryScreen
+            state = Inventory
+            screen = Inventory.buffer
             emitempty()
           case _ =>
             message("Unknown command: M-%c [%d]".format(kp.chr, kp.chr.toInt))
             emitempty()
         }
-      case 'inventory =>
+      }
+    }
+    
+    object Inventory extends State {
+      private var pos = -1
+      private val inventory = Listing()
+      private var items = Seq[String]()
+      
+      def setItems(lst: Seq[String]) {
+        items = lst
+        inventory.list = items.map(Mini().setText(_))
+        if (lst.nonEmpty) select(0)
+      }
+      
+      def buffer = Composite(List(
+        Mini().setText("[[995500]]====== [[ffff00]]Inventory [[995500]]======"),
+        inventory,
+        messagebox
+      ))
+      def mousePress(x: Int, y: Int, b: Int) {}
+      def keyPress(kp: KeyPressed) {
         if (shell.noMods(kp.mods)) kp.chr.toInt match {
           case 27  =>
-            state = 'main
-            screen = mainScreen
+            state = Main
+            screen = Main.buffer
+            emitempty()
+          case '8' =>
+            goup()
+            emitempty()
+          case 'k' =>
+            godown()
             emitempty()
           case _ =>
             message("Unknown command: %c [%d]".format(kp.chr, kp.chr.toInt))
             emitempty()
         }
+      }
+      def goup() = if (pos > 0) select(pos - 1)
+      def godown() = if (pos < (items.length - 1)) select(pos + 1)
+      def select(desidx: Int): Unit = if (items.isEmpty) pos = -1 else {
+        def set(i: Int, s: String) = inventory.list(i) match {
+          case m @ Mini(_) => m.text = s
+        }
+        val idx = (desidx max 0) min inventory.list.length
+        if (pos != -1) set(pos, items(pos))
+        set(idx, "[[00dd66]]" + items(idx))
+        pos = idx
+      }
     }
-    def mousePress(x: Int, y: Int, b: Int) {
-    }
+    
+    var state: State = Main
+    var screen = Main.buffer
+    
+    Inventory.setItems(for (i <- 0 until 15) yield "  Item %d".format(i))
+    
+    /* main layout */
+    
+    lazy val messagebox = Mini(2).setText("<no messages>")
+    lazy val attribs = Mini().setText("")
+    lazy val stats = Mini().setText("")
+    lazy val conditions = Mini().setText("")
+    
+    private def emitorder(o: Order) = engine.map(_.push(OrderCommand(playerId, o)))
+    
+    private def emitscript(s: String) = engine.map(_.push(ScriptCommand(s)))
+    
+    private def emitempty() = engine.map(_.push(EmptyCommand))
+    
+    def keyPress(kp: KeyPressed) = state.keyPress(kp)
+    
+    def mousePress(x: Int, y: Int, b: Int) = state.mousePress(x, y, b)
   }
   
   /* inputs */

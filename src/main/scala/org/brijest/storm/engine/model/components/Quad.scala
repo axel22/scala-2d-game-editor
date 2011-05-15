@@ -542,11 +542,11 @@ extends QNode[T] {
   }
   
   private def pack(c: Boolean) {
-    if (c && bmp == 0xffffffff) {
+    if (c && elems == mxside * mxside) {
       var allsame = true
-      var refer = mx(0)
+      val refer = mx(0)
       var i = 1
-      var len = mx.length
+      val len = mx.length
       while (i < len) {
         if (mx(i) ne refer) {
           allsame = false

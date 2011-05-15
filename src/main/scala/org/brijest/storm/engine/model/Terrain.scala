@@ -56,3 +56,15 @@ object HardRock0 extends HardRock(0)
 
 
 object DungeonFloor0 extends DungeonFloor(0)
+
+
+
+
+
+
+
+
+
+
+
+
