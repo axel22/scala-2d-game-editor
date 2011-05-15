@@ -17,8 +17,8 @@ import collection._
 package object components {
   
   def cell[T](v: T) = new Cell[T](v)
-  def quad[T](w: Int, h: Int, default: (Int, Int) => Option[T]) = new Quad(w, h, default)
-  def quad[T](w: Int, h: Int, d: Option[T]): Quad[T] = quad(w, h, (x, y) => d)
+  def quad[T](w: Int, h: Int, default: (Int, Int) => Option[T], compress: Boolean) = new Quad(w, h, default, compress)
+  def quad[T](w: Int, h: Int, d: Option[T], compress: Boolean = false): Quad[T] = quad(w, h, (x, y) => d, compress)
   def table[K, V] = new Table[K, V]
   def queue[T] = new Queue[T]
   def heap[T: Ordering] = new Heap[T]

@@ -14,6 +14,7 @@ package impl
 import collection._
 import swing._
 import java.awt.image._
+import java.lang.ref.SoftReference
 import org.brijest.storm.engine.model._
 
 
@@ -25,7 +26,9 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
       super.paintComponent(g)
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
                          java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
-      g.drawImage(buffer, 0, 0, 640, 480, 0, 0, 640, 480, null, null)
+      buffer.synchronized {
+        g.drawImage(buffer, 0, 0, 640, 480, 0, 0, 640, 480, null, null)
+      }
     }
   }
   
@@ -39,6 +42,15 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
   
   frame.size = new Dimension(640, 480)
   frame.open()
+  
+  val refresher = new Thread {
+    override def run() = while (true) {
+      underlying.repaint()
+      Thread.sleep(36)
+    }
+  }
+  
+  refresher.start()
   
   /* implementations */
   
@@ -58,7 +70,9 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
   
   def height: Int = frame.size.height
   
-  import java.lang.ref.SoftReference
+  override def refresh(area: AreaView, state: Engine.State) = buffer.synchronized {
+    super.refresh(area, state)
+  }
   
   object palette extends Palette {
     val imageinfos = mutable.HashMap[String, ImageInfo]()

@@ -37,7 +37,7 @@ self =>
 
 class Area extends AreaView {
   private val entitycount = cell(0l)
-  private var rawterrain: Quad[Slot] = quad(1, 1, Some(HardRock0))
+  private var rawterrain: Quad[Slot] = quad(1, 1, Some(HardRock0), true)
   val id = cell(invalidAreaId)
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable(1, 1)

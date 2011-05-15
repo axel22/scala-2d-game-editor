@@ -179,20 +179,28 @@ class BasicTests extends WordSpec with ShouldMatchers {
       q(2, 1) should equal (9)
     }
     
-    def testInsertions(d: Int) {
-      val q = quad[Int](d, d, None)
+    def testInsertions(d: Int, c: Boolean) {
+      val q = quad[Int](d, d, None, c)
       for (x <- 0 until d; y <- 0 until d) q(x, y) = x * y
       
       q.size should equal (d * d)
       for (x <- 0 until d; y <- 0 until d) assert(q(x, y) == x * y, (x, y))
     }
     
-    "have 32x32 elements after insertion" in {
-      testInsertions(32)
+    "have 32x32 elements after insertion w/o compression" in {
+      testInsertions(32, false)
     }
     
-    "have 256x256 elements after insertion" in {
-      testInsertions(256)
+    "have 256x256 elements after insertion w/o compression" in {
+      testInsertions(256, false)
+    }
+    
+    "have 32x32 elements after insertion" in {
+      testInsertions(32, true)
+    }
+    
+    "have 256x256 elements after insertion with compression" in {
+      testInsertions(256, true)
     }
     
     "have 200k elements after insertion" in {
@@ -283,8 +291,8 @@ class BasicTests extends WordSpec with ShouldMatchers {
       q.size should equal (0)
     }
     
-    def testRemovals(sz: Int) = {
-      val q = quad(sz, sz, Some(-1))
+    def testRemovals(sz: Int, c: Boolean) = {
+      val q = quad(sz, sz, Some(-1), c)
       for (x <- 0 until sz; y <- 0 until sz) q(x, y) = x * y
       var count = sz * sz
       for (x <- 0 until sz; y <- 0 until sz) {
@@ -297,12 +305,20 @@ class BasicTests extends WordSpec with ShouldMatchers {
       q.size should equal (0)
     }
     
-    "have zero elements out of 32x32 after removal" in {
-      testRemovals(32)
+    "have zero elements out of 32x32 after removal w/o compression" in {
+      testRemovals(32, false)
     }
     
-    "have zero elements out of 128x128 after removal" in {
-      testRemovals(128)
+    "have zero elements out of 128x128 after removal w/o compression" in {
+      testRemovals(128, false)
+    }
+    
+    "have zero elements out of 32x32 after removal with compression" in {
+      testRemovals(32, true)
+    }
+    
+    "have zero elements out of 128x128 after removal with compression" in {
+      testRemovals(128, true)
     }
     
     "be cleared" in {

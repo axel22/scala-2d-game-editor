@@ -29,7 +29,7 @@ package immutable {
 }
 
 
-@serializable class Quad[T](w: Int, h: Int, d: (Int, Int) => Option[T]) extends immutable.Quad[T] {
+@serializable class Quad[T](w: Int, h: Int, d: (Int, Int) => Option[T], compress: Boolean) extends immutable.Quad[T] {
   private var dflt: (Int, Int) => Option[T] = d
   private var dims: (Int, Int) = (w, h);
   private var root: QNode[T] = new QEmpty[T](QNode.calcSide(dims))
@@ -49,7 +49,7 @@ package immutable {
   
   private def upd(x: Int, y: Int, v: T) {
     check(x, y)
-    root = root.update(0, 0, x, y, v)
+    root = root.update(0, 0, x, y, v, compress)
   }
   
   private def clr() {
@@ -71,7 +71,7 @@ package immutable {
   final def default_=(d: (Int, Int) => Option[T]) = dflt = d
   final def dimensions_=(sz: (Int, Int)) = resize(sz)
   final def update(x: Int, y: Int, elem: T) = upd(x, y, elem)
-  final def remove(x: Int, y: Int) = root = root.remove(0, 0, x, y)
+  final def remove(x: Int, y: Int) = root = root.remove(0, 0, x, y, compress)
   final def clear() = clr()
 }
 
@@ -118,8 +118,8 @@ private abstract class QNode[T] {
   def elems: Int
   def apply(x0: Int, y0: Int, x: Int, y: Int, d: (Int, Int) => Option[T]): T
   def within(x0: Int, y0: Int, p: Quad.Area, acc: Buffer[(Int, Int, T)]): Unit
-  def update(x0: Int, y0: Int, x: Int, y: Int, v: T): QNode[T]
-  def remove(x0: Int, y0: Int, x: Int, y: Int): QNode[T]
+  def update(x0: Int, y0: Int, x: Int, y: Int, v: T, c: Boolean): QNode[T]
+  def remove(x0: Int, y0: Int, x: Int, y: Int, c: Boolean): QNode[T]
   def foreach(x0: Int, y0: Int, f: (Int, Int, T) => Unit): Unit
 }
 
@@ -147,11 +147,11 @@ private case class QEmpty[T](side: Int) extends QNode[T] {
   final def elems = 0
   final def apply(x0: Int, y0: Int, x: Int, y: Int, d: (Int, Int) => Option[T]): T = d(x, y).get
   final def within(x0: Int, y0: Int, p: Quad.Area, acc: Buffer[(Int, Int, T)]): Unit = ()
-  final def update(x0: Int, y0: Int, x: Int, y: Int, v: T): QNode[T] = {
+  final def update(x0: Int, y0: Int, x: Int, y: Int, v: T, c: Boolean): QNode[T] = {
     val ql = new QList[T](0, new Array[Int](4), new Array(2), side)
-    ql.update(x0, y0, x, y, v)
+    ql.update(x0, y0, x, y, v, c)
   }
-  final def remove(x0: Int, y0: Int, x: Int, y: Int): QNode[T] = this
+  final def remove(x0: Int, y0: Int, x: Int, y: Int, c: Boolean): QNode[T] = this
   final def foreach(x0: Int, y0: Int, f: (Int, Int, T) => Unit) = ()
 }
 
@@ -219,7 +219,7 @@ extends QNode[T] {
   
   private def rectIn(tlx: Int, tly: Int, sidelen: Int, p: Quad.Area) = p.rectIn(tlx, tly, sidelen)
   
-  final def update(x0: Int, y0: Int, x: Int, y: Int, v: T) = {
+  final def update(x0: Int, y0: Int, x: Int, y: Int, v: T, c: Boolean) = {
     val sofss = side >> 3 // 3 == log(forkslotside)
     val fx = (x - x0) / sofss
     val fy = (y - y0) / sofss
@@ -231,14 +231,14 @@ extends QNode[T] {
       val pos = java.lang.Long.bitCount(bmp & ((1L << loc) - 1))
       val subnode = subs(pos)
       val oldelems = subnode.elems
-      subs(pos) = subnode.update(subx0, suby0, x, y, v)
+      subs(pos) = subnode.update(subx0, suby0, x, y, v, c)
       
       if (subs(pos) != oldelems) elems += 1
       
       this
     } else { // create a new subnode
       val ql = new QList[T](0, new Array[Int](4), new Array(2), side / forkslotside)
-      ql.update(subx0, suby0, x, y, v)
+      ql.update(subx0, suby0, x, y, v, c)
       val subelems = java.lang.Long.bitCount(bmp)
       val pos = java.lang.Long.bitCount(bmp & ((1L << loc) - 1))
       bmp |= (1L << loc)
@@ -281,7 +281,7 @@ extends QNode[T] {
     }
   }
   
-  final def remove(x0: Int, y0: Int, x: Int, y: Int) = {
+  final def remove(x0: Int, y0: Int, x: Int, y: Int, c: Boolean) = {
     val sofss = side >> 3 // 3 == log(forkslotside)
     val fx = (x - x0) / sofss
     val fy = (y - y0) / sofss
@@ -293,7 +293,7 @@ extends QNode[T] {
       val pos = java.lang.Long.bitCount(bmp & ((1L << loc) - 1))
       val oldsub = subs(pos)
       val oldelems = oldsub.elems
-      val newsub = oldsub.remove(subx0, suby0, x, y)
+      val newsub = oldsub.remove(subx0, suby0, x, y, c)
       
       if (!newsub.isQEmpty) {
         subs(pos) = newsub
@@ -311,14 +311,14 @@ extends QNode[T] {
       }
       
       if (elems > lstmax / 2) this else { // compress
-        toQList(x0, y0)
+        toQList(x0, y0, c)
       }
     }
   }
   
-  private def toQList(x0: Int, y0: Int): QList[T] = {
+  private def toQList(x0: Int, y0: Int, c: Boolean): QList[T] = {
     val ql = new QList[T](0, new Array[Int](4), new Array[AnyRef](2), side)
-    foreach(x0, y0, (x, y, v) => ql.update(x0, y0, x, y, v))
+    foreach(x0, y0, (x, y, v) => ql.update(x0, y0, x, y, v, c))
     ql
   }
   
@@ -371,7 +371,7 @@ extends QNode[T] {
     }
   }
   
-  final def update(x0: Int, y0: Int, x: Int, y: Int, v: T): QNode[T] = {
+  final def update(x0: Int, y0: Int, x: Int, y: Int, v: T, c: Boolean): QNode[T] = {
     // write("list update: x0=%d, y0=%d, x=%d, y=%d".format(x0, y0, x, y))
     var i = 0
     val until = elems * 2
@@ -385,12 +385,12 @@ extends QNode[T] {
     
     if (elems == lstmax) {
       if (side != mxside) { // still wide
-        val n = toQNode(new QFork(0, 0, new Array[QNode[T]](lstmax * 2), side), x0, y0)
-        n.update(x0, y0, x, y, v)
+        val n = toQNode(new QFork(0, 0, new Array[QNode[T]](lstmax * 2), side), x0, y0, c)
+        n.update(x0, y0, x, y, v, c)
         n
       } else { // smallest granularity
-        val n = toQNode(new QMatrix(0, 0, new Array[AnyRef](QNode.mxsz)), x0, y0)
-        n.update(x0, y0, x, y, v)
+        val n = toQNode(new QMatrix(0, 0, new Array[AnyRef](QNode.mxsz)), x0, y0, c)
+        n.update(x0, y0, x, y, v, c)
         n
       }
     } else {
@@ -412,18 +412,18 @@ extends QNode[T] {
     }
   }
   
-  private def toQNode(n: QNode[T], x0: Int, y0: Int) = {
+  private def toQNode(n: QNode[T], x0: Int, y0: Int, c: Boolean) = {
     // write("toQNode(%d, %d): ".format(x0, y0) + n + " from: " + this.lst.toList + ", " + this.coords.toList)
     var i = 0
     while (i < elems) {
       val curr = lst(i)
-      n.update(x0, y0, coords(2 * i), coords(2 * i + 1), lst(i).asInstanceOf[T])
+      n.update(x0, y0, coords(2 * i), coords(2 * i + 1), lst(i).asInstanceOf[T], c)
       i += 1
     }
     n
   }
   
-  final def remove(x0: Int, y0: Int, x: Int, y: Int): QNode[T] = {
+  final def remove(x0: Int, y0: Int, x: Int, y: Int, c: Boolean): QNode[T] = {
     var i = 0
     val until = 2 * elems
     while (i < until) {
@@ -488,17 +488,17 @@ extends QNode[T] {
 }
 
 
-private case class QMatrix[T](var elems: Int, var bmp: Int, mx: Array[AnyRef])
+private case class QMatrix[T](var elems: Int, var bmp: Int, var mx: Array[AnyRef], var cval: AnyRef = null)
 extends QNode[T] {
   def side = mxside
   
-  final def apply(x0: Int, y0: Int, x: Int, y: Int, d: (Int, Int) => Option[T]) = {
+  final def apply(x0: Int, y0: Int, x: Int, y: Int, d: (Int, Int) => Option[T]) = if (cval ne null) cval.asInstanceOf[T] else {
     val loc = ((y - y0) << 2) | (x - x0) // 2 == log(mxside)
     if ((bmp & (1 << loc)) == 0) d(x, y).get
     else mx(loc).asInstanceOf[T]
   }
   
-  final def within(x0: Int, y0: Int, p: Quad.Area, buff: Buffer[(Int, Int, T)]): Unit = {
+  final def within(x0: Int, y0: Int, p: Quad.Area, buff: Buffer[(Int, Int, T)]): Unit = if (cval eq null) {
     var loc = 0
     val until = mxside * mxside
     val b = bmp
@@ -510,9 +510,61 @@ extends QNode[T] {
       }
       loc += 1
     }
+  } else {
+    // compressed version
+    var x = 0
+    var y = 0
+    val sd = mxside
+    while (x < sd) {
+      while (y < sd) {
+        val xp = x0 + x
+        val yp = y0 + y
+        if (p(xp, yp)) buff += ((xp, yp, cval.asInstanceOf[T]))
+        y += 1
+      }
+      y = 0
+      x += 1
+    }
   }
   
-  final def update(x0: Int, y0: Int, x: Int, y: Int, v: T) = {
+  private def unpack(c: Boolean) {
+    // check if previously compressed and restore
+    if (c && (cval ne null)) {
+      val len = QNode.mxsz
+      mx = new Array[AnyRef](len)
+      var i = 0
+      while (i < len) {
+        mx(i) = cval
+        i += 1
+      }
+      cval = null
+    }
+  }
+  
+  private def pack(c: Boolean) {
+    if (c && bmp == 0xffffffff) {
+      var allsame = true
+      var refer = mx(0)
+      var i = 1
+      var len = mx.length
+      while (i < len) {
+        if (mx(i) ne refer) {
+          allsame = false
+          i = len
+        }
+        i += 1
+      }
+      
+      if (allsame) {
+        cval = refer
+        mx = null
+      }
+    }
+  }
+  
+  final def update(x0: Int, y0: Int, x: Int, y: Int, v: T, c: Boolean) = {
+    unpack(c)
+    
     val loc = ((y - y0) << 2) | (x - x0) // 2 == log(mxside)
     if ((bmp & (1 << loc)) == 0) {
       bmp |= 1 << loc
@@ -521,10 +573,15 @@ extends QNode[T] {
     // write("update: " + loc + ", from: " + (x, y) + ", left upper: " + (x0, y0))
     mx(loc) = v.asInstanceOf[AnyRef]
     
+    // check if compression needed and possible
+    pack(c)
+    
     this
   }
   
-  final def remove(x0: Int, y0: Int, x: Int, y: Int) = {
+  final def remove(x0: Int, y0: Int, x: Int, y: Int, c: Boolean) = {
+    unpack(c)
+    
     val loc = ((y - y0) << 2) | (x - x0)
     val flag = 1 << loc
     if ((bmp & flag) != 0) {
@@ -542,7 +599,7 @@ extends QNode[T] {
         if ((b & (1 << loc)) != 0) {
           val xp = x0 + (loc & 0x3)        // 0x3 == 1 << log(mxside) - 1
           val yp = y0 + ((loc & 0xc) >> 2) // 0xc == (1 << (2 * log(mxside))) - (1 << log(mxside))
-          ql.update(x0, y0, xp, yp, mx(loc).asInstanceOf[T])
+          ql.update(x0, y0, xp, yp, mx(loc).asInstanceOf[T], c)
         }
         loc += 1
       }
@@ -550,7 +607,7 @@ extends QNode[T] {
     } else this
   }
   
-  final def foreach(x0: Int, y0: Int, f: (Int, Int, T) => Unit) {
+  final def foreach(x0: Int, y0: Int, f: (Int, Int, T) => Unit) = if (cval eq null) {
     var loc = 0
     val until = mxside * mxside
     val b = bmp
@@ -561,6 +618,21 @@ extends QNode[T] {
         f(xp, yp, mx(loc).asInstanceOf[T])
       }
       loc += 1
+    }
+  } else {
+    // compressed version
+    var x = 0
+    var y = 0
+    val sd = mxside
+    while (x < sd) {
+      while (y < sd) {
+        val xp = x0 + x
+        val yp = y0 + y
+        f(xp, yp, cval.asInstanceOf[T])
+        y += 1
+      }
+      y = 0
+      x += 1
     }
   }
   
