@@ -17,6 +17,6 @@ package rules
 
 trait InventoryRules {
   def newInventory: Inventory
-  def canMove(weight: Int, encumbrance: Int, c: Character): Boolean
-  def delayModifier(weight: Int, encumbrance: Int, c: Character): Int
+  def canMove(c: Character): Boolean
+  def additionalDelay(c: Character): Int
 }

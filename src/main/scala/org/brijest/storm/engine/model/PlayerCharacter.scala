@@ -32,6 +32,7 @@ pc =>
   def pov(area: AreaView) = area // TODO
   def chr = '@'
   def color = 0x0000ff00
+  def identifier = "basic_chars.playerchar"
 }
 
 

@@ -44,9 +44,6 @@ trait SpriteUI extends UI {
     val hslots = (height / shgt + 1) min area.terrain.dimensions._2
     val pal = palette
     
-    // draw background
-    // TODO
-    
     // draw terrain
     val x0 = pos._1
     var x = x0
@@ -66,7 +63,6 @@ trait SpriteUI extends UI {
     }
     
     // draw items
-    /*
     x = x0
     y = y0
     while (y < yuntil) {
@@ -76,9 +72,9 @@ trait SpriteUI extends UI {
           case i :: is =>
             val s = pal.sprite(i)
             s.draw((x - x0) * swdt, (y - y0) * shgt, 0)
-            x += 1
           case Nil => // skip
         }
+        x += 1
       }
       x = pos._1
       y += 1
@@ -89,56 +85,85 @@ trait SpriteUI extends UI {
     y = y0
     while (y < yuntil) {
       while (x < xuntil) {
-        val c = area.characters.locs(x, y)
-        val s = pal.sprite(c)
-        s.draw((x - x0) * swdt, (y - y0) * shgt, 0)
+        area.characters.locs(x, y) match {
+          case NoCharacter => // skip
+          case c =>
+            val s = pal.sprite(c)
+            s.draw((x - x0) * swdt, (y - y0) * shgt, 0)
+        }
         x += 1
       }
       x = pos._1
       y += 1
     }
-    */
   }
   
 }
 
 
 object SpriteUI {
+  import scala.util.parsing.combinator._
+  
   def pngStream(group: String): java.io.InputStream = {
     getClass.getResourceAsStream("/" + group + ".png")
   }
+  
+  trait ImageInfo {
+    def apply(idx: String, frame: Int): ((Int, Int), (Int, Int), (Int, Int))
+    def position(idx: String, frame: Int) = apply(idx, frame)._1
+    def size(idx: String, frame: Int) = apply(idx, frame)._2
+    def offset(idx: String, frame: Int) = apply(idx, frame)._3
+  }
+  
   def imageInfo(group: String): ImageInfo = {
-    val s = getClass.getResourceAsStream("/" + group + ".dsc")
+    val desc = getClass.getResourceAsStream("/" + group + ".dsc")
     try {
-      val props = new java.util.Properties
-      props.load(s)
-      val propmap = mutable.HashMap[String, String]()
-      val sz = props.stringPropertyNames.size
-      val table = new Array[String](sz)
-      for (nm <- JavaConversions.asScalaSet(props.stringPropertyNames)) {
-        val v = props.getProperty(nm)
-        val idx = nm.toInt
-        table(idx) = v
-      }
+      val table = parseImageInfo(group, org.apache.commons.io.IOUtils.toString(desc, "UTF-8"))
       
       new ImageInfo {
-        def apply(idx: Int) = {
-          val seq = table(idx).split(',').map(_.toInt)
+        def apply(idx: String, frame: Int) = {
+          val seq = table(idx)(frame).split(',').map(_.toInt)
           ((seq(0), seq(1)), (seq(2), seq(3)), (seq(4), seq(5)))
         }
       }
     } finally {
-      s.close()
+      desc.close()
     }
   }
-}
-
-
-trait ImageInfo {
-  def apply(idx: Int): ((Int, Int), (Int, Int), (Int, Int))
-  def position(idx: Int) = apply(idx)._1
-  def size(idx: Int) = apply(idx)._2
-  def offset(idx: Int) = apply(idx)._3
+  
+  def parseImageInfo(group: String, s: String): mutable.Map[String, Seq[String]] = {
+    class ImageInfoParser extends syntactical.StandardTokenParsers {
+      val info = mutable.Map[String, Seq[String]]()
+      
+      lexical.delimiters ++= List("{", "}", ",", ":", "=", ";", ".", "-")
+      
+      entries(new lexical.Scanner(s)) match {
+        case Success(obj, _) => obj
+        case Failure(msg, _) => 
+        case Error(msg, _) => 
+      }
+      
+      def entries: Parser[Any] = rep(entry)
+      def entr = ident ^^ { case x => println(x) }
+      def entry: Parser[Unit] = ident ~ "=" ~ "{" ~ frames ~ "}" ^^ {
+        case nm ~ _ ~ _ ~ frames ~ _ => info.put(group + "." + nm, frames)
+      }
+      def frames: Parser[Seq[String]] = rep(frame) ^^ {
+        case sq => sq.toBuffer
+      }
+      def frame: Parser[String] = number ~ ":" ~ repsep(number, ",") ~ ";" ^^ {
+        case _ ~ _ ~ numbers ~ _ => numbers.mkString(",")
+      }
+      def number = posnumber | negnumber
+      def posnumber = super.numericLit ^^ { _.toInt }
+      def negnumber = "-" ~ posnumber ^^ {
+        case _ ~ n => -n.toInt
+      }
+    }
+    
+    (new ImageInfoParser).info
+  }
+  
 }
 
 

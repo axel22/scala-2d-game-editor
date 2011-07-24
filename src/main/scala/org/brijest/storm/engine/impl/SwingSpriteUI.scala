@@ -27,6 +27,7 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
                          java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
       buffer.synchronized {
+        g.drawImage(stars, 0, 0, 800, 600, 0, 0, 800, 600, null, null)
         g.drawImage(buffer, 0, 0, 640, 480, 0, 0, 640, 480, null, null)
       }
     }
@@ -38,6 +39,7 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
     underlying.requestFocus()
   }
     
+  val stars = javax.imageio.ImageIO.read(getClass.getResourceAsStream("/stars.png"))
   val buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
   
   frame.size = new Dimension(640, 480)
@@ -54,7 +56,8 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
   
   /* implementations */
   
-  class SwingSprite(val image: Image, val wdt: Int, val hgt: Int, val xoffset: Int, val yoffset: Int) extends Sprite {
+  class SwingSprite(val image: Image, val wdt: Int, val hgt: Int, val xoffset: Int, val yoffset: Int)
+  extends Sprite {
     def draw(x: Int, y: Int, frame: Int) {
       buffer.createGraphics.drawImage(
         image, 
@@ -75,9 +78,9 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
   }
   
   object palette extends Palette {
-    val imageinfos = mutable.HashMap[String, ImageInfo]()
+    val imageinfos = mutable.HashMap[String, SpriteUI.ImageInfo]()
     val images = mutable.HashMap[String, SoftReference[Image]]()
-    val spritez = mutable.HashMap[Int, SoftReference[Sprite]]()
+    val spritez = mutable.HashMap[String, SoftReference[Sprite]]()
     
     private def loadImage(group: String) = {
       val stream = SpriteUI.pngStream(group)
@@ -105,27 +108,31 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
       case None => loadImage(group)
     }
     
-    private def loadSprite(id: Int): Sprite = {
-      val (group, name) = Slot.idents(id)
+    private def loadSprite(id: String): Sprite = {
+      val s = id.split("\\.")
+      val (group, name) = (s(0), s(1))
       val ts = image(group)
       val info = imageinfo(group)
-      val ((x, y), (w, h), (xoff, yoff)) = info(id)
-      val wdt = w * swdt
-      val hgt = h * shgt
+      val ((x, y), (w, h), (xoff, yoff)) = info(id, 0)
+      val wdt = w
+      val hgt = h
       val img = new BufferedImage(wdt, hgt, BufferedImage.TYPE_4BYTE_ABGR)
-      img.createGraphics.drawImage(ts, 0, 0, wdt, hgt, x * swdt, y * swdt, x * swdt + wdt, y * hgt + hgt, null, null)
-      val sprite = new SwingSprite(img, wdt, hgt, xoff * swdt, yoff * shgt)
+      img.createGraphics.drawImage(ts, 0, 0, wdt, hgt, x, y, x + wdt, y + hgt, null, null)
+      val sprite = new SwingSprite(img, wdt, hgt, xoff, yoff)
       spritez.put(id, new SoftReference(sprite))
       sprite
     }
     
-    def sprite(t: Slot): Sprite = spritez.get(t.identifier) match {
+    def sprite(ident: String): Sprite = spritez.get(ident) match {
       case Some(sref) =>
         val s = sref.get
-        if (s eq null) loadSprite(t.identifier) else s
-      case None => loadSprite(t.identifier)
+        if (s eq null) loadSprite(ident) else s
+      case None => loadSprite(ident)
     }
-    def sprite(e: EntityView): Sprite = NullSprite
+    
+    def sprite(e: EntityView): Sprite = sprite(e.identifier)
+    
+    def sprite(s: Slot): Sprite = sprite(s.identifier)
   }
   
 }

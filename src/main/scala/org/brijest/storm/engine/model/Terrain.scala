@@ -22,15 +22,11 @@ trait Slot extends Immutable {
   def height: Int
   def chr: Char
   def color: Int
-  def identifier: Int
+  def identifier: String
 }
 
 
 object Slot {
-  def idents(id: Int) = (id: @switch) match {
-    case 0x00000000 => ("dungeon", "rock")
-    case 0x00000001 => ("dungeon", "floor")
-  }
 }
 
 
@@ -39,7 +35,7 @@ class HardRock(val height: Int) extends Slot {
   def seethrough = false
   def chr = '#'
   def color = 0x55555500
-  def identifier = 0x00000000
+  def identifier = "dungeon.rock"
 }
 
 
@@ -48,7 +44,7 @@ class DungeonFloor(val height: Int) extends Slot {
   def seethrough = true
   def chr = '.'
   def color = 0x55555500
-  def identifier = 0x00000001
+  def identifier = "dungeon.floor"
 }
 
 

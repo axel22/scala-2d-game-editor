@@ -43,7 +43,9 @@ trait EnrouteStatsRules {
 trait EnrouteInventoryRules {
   def newInventory = new Inventory {
     val items = mutable.Set[Item]()
+    def equipslots = Seq("Head", "Neck", "Left hand", "Right hand", "Armor", "Feet")
+    val equipped = mutable.Map() ++ (equipslots zip (0 until equipslots.size).map(x => None: Option[Item]))
   }
-  def canMove(weight: Int, encumbrance: Int, c: Character) = weight < encumbrance
-  def delayModifier(weight: Int, encumbrance: Int, c: Character) = 1
+  def canMove(c: Character) = true
+  def additionalDelay(c: Character) = 0
 }

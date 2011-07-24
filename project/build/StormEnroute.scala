@@ -31,6 +31,8 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   val slf4j_jdk = "org.slf4j" % "slf4j-jdk14" % "1.6.1"
   val h2db = "com.h2database" % "h2" % "1.2.147"
   val scalaSwing = "org.scala-lang" % "scala-swing" % scalaVersion
+  val apacheCommons = "commons-lang" % "commons-lang" % "2.2"
+  val apacheCommonsIo = "commons-io" % "commons-io" % "1.3.2"
   
   /* constants */
   
@@ -85,7 +87,9 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   def createRunScript(name: String, dir: Path, libdir: Path) {
     val alljars = List(Deploy.dir / artifactname) ++ classpath ++ List(scalalibpath)
     val jardecl = "JARS=%s".format(alljars.map(fileName(_)).map(libdir.asFile.getName / _).mkString(":"))
-    val startcommand = "java -cp $JARS %s %s".format(
+    val flags = "-Dsun.java2d.opengl=True"
+    val startcommand = "java -cp $JARS %s %s %s".format(
+      flags,
       mainClass.get,
       "$@"
     )
