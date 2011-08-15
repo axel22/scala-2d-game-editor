@@ -21,13 +21,13 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   /* config */
   
-  val scalaVersion = "2.8.1"
+  val scalaVersion = "2.9.0"
   
   /* dependencies */
   
   //val scopt = "com.github.scopt" % "scopt" % "1.0-SNAPSHOT" - not found?
-  val scalatest = "org.scalatest" % "scalatest" % "1.2"
-  val slf4s = "com.weiglewilczek.slf4s" %% "slf4s" % "1.0.3"
+  val scalatest = "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
+  val slf4s = "com.weiglewilczek.slf4s" %% "slf4s" % "1.0.6"
   val slf4j_jdk = "org.slf4j" % "slf4j-jdk14" % "1.6.1"
   val h2db = "com.h2database" % "h2" % "1.2.147"
   val scalaSwing = "org.scala-lang" % "scala-swing" % scalaVersion

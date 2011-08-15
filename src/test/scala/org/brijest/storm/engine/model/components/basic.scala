@@ -363,7 +363,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
       }
       
       for (i <- (0 until 15).reverse) {
-        h.max should equal (i)
+        h.head should equal (i)
         h.dequeue() should equal (i)
       }
     }
@@ -378,7 +378,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
       
       for (i <- (0 until many).reverse) {
         h.size should equal (i + 1)
-        h.max should equal (i)
+        h.head should equal (i)
         h.dequeue() should equal (i)
       }
       
@@ -388,7 +388,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
       
       for (i <- (0 until many).reverse) {
         h.size should equal (i + 1)
-        h.max should equal (i)
+        h.head should equal (i)
         h.dequeue() should equal (i)
       }
       
@@ -398,7 +398,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
       
       for (i <- (0 until many).reverse) {
         h.size should equal (i + 1)
-        h.max should equal (i)
+        h.head should equal (i)
         h.dequeue() should equal (i)
       }
     }

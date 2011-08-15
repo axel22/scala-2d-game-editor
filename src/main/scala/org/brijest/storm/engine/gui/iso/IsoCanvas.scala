@@ -6,25 +6,14 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine.model.components
+package org.brijest.storm.engine
+package gui.iso
 
 
 
+import collection._
 
 
 
-package immutable {
-  
-  trait Cell[+T] {
-    def apply(): T
-  }
-  
-}
-
-
-class Cell[T](private var v: T) extends immutable.Cell[T] with Serializable {
-  def this() = this(null.asInstanceOf[T])
-  def apply() = v
-  def :=(nv: T) = v = nv
-  def +=(nv: T)(implicit n: Numeric[T]) = v = n.plus(v, nv)
+trait IsoCanvas {
 }

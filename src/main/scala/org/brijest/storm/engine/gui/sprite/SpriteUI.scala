@@ -7,6 +7,7 @@
 \*                                            www.storm-enroute.com       */
 
 package org.brijest.storm.engine
+package gui.sprite
 
 
 

@@ -23,7 +23,7 @@ package immutable {
 }
 
 
-@serializable class Queue[T] extends immutable.Queue[T] with ElemRef[T] {
+class Queue[T] extends immutable.Queue[T] with ElemRef[T] with Serializable {
   private var start = new UNode[T]
   private var prelast = start
   private var lastnd = start
@@ -70,7 +70,7 @@ trait ElemRef[T] {
 }
 
 
-@serializable private class UNode[T] {
+private class UNode[T] extends Serializable {
   @inline final def bsz = 32
   
   val array = new Array[AnyRef](bsz)
@@ -105,7 +105,7 @@ trait ElemRef[T] {
     }
   }
   
-  final def iterator(f: UNode[T] => UNode[T]) = new Iterator[T] {
+  final def iterator(f: UNode[T] => UNode[T]): Iterator[T] = new Iterator[T] {
     private var nd = UNode.this
     private var pos = start
     def hasNext = (nd ne null) && pos < nd.end

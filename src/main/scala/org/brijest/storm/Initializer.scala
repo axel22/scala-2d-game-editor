@@ -50,8 +50,9 @@ object Initializer {
   }
   
   private def createUI(config: Config): UI = config.ui match {
-    case ui.swingConsole => new ConsoleUI(new SwingStandaloneShell(app.name) with Buffers)
-    case ui.swingSprites => new SwingSpriteUI(app.name)
+    case ui.swingConsole => new gui.console.ConsoleUI(new SwingStandaloneShell(app.name) with Buffers)
+    case ui.swingSprites => new gui.sprite.SwingSpriteUI(app.name)
+    case ui.swingIso => new gui.iso.SwingIsoUI(app.name)
     case e => exit("User interface '%s' not recognized".format(e))
   }
   

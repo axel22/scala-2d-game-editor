@@ -39,7 +39,7 @@ class Simulator(val area: Area) {
   
   def time = simtime
   
-  def nextEventAt = eventqueue.max._1
+  def nextEventAt = eventqueue.head._1
   
   def hasNextEvent = eventqueue.nonEmpty
   
@@ -77,7 +77,7 @@ class Simulator(val area: Area) {
       processTrigger(e.id, trig)
     }
     
-    while (eventqueue.nonEmpty && eventqueue.max._1 == simtime) {
+    while (eventqueue.nonEmpty && eventqueue.head._1 == simtime) {
       val (_, eid) = eventqueue.dequeue()
       area.entity(eid) match {
         case Some(entity) => doAction(entity)

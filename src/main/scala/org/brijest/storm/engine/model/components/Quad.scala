@@ -29,7 +29,7 @@ package immutable {
 }
 
 
-@serializable class Quad[T](w: Int, h: Int, d: (Int, Int) => Option[T], compress: Boolean) extends immutable.Quad[T] {
+class Quad[T](w: Int, h: Int, d: (Int, Int) => Option[T], compress: Boolean) extends immutable.Quad[T] with Serializable {
   private var dflt: (Int, Int) => Option[T] = d
   private var dims: (Int, Int) = (w, h);
   private var root: QNode[T] = new QEmpty[T](QNode.calcSide(dims))

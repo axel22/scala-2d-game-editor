@@ -22,5 +22,5 @@ package immutable {
 }
 
 
-@serializable class Heap[T: Ordering] extends mutable.PriorityQueue[T] with immutable.Heap[T]
+class Heap[T: Ordering] extends mutable.PriorityQueue[T] with immutable.Heap[T]
 

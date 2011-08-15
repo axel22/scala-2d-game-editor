@@ -127,8 +127,8 @@ engine =>
     
     def interpret(m: String) = script(new lexical.Scanner(m)) match {
       case Success(obj, _) => obj
-      case Failure(msg, _) => /*sys.*/error(msg)
-      case Error(msg, _) => /*sys.*/error(msg)
+      case Failure(msg, _) => sys.error(msg)
+      case Error(msg, _) => sys.error(msg)
     }
     
     /* language */

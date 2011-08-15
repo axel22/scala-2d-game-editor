@@ -13,4 +13,4 @@ package org.brijest.storm.engine.model.components
 
 
 
-@serializable trait Struct
+trait Struct extends Serializable
