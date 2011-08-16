@@ -26,7 +26,7 @@ package object storm {
   
   def exit(msg: String): Nothing = {
     Console.err.println(msg)
-    System.exit(1)
+    sys.exit(1)
     sys.error("unreachable")
   }
   
@@ -41,6 +41,7 @@ package object storm {
   
   object app {
     val name = "Storm Enroute"
+    val editorname = "Storm Enroute Area Editor"
     val command = "storm-enroute"
   }
   

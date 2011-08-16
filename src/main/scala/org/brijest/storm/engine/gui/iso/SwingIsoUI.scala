@@ -28,8 +28,11 @@ class SwingIsoUI(val name: String) extends IsoUI {
       super.paintComponent(g)
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
                          java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
+      
+      for (x <- 0 to (width / 800 + 1); y <- 0 to (height / 600 + 1))
+        g.drawImage(stars, x * 800, y * 600, x * 800 + 800, y * 600 + 600, 0, 0, 800, 600, null, null)
+      
       buffer.synchronized {
-        g.drawImage(stars, 0, 0, 800, 600, 0, 0, 800, 600, null, null)
         g.drawImage(buffer, 0, 0, 640, 480, 0, 0, 640, 480, null, null)
       }
     }

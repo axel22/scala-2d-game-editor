@@ -36,7 +36,7 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   /* constants */
   
-  def scalavers = "2.8.1"
+  def scalavers = scalaVersion
   
   def fullArtifactName(artname: String) = artname + "-" + version + "." + defaultMainArtifact.extension
   
@@ -47,6 +47,8 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   def scalalibpath = "project" / "boot" / ("scala-" + scalavers) / "lib" / "scala-library.jar"
   
   override def mainClass = Some("org.brijest.storm.StormEnroute")
+  
+  def editorClass = Some("org.brijest.storm.Editor")
   
   def classpath =
     unmanagedClasspath.get ++
@@ -84,17 +86,17 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   def fileName(f: Path) = f.asFile.getName
   
-  def createRunScript(name: String, dir: Path, libdir: Path) {
+  def createRunScript(name: String, dir: Path, libdir: Path, comment: String, maincls: String) {
     val alljars = List(Deploy.dir / artifactname) ++ classpath ++ List(scalalibpath)
     val jardecl = "JARS=%s".format(alljars.map(fileName(_)).map(libdir.asFile.getName / _).mkString(":"))
     val flags = "-Dsun.java2d.opengl=True"
     val startcommand = "java -cp $JARS %s %s %s".format(
       flags,
-      mainClass.get,
+      maincls,
       "$@"
     )
     val startscript = (dir / name).asFile
-    "echo # Storm Enroute" #> startscript !;
+    "echo # %s".format(comment) #> startscript !;
     "echo \n%s".format(jardecl) #>> startscript !;
     "echo \n%s".format(startcommand) #>> startscript !;
     "chmod a+x %s".format(startscript) !;
@@ -109,9 +111,11 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   object Deploy {
     val stormcmd = "storm-enroute"
+    val editorcmd = "editor"
     val dir = "deploy"
     val savedir = dir / "saves"
     val libzdir = dir / "libz"
+    val areadir = dir / "areas"
   }
   
   /* tasks */
@@ -120,8 +124,10 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     runsync("rm -rf %s".format(Deploy.savedir))
     runsync("mkdir %s".format(Deploy.dir))
     runsync("mkdir %s".format(Deploy.libzdir))
+    runsync("mkdir %s".format(Deploy.areadir))
     copyDependencies(Deploy.libzdir)
-    createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir)
+    createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir, "Storm Enroute", mainClass.get)
+    createRunScript(Deploy.editorcmd, Deploy.dir, Deploy.libzdir, "Editor", editorClass.get)
     createBaseDirRunScript("deployrun", Deploy.stormcmd, Deploy.dir)
     None
   } dependsOn (`package`)

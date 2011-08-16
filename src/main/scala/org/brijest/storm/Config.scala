@@ -21,6 +21,12 @@ final class Config {
   var world: Option[String] = None
   val basedir = System.getProperty("user.dir")
   val savedir = "saves"
+  
+  object area {
+    var name: String = _
+    var width = 16
+    var height = 16
+  }
 }
 
 
