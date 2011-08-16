@@ -19,7 +19,7 @@ import collection._
 trait IsoCanvas {
   val deppool = new MemoryPool(new DepNode)
   val infopool = new MemoryPool(new Info)
-  var slots: Array[Info] = null
+  var infos: Array[Info] = null
   
   val oneone = (1, 1);
   
@@ -142,41 +142,51 @@ trait IsoCanvas {
     val w = (xbr - x0).toInt
     val h = (ybl - y0).toInt
     
-    def contained(x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + w) && y < (y0 + h)
+    @inline def onscreen(x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + w) && y < (y0 + h)
+    object slotinfo {
+      @inline def apply(x: Int, y: Int) = if (onscreen(x, y)) infos((y - y0) * w + (x - x0)) else null
+      @inline def update(x: Int, y: Int, i: Info) = infos((y - y0) * w + (x - x0)) = i
+    }
     
-    // group slots
-    if ((slots eq null) || slots.length != w * h) slots = new Array[Info](w * h)
+    // initialize and group infos
+    if ((infos eq null) || infos.length != w * h) infos = new Array[Info](w * h)
     for (x <- x0 until (x0 + w); y <- y0 until (y0 + h)) if (area.contains(x, y)) area.characters(x, y) match {
       case NoCharacter =>
         val info = infopool.create
         info.deps = deppool.create
-        slots(y * w + x) = info
+        slotinfo(x, y) = info
       case c =>
         val info = infopool.create
         if (c.pos.equals(x, y)) {
           info.deps = deppool.create
           info.dims = c.dimensions()
         } else info.top = c.pos().toPair
-        slots(y * w + x) = info
+        slotinfo(x, y) = info
     }
     
-    // compute dependencies - iterate over all the slots diagonal-wise
+    // compute dependencies - iterate over all the infos diagonal-wise
     def dependencies(x: Int, y: Int) {
-      val info = slots(y * w + x)
-      if (info.isTop) {
+      val info = slotinfo(x, y)
+      if ((info ne null) && info.isTop) {
         val cspr = characterSprite(area.characters(x, y))
         val vhi = info.lowestV(x, y, area) - cspr.height
         val (u, v) = iso2planar(x, y, area.terrain(x, y).height, area.sidelength)
         val (xtop, ytop) = planar2iso(u, vhi, area.sidelength)
         val (xl, yl) = info.leftXY(x, y)
         val (xr, yr) = info.rightXY(x, y)
-        val uleft = iso2planar_u(xl, yl, 0, area.sidelength) - slotwidth
-        val uright = iso2planar_u(xr, yr, 0, area.sidelength) + slotwidth
+        val uleft = iso2planar_u(xl, yl, 0, area.sidelength) - slotwidth * 2
+        val uright = iso2planar_u(xr, yr, 0, area.sidelength) + slotwidth * 2
         
         // add everything in the rectangle to the dependency list
         for (xp <- xtop.toInt to xr; yp <- ytop.toInt to yl) {
           val up = iso2planar_u(xp, yp, 0, area.sidelength)
-          if (up > uleft && up < uright && !info.contains(x, y, xp, yp)) info.deps = info.deps.add(xp, yp)
+          if (up > uleft && up < uright && !info.contains(x, y, xp, yp)) {
+            val depinfo = slotinfo(xp, yp)
+            if (depinfo ne null) {
+              if (depinfo.isTop) info.deps = info.deps.add(xp, yp)
+              else info.deps = info.deps.add(depinfo.top._1, depinfo.top._2)
+            }
+          }
         }
       }
     }
@@ -205,7 +215,8 @@ trait IsoCanvas {
       }
     }
     def reverseDraw(x: Int, y: Int) {
-      val info = slots(y * w + x)
+      println(x, y)
+      val info = slotinfo(x, y)
       if (info.isTop && !info.drawn) {
         info.deps.foreach((xp, yp) => reverseDraw(xp, yp))
         draw(x, y, info)
@@ -216,9 +227,9 @@ trait IsoCanvas {
     for (i <- 1 until h; x <- i until h; y = h - x) reverseDraw(x, y)
    
     // dispose dependencies
-    for (i <- 0 until slots.length) {
-      val info = slots(i)
-      slots(i) = null
+    for (i <- 0 until infos.length) {
+      val info = infos(i)
+      infos(i) = null
       if (info.deps ne null) deppool.dispose(info.deps)
       infopool.dispose(info)
     }
