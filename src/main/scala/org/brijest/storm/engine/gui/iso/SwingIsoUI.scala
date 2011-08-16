@@ -60,10 +60,20 @@ class SwingIsoUI(val name: String) extends IsoUI {
   def height: Int = frame.size.height
   
   def refresh(area: AreaView, state: Engine.State) = buffer.synchronized {
-    redraw(area, state, new SwingDrawingAdapter)
+    redraw(area, state, new SwingDrawAdapter)
   }
   
-  class SwingDrawingAdapter extends DrawingAdapter {
+  def characterSprite(c: CharacterView) = new Sprite { def height = 0 } // TODO
+  
+  class SwingDrawAdapter extends DrawAdapter {
+    val gr = buffer.getGraphics.asInstanceOf[Graphics2D]
+    
+    def drawLine(x1: Int, y1: Int, x2: Int, y2: Int) {
+      gr.drawLine(x1, y1, x2, y2)
+    }
+    def setColor(r: Int, g: Int, b: Int) {
+      gr.setColor(new java.awt.Color(r, g, b))
+    }
   }
   
 }

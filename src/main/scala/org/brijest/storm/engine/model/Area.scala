@@ -23,6 +23,11 @@ self =>
   def items: ItemTableView
   def neighbours: components.immutable.Table[Pos, AreaId]
   
+  def sidelength = terrain.dimensions._1 max terrain.dimensions._2
+  def contains(x: Int, y: Int) = {
+    val d = terrain.dimensions
+    x >= 0 && y >= 0 && x < d._1 && y < d._2
+  }
   def entities = characters.ids.iterator.map(_._2) ++ items.ids.iterator.map(_._2)
   def entity(id: EntityId): Option[EntityView] = characters.ids.get(id) match {
     case None => items.ids.get(id)

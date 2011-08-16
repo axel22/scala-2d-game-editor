@@ -27,7 +27,7 @@ package object storm {
   def exit(msg: String): Nothing = {
     Console.err.println(msg)
     System.exit(1)
-    error("unreachable")
+    sys.error("unreachable")
   }
   
   /* pimps */

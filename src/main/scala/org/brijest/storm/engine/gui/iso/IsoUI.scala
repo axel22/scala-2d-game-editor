@@ -25,15 +25,15 @@ trait IsoUI extends UI with IsoCanvas {
   
   def height: Int
   
+  def slotheight = 24
+  
   def update(actions: Seq[Action], area: AreaView, state: Engine.State) = refresh(area, state)
   
   def message(msg: String) {}
   
-  trait DrawingAdapter {
-  }
-  
-  def redraw(area: AreaView, state: Engine.State, adapter: DrawingAdapter) = {
+  def redraw(area: AreaView, state: Engine.State, adapter: DrawAdapter) = {
     // update canvas with relevant information
+    draw(area, adapter)
   }
   
 }

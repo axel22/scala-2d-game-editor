@@ -45,7 +45,7 @@ object World {
           return pc
         }
       }
-      error("could not place character " + area.id())
+      sys.error("could not place character " + area.id())
     }
   }
   

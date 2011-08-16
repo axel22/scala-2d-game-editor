@@ -19,6 +19,8 @@ trait CharacterTableView extends Struct {
   def ids: components.immutable.Table[EntityId, CharacterView]
   def locs: components.immutable.Quad[CharacterView]
   def pcs: components.immutable.Table[PlayerId, EntityId]
+  
+  def apply(x: Int, y: Int) = locs(x, y)
 }
 
 

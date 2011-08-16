@@ -7,16 +7,17 @@
 \*                                            www.storm-enroute.com       */
 
 package org.brijest.storm.engine
-package model
+package gui.iso
 
 
 
+import model._
 
 
 
-case class Pos(x: Int, y: Int) extends Immutable {
-  def to(dir: Dir) = Dir.fromTo(this, dir)
-  def adjacent(p: Pos) = math.abs(x - p.x) <= 1 && math.abs(y - p.y) <= 1
-  def equals(x1: Int, y1: Int) = x == x1 && y == y1
-  def toPair = (x, y)
+trait DrawAdapter {
+  def setColor(r: Int, g: Int, b: Int)
+  def drawLine(x1: Int, y1: Int, x2: Int, y2: Int)
+  def drawLine(x1: Double, y1: Double, x2: Double, y2: Double): Unit = drawLine(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
 }
+  

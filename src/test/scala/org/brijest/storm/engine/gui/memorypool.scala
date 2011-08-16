@@ -21,7 +21,7 @@ class MemoryPoolTests extends WordSpec with ShouldMatchers {
   "Memory pool" should {
     
     "create and dispose objects" in {
-      class Next extends Linked[Next]
+      class Next extends Linked[Next] { def reset() {} }
       val m = new MemoryPool(new Next)
       
       val a = m.create
@@ -35,6 +35,16 @@ class MemoryPoolTests extends WordSpec with ShouldMatchers {
       m.dispose(d)
       
       for (i <- 0 until 4) m.create.next should equal (null)
+    }
+    
+    "create and dispose many objects" in {
+      class Next extends Linked[Next] { def reset() {} }
+      val m = new MemoryPool(new Next)
+      val sz = 5000
+      
+      val objs = for (i <- 0 until sz) yield m.create
+      for (o <- objs) m.dispose(o)
+      for (i <- 0 until sz) m.create
     }
     
   }
