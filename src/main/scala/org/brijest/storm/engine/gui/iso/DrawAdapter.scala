@@ -17,7 +17,9 @@ import model._
 
 trait DrawAdapter {
   def setColor(r: Int, g: Int, b: Int)
+  def setFontSize(sz: Float)
   def drawLine(x1: Int, y1: Int, x2: Int, y2: Int)
   def drawLine(x1: Double, y1: Double, x2: Double, y2: Double): Unit = drawLine(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
+  def drawString(s: String, x: Int, y: Int)
 }
   

@@ -50,14 +50,6 @@ class SwingIsoUI(val name: String) extends IsoUI {
   frame.peer.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
   frame.open()
   
-  areadisplay.listenTo(areadisplay)
-  
-  areadisplay.reactions += {
-    case event.UIElementResized(_) => this.synchronized {
-      buffer = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
-    }
-  }
-  
   /* implementations */
   
   def width: Int = frame.size.width
@@ -84,6 +76,12 @@ class SwingIsoUI(val name: String) extends IsoUI {
     }
     def setColor(r: Int, g: Int, b: Int) {
       gr.setColor(new java.awt.Color(r, g, b))
+    }
+    def drawString(s: String, x: Int, y: Int) {
+      gr.drawString(s, x, y)
+    }
+    def setFontSize(sz: Float) {
+      gr.setFont(gr.getFont.deriveFont(sz))
     }
   }
   

@@ -12,6 +12,7 @@ package org.brijest.storm
 
 import org.github.scopt._
 import scala.swing._
+import java.awt.image._
 import engine.model._
 
 
@@ -63,9 +64,18 @@ class SwingEditor(config: Config) extends engine.gui.iso.SwingIsoUI(app.editorna
     case e @ event.MousePressed(_, p, mods, clicks, trig) =>
       if (e.peer.getButton == java.awt.event.MouseEvent.BUTTON1) lastpress = p
     case event.MouseDragged(_, p, mods) =>
-      pos = ((pos._1 - lastpress.getX + p.getX).toInt, (pos._2 - lastpress.getY + p.getY).toInt);
+      pos = ((pos._1 + lastpress.getX - p.getX).toInt, (pos._2 + lastpress.getY - p.getY).toInt);
       lastpress = p
       refresh(area, engine.get)
+  }
+  
+  areadisplay.listenTo(areadisplay)
+  
+  areadisplay.reactions += {
+    case event.UIElementResized(_) => this.synchronized {
+      buffer = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
+      refresh(area, engine.get)
+    }
   }
   
 }

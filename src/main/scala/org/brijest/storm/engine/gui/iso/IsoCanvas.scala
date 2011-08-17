@@ -100,7 +100,10 @@ trait IsoCanvas {
   
   def levelheight = 16
   
-  def outline = true
+  object drawing {
+    def outline = true
+    def indices = true
+  }
   
   def pos: (Int, Int)
   
@@ -143,6 +146,7 @@ trait IsoCanvas {
     val y0 = ytr.toInt
     val w = (xbr - x0).toInt
     val h = (ybl - y0).toInt
+    println(u0, v0, x0, y0, x0 + w, y0 + h)
     
     @inline def onscreen(x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + w) && y < (y0 + h)
     object slotinfo {
@@ -192,20 +196,21 @@ trait IsoCanvas {
         }
       }
     }
-    for (i <- 0 until h; x <- 0 to i; y = i - x) dependencies(x, y)
-    for (i <- 1 until h; x <- i until h; y = h - x) dependencies(x, y)
+    for (i <- 0 until h; x <- 0 to i; y = i - x) dependencies(x0 + x, y0 + y)
+    for (i <- 0 until h; x <- i until h; y = h + i - x) dependencies(x0 + x, y0 + y)
     
     // reverse drawing
-    def draw(x: Int, y: Int, info: Info) {
+    def drawTop(x: Int, y: Int, info: Info) {
       import a._
-      if (outline) {
+      if (drawing.outline) {
         val (uabs, vabs) = iso2planar(x, y, area.terrain(x, y).height, area.sidelength)
-        val u = uabs + u0
-        val v = vabs + v0
-        
+        val u = uabs - u0
+        val v = vabs - v0
         
         // draw terrain and sides
         setColor(0, 100, 200)
+        setFontSize(8)
+        if (drawing.indices) drawString("%s, %s".format(x, y), u.toInt - slotwidth / 4, v.toInt)
         drawLine(u - slotwidth / 2, v, u, v - slotheight / 2)
         drawLine(u, v - slotheight / 2, u + slotwidth / 2, v)
         drawLine(u + slotwidth / 2, v, u, v + slotheight / 2)
@@ -224,7 +229,7 @@ trait IsoCanvas {
       if (info != null && !info.drawn) {
         if (info.isTop) {
           info.deps.foreach((xp, yp) => reverseDraw(xp, yp))
-          draw(x, y, info)
+          drawTop(x, y, info)
           info.drawn = true
         } else {
           reverseDraw(info.top._1, info.top._2)
@@ -232,12 +237,8 @@ trait IsoCanvas {
         }
       }
     }
-    for (i <- 0 until h; x <- 0 to i; y = i - x) {
-      reverseDraw(x, y)
-    }
-    for (i <- 1 until h; x <- i until h; y = h - x) {
-      reverseDraw(x, y)
-    }
+    for (i <- 0 until h; x <- 0 to i; y = i - x) reverseDraw(x0 + x, y0 + y)
+    for (i <- 0 until h; x <- i until h; y = h + i - x) reverseDraw(x0 + x, y0 + y)
    
     // dispose dependencies
     for (i <- 0 until infos.length) {
