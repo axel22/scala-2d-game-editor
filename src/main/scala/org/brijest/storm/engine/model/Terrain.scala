@@ -17,14 +17,14 @@ import annotation.switch
 
 
 trait Slot extends Immutable {
-  assert(height >= 0)
-  
   def walkable: Boolean
   def seethrough: Boolean
   def height: Int
   def chr: Char
   def color: Int
   def identifier: String
+  
+  assert(height >= 0)
 }
 
 

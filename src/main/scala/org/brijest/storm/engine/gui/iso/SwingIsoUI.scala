@@ -63,10 +63,16 @@ class SwingIsoUI(val name: String) extends IsoUI {
     sad.gr.fillRect(0, 0, buffer.getWidth, buffer.getHeight)
     sad.gr.setComposite(oldcomp)
     
-    redraw(area, state, sad)
+    val t = timed {
+      redraw(area, state, sad)
+    }
+    
+    //println("Time to render: %d ms".format(t))
   }
   
   def characterSprite(c: CharacterView) = new Sprite { def height = 0 } // TODO
+  
+  def maxSpriteHeight = 320
   
   class SwingDrawAdapter extends DrawAdapter {
     val gr = buffer.getGraphics.asInstanceOf[Graphics2D]
@@ -82,6 +88,12 @@ class SwingIsoUI(val name: String) extends IsoUI {
     }
     def setFontSize(sz: Float) {
       gr.setFont(gr.getFont.deriveFont(sz))
+    }
+    def drawPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
+      gr.drawPolyline(xpoints, ypoints, n)
+    }
+    def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
+      gr.fillPolygon(xpoints, ypoints, n)
     }
   }
   

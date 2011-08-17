@@ -24,4 +24,12 @@ package object engine {
   
   def unsupported() = throw new UnsupportedOperationException
   
+  def timed(thunk: =>Unit) = {
+    val t1 = System.currentTimeMillis
+    thunk
+    val time = System.currentTimeMillis - t1
+    time
+  }
+
+  
 }

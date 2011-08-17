@@ -20,6 +20,8 @@ trait IsoCanvas {
   val deppool = new MemoryPool(new DepNode)
   val infopool = new MemoryPool(new Info)
   var infos: Array[Info] = null
+  val xrect = new Array[Int](5)
+  val yrect = new Array[Int](5)
   
   val oneone = (1, 1);
   
@@ -133,11 +135,13 @@ trait IsoCanvas {
   
   def characterSprite(c: CharacterView): Sprite
   
+  def maxSpriteHeight: Int
+  
   def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     // determine region
     val (u0, v0) = pos
     val pw = width
-    val ph = height
+    val ph = height + area.maxheight() * levelheight + maxSpriteHeight
     val (xtl, ytl) = planar2iso(u0, v0, area.sidelength)
     val (xtr, ytr) = planar2iso(u0 + pw, v0, area.sidelength)
     val (xbr, ybr) = planar2iso(u0 + pw, v0 + ph, area.sidelength)
@@ -146,7 +150,6 @@ trait IsoCanvas {
     val y0 = ytr.toInt
     val w = (xbr - x0).toInt
     val h = (ybl - y0).toInt
-    println(u0, v0, x0, y0, x0 + w, y0 + h)
     
     @inline def onscreen(x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + w) && y < (y0 + h)
     object slotinfo {
@@ -208,13 +211,23 @@ trait IsoCanvas {
         val v = vabs - v0
         
         // draw terrain and sides
+        @inline implicit def double2int(d: Double) = d.toInt
+        xrect(0) = u - slotwidth / 2
+        xrect(1) = u.toInt
+        xrect(2) = u + slotwidth / 2
+        xrect(3) = u
+        xrect(4) = u - slotwidth / 2
+        yrect(0) = v
+        yrect(1) = v - slotheight / 2
+        yrect(2) = v
+        yrect(3) = v + slotheight / 2
+        yrect(4) = v
+        setColor(0, 0, 0)
+        fillPoly(xrect, yrect, 5)
         setColor(0, 100, 200)
+        drawPoly(xrect, yrect, 5)
         setFontSize(8)
         if (drawing.indices) drawString("%s, %s".format(x, y), u.toInt - slotwidth / 4, v.toInt)
-        drawLine(u - slotwidth / 2, v, u, v - slotheight / 2)
-        drawLine(u, v - slotheight / 2, u + slotwidth / 2, v)
-        drawLine(u + slotwidth / 2, v, u, v + slotheight / 2)
-        drawLine(u, v + slotheight / 2, u - slotwidth / 2, v)
         // TODO sides
         
         // draw character

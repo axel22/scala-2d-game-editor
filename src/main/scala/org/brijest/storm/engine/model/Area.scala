@@ -19,6 +19,7 @@ trait AreaView extends Struct {
 self =>
   def id: components.immutable.Cell[AreaId]
   def terrain: components.immutable.Quad[Slot]
+  def maxheight: Cell[Int]
   def characters: CharacterTableView
   def items: ItemTableView
   def neighbours: components.immutable.Table[Pos, AreaId]
@@ -47,6 +48,7 @@ class Area extends AreaView {
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable(1, 1)
   val neighbours = table[Pos, AreaId]
+  val maxheight = cell(20)
   
   def newEntityId() = {
     entitycount += 1
