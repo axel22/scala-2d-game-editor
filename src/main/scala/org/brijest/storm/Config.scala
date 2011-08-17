@@ -24,8 +24,8 @@ final class Config {
   
   object area {
     var name: String = _
-    var width = 16
-    var height = 16
+    var width = 8
+    var height = 8
   }
 }
 

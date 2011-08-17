@@ -22,8 +22,10 @@ import org.brijest.storm.engine.model._
 class SwingIsoUI(val name: String) extends IsoUI {
   
   val stars = javax.imageio.ImageIO.read(getClass.getResourceAsStream("/stars.png"))
-  val buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
-  val underlying = new Component {
+  var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
+  val areadisplay = new AreaDisplay
+  
+  class AreaDisplay extends Component {
     override def paintComponent(g: Graphics2D) {
       super.paintComponent(g)
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
@@ -32,29 +34,29 @@ class SwingIsoUI(val name: String) extends IsoUI {
       for (x <- 0 to (width / 800 + 1); y <- 0 to (height / 600 + 1))
         g.drawImage(stars, x * 800, y * 600, x * 800 + 800, y * 600 + 600, 0, 0, 800, 600, null, null)
       
-      buffer.synchronized {
-        g.drawImage(buffer, 0, 0, 640, 480, 0, 0, 640, 480, null, null)
+      this.synchronized {
+        g.drawImage(buffer, 0, 0, width, height, 0, 0, width, height, null, null)
       }
     }
   }
   
   val frame = new Frame {
     title = name
-    contents = underlying
-    underlying.requestFocus()
+    contents = areadisplay
+    areadisplay.requestFocus()
   }
-    
+  
   frame.size = new Dimension(640, 480)
+  frame.peer.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
   frame.open()
   
-  val refresher = new Thread {
-    override def run() = while (true) {
-      underlying.repaint()
-      Thread.sleep(36)
+  areadisplay.listenTo(areadisplay)
+  
+  areadisplay.reactions += {
+    case event.UIElementResized(_) => this.synchronized {
+      buffer = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
     }
   }
-  
-  refresher.start()
   
   /* implementations */
   
@@ -62,8 +64,14 @@ class SwingIsoUI(val name: String) extends IsoUI {
   
   def height: Int = frame.size.height
   
-  def refresh(area: AreaView, state: Engine.State) = buffer.synchronized {
-    redraw(area, state, new SwingDrawAdapter)
+  def refresh(area: AreaView, state: Engine.State) = this.synchronized {
+    val sad = new SwingDrawAdapter
+    val oldcomp = sad.gr.getComposite
+    sad.gr.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.CLEAR, 0.0f))
+    sad.gr.fillRect(0, 0, buffer.getWidth, buffer.getHeight)
+    sad.gr.setComposite(oldcomp)
+    
+    redraw(area, state, sad)
   }
   
   def characterSprite(c: CharacterView) = new Sprite { def height = 0 } // TODO

@@ -21,10 +21,16 @@ trait Linked[Repr <: AnyRef] {
 }
 
 
+/** A memory pool for objects which have a `next` field. They should
+ *  be manually allocated and disposed using the methods `allocate`
+ *  and `dispose`. They can even use the `next` field as long as they
+ *  are not already disposed. Disposing an object with a long chain of
+ *  next fields will dispose all the elements in the chain efficiently.
+ */
 class MemoryPool[T <: Linked[T]: ClassManifest](newObject: =>T) {
   private var chain = mutable.UnrolledBuffer[T]()
   
-  def create = if (chain.nonEmpty) {
+  def allocate = if (chain.nonEmpty) {
     val elem = chain(0)
     if (elem.next eq null) chain.remove(0)
     else chain(0) = elem.next

@@ -36,18 +36,19 @@ trait IsoCanvas {
       drawn = false
     }
     def contains(x0: Int, y0: Int, x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + dims._1) && y < (y0 + dims._2)
-    def leftXY(x0: Int, y0: Int) = (x0, y0 + dims._2)
-    def rightXY(x0: Int, y0: Int) = (x0 + dims._1, y0)
+    def leftXY(x0: Int, y0: Int) = (x0, y0 + dims._2 - 1)
+    def rightXY(x0: Int, y0: Int) = (x0 + dims._1 - 1, y0)
     def lowestV(x0: Int, y0: Int, area: AreaView) = {
       var minv = Int.MaxValue
       var mins = area.terrain(x0, y0)
       val xu = x0 + dims._1
       val yu = y0 + dims._2
-      var x, y = 0
+      var x = x0
+      var y = y0
       while (x < xu) {
         while (y < yu) {
           val s = area.terrain(x, y)
-          val v = iso2planar(x, y, s.height, area.sidelength)._2.toInt
+          val v = iso2planar_v(x, y, s.height, area.sidelength).toInt
           if (v < minv) {
             minv = v
             mins = s
@@ -71,7 +72,7 @@ trait IsoCanvas {
       sz += 2
       this
     } else {
-      val dp = deppool.create
+      val dp = deppool.allocate
       dp.next = this
       dp.add(x, y)
       dp
@@ -84,6 +85,7 @@ trait IsoCanvas {
       }
       if (next ne null) next.foreach(f)
     }
+    override def toString: String = array.mkString("[", ",", "]") + " --> " + (if (next ne null) next.toString else "")
   }
   
   def width: Int
@@ -128,7 +130,7 @@ trait IsoCanvas {
   
   def characterSprite(c: CharacterView): Sprite
   
-  def draw(area: AreaView, a: DrawAdapter) {
+  def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     // determine region
     val (u0, v0) = pos
     val pw = width
@@ -152,13 +154,13 @@ trait IsoCanvas {
     if ((infos eq null) || infos.length != w * h) infos = new Array[Info](w * h)
     for (x <- x0 until (x0 + w); y <- y0 until (y0 + h)) if (area.contains(x, y)) area.characters(x, y) match {
       case NoCharacter =>
-        val info = infopool.create
-        info.deps = deppool.create
+        val info = infopool.allocate
+        info.deps = deppool.allocate
         slotinfo(x, y) = info
       case c =>
-        val info = infopool.create
+        val info = infopool.allocate
         if (c.pos.equals(x, y)) {
-          info.deps = deppool.create
+          info.deps = deppool.allocate
           info.dims = c.dimensions()
         } else info.top = c.pos().toPair
         slotinfo(x, y) = info
@@ -190,14 +192,17 @@ trait IsoCanvas {
         }
       }
     }
-    for (i <- 0 until h; x <- 0 until i; y = i - x) dependencies(x, y)
+    for (i <- 0 until h; x <- 0 to i; y = i - x) dependencies(x, y)
     for (i <- 1 until h; x <- i until h; y = h - x) dependencies(x, y)
     
     // reverse drawing
     def draw(x: Int, y: Int, info: Info) {
       import a._
       if (outline) {
-        val (u, v) = iso2planar(x, y, area.terrain(x, y).height, area.sidelength)
+        val (uabs, vabs) = iso2planar(x, y, area.terrain(x, y).height, area.sidelength)
+        val u = uabs + u0
+        val v = vabs + v0
+        
         
         // draw terrain and sides
         setColor(0, 100, 200)
@@ -215,23 +220,33 @@ trait IsoCanvas {
       }
     }
     def reverseDraw(x: Int, y: Int) {
-      println(x, y)
       val info = slotinfo(x, y)
-      if (info.isTop && !info.drawn) {
-        info.deps.foreach((xp, yp) => reverseDraw(xp, yp))
-        draw(x, y, info)
-        info.drawn = true
+      if (info != null && !info.drawn) {
+        if (info.isTop) {
+          info.deps.foreach((xp, yp) => reverseDraw(xp, yp))
+          draw(x, y, info)
+          info.drawn = true
+        } else {
+          reverseDraw(info.top._1, info.top._2)
+          info.drawn = true
+        }
       }
     }
-    for (i <- 0 until h; x <- 0 until i; y = i - x) reverseDraw(x, y)
-    for (i <- 1 until h; x <- i until h; y = h - x) reverseDraw(x, y)
+    for (i <- 0 until h; x <- 0 to i; y = i - x) {
+      reverseDraw(x, y)
+    }
+    for (i <- 1 until h; x <- i until h; y = h - x) {
+      reverseDraw(x, y)
+    }
    
     // dispose dependencies
     for (i <- 0 until infos.length) {
       val info = infos(i)
-      infos(i) = null
-      if (info.deps ne null) deppool.dispose(info.deps)
-      infopool.dispose(info)
+      if (info != null) {
+        infos(i) = null
+        if (info.deps ne null) deppool.dispose(info.deps)
+        infopool.dispose(info)
+      }
     }
   }
   

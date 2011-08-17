@@ -11,6 +11,7 @@ package org.brijest.storm
 
 
 import org.github.scopt._
+import scala.swing._
 import engine.model._
 
 
@@ -43,9 +44,30 @@ class EditorConfigParser(config: Config) extends OptionParser(app.command) {
 
 class SwingEditor(config: Config) extends engine.gui.iso.SwingIsoUI(app.editorname) {
   val area = Area.emptyDungeon(config.area.width, config.area.height)
+  var lastpress = new java.awt.Point(0, 0)
+  val refresher = new Thread {
+    override def run() = while (true) {
+      areadisplay.repaint()
+      Thread.sleep(36)
+    }
+  }
   
+  refresher.start()
   engine = Some(org.brijest.storm.engine.IdleEngine)
   refresh(area, engine.get)
+  
+  areadisplay.listenTo(areadisplay.mouse.clicks)
+  areadisplay.listenTo(areadisplay.mouse.moves)
+  
+  areadisplay.reactions += {
+    case e @ event.MousePressed(_, p, mods, clicks, trig) =>
+      if (e.peer.getButton == java.awt.event.MouseEvent.BUTTON1) lastpress = p
+    case event.MouseDragged(_, p, mods) =>
+      pos = ((pos._1 - lastpress.getX + p.getX).toInt, (pos._2 - lastpress.getY + p.getY).toInt);
+      lastpress = p
+      refresh(area, engine.get)
+  }
+  
 }
 
 

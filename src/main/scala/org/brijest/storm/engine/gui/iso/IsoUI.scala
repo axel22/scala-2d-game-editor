@@ -31,11 +31,6 @@ trait IsoUI extends UI with IsoCanvas {
   
   def message(msg: String) {}
   
-  def redraw(area: AreaView, state: Engine.State, adapter: DrawAdapter) = {
-    // update canvas with relevant information
-    draw(area, adapter)
-  }
-  
 }
 
 
