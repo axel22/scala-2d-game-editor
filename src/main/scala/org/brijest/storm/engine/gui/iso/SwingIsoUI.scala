@@ -21,7 +21,6 @@ import org.brijest.storm.engine.model._
 
 class SwingIsoUI(val name: String) extends IsoUI {
   
-  val stars = javax.imageio.ImageIO.read(getClass.getResourceAsStream("/stars.png"))
   var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
   val areadisplay = new AreaDisplay
   
@@ -30,9 +29,6 @@ class SwingIsoUI(val name: String) extends IsoUI {
       super.paintComponent(g)
       g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
                          java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
-      
-      for (x <- 0 to (width / 800 + 1); y <- 0 to (height / 600 + 1))
-        g.drawImage(stars, x * 800, y * 600, x * 800 + 800, y * 600 + 600, 0, 0, 800, 600, null, null)
       
       this.synchronized {
         g.drawImage(buffer, 0, 0, width, height, 0, 0, width, height, null, null)
@@ -58,10 +54,6 @@ class SwingIsoUI(val name: String) extends IsoUI {
   
   def refresh(area: AreaView, state: Engine.State) = this.synchronized {
     val sad = new SwingDrawAdapter
-    val oldcomp = sad.gr.getComposite
-    sad.gr.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.CLEAR, 0.0f))
-    sad.gr.fillRect(0, 0, buffer.getWidth, buffer.getHeight)
-    sad.gr.setComposite(oldcomp)
     
     val t = timed {
       redraw(area, state, sad)
@@ -73,6 +65,10 @@ class SwingIsoUI(val name: String) extends IsoUI {
   def characterSprite(c: CharacterView) = new Sprite { def height = 0 } // TODO
   
   def maxSpriteHeight = 320
+  
+  type Img = java.awt.Image
+  
+  def imageFromPngStream(stream: java.io.InputStream) = javax.imageio.ImageIO.read(stream)
   
   class SwingDrawAdapter extends DrawAdapter {
     val gr = buffer.getGraphics.asInstanceOf[Graphics2D]
@@ -95,6 +91,10 @@ class SwingIsoUI(val name: String) extends IsoUI {
     def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
       gr.fillPolygon(xpoints, ypoints, n)
     }
+    def drawImage(image: Img, dx1: Int, dy1: Int, dx2: Int, dy2: Int, sx1: Int, sy1: Int, sx2: Int, sy2: Int) {
+      gr.drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null, null)
+    }
+
   }
   
 }

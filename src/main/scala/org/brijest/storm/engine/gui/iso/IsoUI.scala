@@ -34,13 +34,3 @@ trait IsoUI extends UI with IsoCanvas {
 }
 
 
-object IsoUI {
-  import scala.util.parsing.combinator._
-  
-  def pngStream(name: String): java.io.InputStream = {
-    getClass.getResourceAsStream("/iso/" + name + ".png")
-  }
-  
-}
-
-

@@ -12,6 +12,7 @@ package model
 
 
 import components._
+import collection._
 import annotation.switch
 
 
@@ -25,14 +26,36 @@ trait Slot extends Immutable {
   def identifier: String
   
   assert(height >= 0)
+  
+  def atHeight(h: Int) = Slot(this.getClass, h)
 }
 
 
 object Slot {
+  private val cachedslots = mutable.Map[Class[_], mutable.Map[Int, Slot]]()
+  
+  def apply(cls: Class[_], h: Int) = {
+    def newslot = cls.getConstructor(classOf[Int]).newInstance(h.asInstanceOf[AnyRef]).asInstanceOf[Slot]
+    cachedslots.get(cls) match {
+      case Some(hmap) => hmap.get(h) match {
+        case Some(slot) => slot
+        case None =>
+          val slot = newslot
+          hmap.put(h, slot)
+          slot
+      }
+      case None =>
+        val slot = newslot
+        cachedslots.put(cls, mutable.Map[Int, Slot](h -> slot))
+        slot
+    }
+  }
 }
 
 
 class HardRock(val height: Int) extends Slot {
+  def this() = this(0)
+  
   def walkable = false
   def seethrough = false
   def chr = '#'
@@ -42,6 +65,8 @@ class HardRock(val height: Int) extends Slot {
 
 
 class DungeonFloor(val height: Int) extends Slot {
+  def this() = this(0)
+  
   def walkable = true
   def seethrough = true
   def chr = '.'
@@ -49,11 +74,6 @@ class DungeonFloor(val height: Int) extends Slot {
   def identifier = "dungeon.floor"
 }
 
-
-object HardRock0 extends HardRock(0)
-
-
-object DungeonFloor0 extends DungeonFloor(0)
 
 
 

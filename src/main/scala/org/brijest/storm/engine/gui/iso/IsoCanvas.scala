@@ -16,7 +16,26 @@ import collection._
 
 
 
-trait IsoCanvas {
+trait Canvas {
+  type Img
+  
+  def imageFromPngStream(stream: java.io.InputStream): Img
+  
+  trait DrawAdapter {
+    def setColor(r: Int, g: Int, b: Int)
+    def setFontSize(sz: Float)
+    def drawLine(x1: Int, y1: Int, x2: Int, y2: Int)
+    def drawLine(x1: Double, y1: Double, x2: Double, y2: Double): Unit = drawLine(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
+    def drawPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int)
+    def drawString(s: String, x: Int, y: Int)
+    def drawImage(image: Img, dx1: Int, dy1: Int, dx2: Int, dy2: Int, sx1: Int, sy1: Int, sx2: Int, sy2: Int)
+    def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int)
+  }
+}
+
+
+trait IsoCanvas extends Canvas {
+  lazy val stars = imageFromPngStream(pngStream("stars"))
   val deppool = new MemoryPool(new DepNode)
   val infopool = new MemoryPool(new Info)
   var infos: Array[Info] = null
@@ -105,6 +124,7 @@ trait IsoCanvas {
   object drawing {
     def outline = true
     def indices = true
+    def background = true
   }
   
   def pos: (Int, Int)
@@ -137,7 +157,18 @@ trait IsoCanvas {
   
   def maxSpriteHeight: Int
   
+  def redrawBackground(area: AreaView, a: DrawAdapter) = if (drawing.background) {
+    val w = 800
+    val h = 600
+    val x0 = pos._1 / 4 % w
+    val y0 = pos._2 / 4 % h
+    for (x <- -1 to (width / w + 1); y <- -1 to (height / h + 1))
+      a.drawImage(stars, x * w - x0, y * h - y0, x * w + w - x0, y * h + h - y0, 0, 0, w, h)
+  }
+  
   def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
+    redrawBackground(area, a)
+    
     // determine region
     val (u0, v0) = pos
     val pw = width
@@ -206,29 +237,71 @@ trait IsoCanvas {
     def drawTop(x: Int, y: Int, info: Info) {
       import a._
       if (drawing.outline) {
-        val (uabs, vabs) = iso2planar(x, y, area.terrain(x, y).height, area.sidelength)
-        val u = uabs - u0
-        val v = vabs - v0
-        
         // draw terrain and sides
         @inline implicit def double2int(d: Double) = d.toInt
-        xrect(0) = u - slotwidth / 2
-        xrect(1) = u.toInt
-        xrect(2) = u + slotwidth / 2
-        xrect(3) = u
-        xrect(4) = u - slotwidth / 2
-        yrect(0) = v
-        yrect(1) = v - slotheight / 2
-        yrect(2) = v
-        yrect(3) = v + slotheight / 2
-        yrect(4) = v
-        setColor(0, 0, 0)
-        fillPoly(xrect, yrect, 5)
-        setColor(0, 100, 200)
-        drawPoly(xrect, yrect, 5)
-        setFontSize(8)
-        if (drawing.indices) drawString("%s, %s".format(x, y), u.toInt - slotwidth / 4, v.toInt)
-        // TODO sides
+        @inline def drawTerrain(up: Int, vp: Int) {
+          xrect(0) = up - slotwidth / 2
+          xrect(1) = up
+          xrect(2) = up + slotwidth / 2
+          xrect(3) = up
+          xrect(4) = up - slotwidth / 2
+          yrect(0) = vp
+          yrect(1) = vp - slotheight / 2
+          yrect(2) = vp
+          yrect(3) = vp + slotheight / 2
+          yrect(4) = vp
+          setColor(0, 0, 0)
+          fillPoly(xrect, yrect, 5)
+          setColor(0, 100, 200)
+          drawPoly(xrect, yrect, 5)
+          setFontSize(8)
+          if (drawing.indices) drawString("%s, %s".format(x, y), up - slotwidth / 4, vp)
+        }
+        @inline def drawTerrainSides(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+          val lslothgt = if (area.contains(xp, yp + 1)) area.terrain(xp, yp + 1).height else 0
+          if (slot.height > lslothgt) {
+            val lu = iso2planar_u(xp, yp + 1, lslothgt, area.sidelength) - u0
+            val lv = iso2planar_v(xp, yp + 1, lslothgt, area.sidelength) - v0
+            xrect(0) = up - slotwidth / 2
+            xrect(1) = up
+            xrect(2) = lu + slotwidth / 2
+            xrect(3) = lu
+            xrect(4) = up - slotwidth / 2
+            yrect(0) = vp
+            yrect(1) = vp + slotheight / 2
+            yrect(2) = lv
+            yrect(3) = lv - slotheight / 2
+            yrect(4) = vp
+            setColor(0, 0, 0)
+            fillPoly(xrect, yrect, 5)
+            setColor(0, 100, 200)
+            drawPoly(xrect, yrect, 5)
+          }
+          val rslothgt = if (area.contains(xp + 1, yp)) area.terrain(xp + 1, yp).height else 0
+          if (slot.height > rslothgt) {
+            val lu = iso2planar_u(xp + 1, yp, rslothgt, area.sidelength) - u0
+            val lv = iso2planar_v(xp + 1, yp, rslothgt, area.sidelength) - v0
+            xrect(0) = up
+            xrect(1) = up + slotwidth / 2
+            xrect(2) = lu
+            xrect(3) = lu - slotwidth / 2
+            xrect(4) = up
+            yrect(0) = vp + slotheight / 2
+            yrect(1) = vp
+            yrect(2) = lv - slotheight / 2
+            yrect(3) = lv
+            yrect(4) = vp + slotheight / 2
+            setColor(0, 0, 0)
+            fillPoly(xrect, yrect, 5)
+            setColor(0, 100, 200)
+            drawPoly(xrect, yrect, 5)
+          }
+        }
+        val slot = area.terrain(x, y)
+        val u = iso2planar_u(x, y, slot.height, area.sidelength) - u0
+        val v = iso2planar_v(x, y, slot.height, area.sidelength) - v0
+        drawTerrain(u, v)
+        drawTerrainSides(slot, x, y, u, v)
         
         // draw character
         // TODO

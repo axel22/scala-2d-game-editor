@@ -43,7 +43,7 @@ self =>
 
 class Area extends AreaView {
   private val entitycount = cell(0l)
-  private var rawterrain: Quad[Slot] = quad(1, 1, Some(HardRock0), true)
+  private var rawterrain: Quad[Slot] = quad(1, 1, Some(new HardRock), true)
   val id = cell(invalidAreaId)
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable(1, 1)
@@ -123,14 +123,14 @@ object Area {
     val area = new Area
     
     area.resize(w, h);
-    area.terrain.default = (x, y) => Some(DungeonFloor0);
+    area.terrain.default = (x, y) => Some(new DungeonFloor);
     for (x <- 0 until w) {
-      area.terrain(x, 0) = HardRock0
-      area.terrain(x, h - 1) = HardRock0
+      area.terrain(x, 0) = Slot(classOf[HardRock], 4)
+      area.terrain(x, h - 1) = Slot(classOf[HardRock], 4)
     }
     for (y <- 1 until (h - 1)) {
-      area.terrain(0, y) = HardRock0
-      area.terrain(w - 1, y) = HardRock0
+      area.terrain(0, y) = Slot(classOf[HardRock], 4)
+      area.terrain(w - 1, y) = Slot(classOf[HardRock], 4)
     }
     
     area
