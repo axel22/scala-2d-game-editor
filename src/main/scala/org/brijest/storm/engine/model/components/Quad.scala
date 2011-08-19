@@ -138,7 +138,7 @@ private object QNode {
     else if (n <= (1 << 23)) 1 << 23
     else if (n <= (1 << 26)) 1 << 26
     else if (n <= (1 << 29)) 1 << 29
-    else error("unsupported size")
+    else sys.error("unsupported size")
 }
 
 

@@ -62,7 +62,16 @@ class SwingIsoUI(val name: String) extends IsoUI {
     //println("Time to render: %d ms".format(t))
   }
   
-  def characterSprite(c: CharacterView) = new Sprite { def height = 0 } // TODO
+  def characterSprite(c: CharacterView) = c match {
+    case NoCharacter => new Sprite {
+      def width = 0
+      def height = 0
+    }
+    case c => new Sprite {
+      def width = 20
+      def height = 50
+    } // TODO
+  }
   
   def maxSpriteHeight = 320
   

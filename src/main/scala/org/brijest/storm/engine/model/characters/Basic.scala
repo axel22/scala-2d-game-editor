@@ -6,40 +6,25 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package model
+package characters
 
 
 
+import components._
+import rules.{Stats, Inventory}
 
 
 
-/** A regular character.
- *  
- *  Most characters are of this type. A regular character takes 1x1 space.
- */
-abstract class RegularCharacter extends RulesetCharacter {
-  override def isRC: Boolean = true
+class Rock(val id: EntityId) extends Character {
+  dimensions := (3, 3)
   
-  def canWalk(from: Slot, to: Slot) = math.abs(from.height - to.height) <= stats.heightStride
+  def manager = NoManager
+  def canWalk(from: Slot, to: Slot) = false
+  def chr = '#'
+  def identifier = ""
+  def color = 0xffffff00
+  def pov(area: AreaView) = area
 }
-
-
-object RegularCharacter {
-  def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[RegularCharacter]) Some(e.id) else None
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -16,5 +16,6 @@ import model._
 
 
 trait Sprite {
+  def width: Int
   def height: Int
 }  

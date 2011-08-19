@@ -13,6 +13,7 @@ package model
 
 
 import components._
+import rules.{Stats, Inventory}
 
 
 
@@ -73,6 +74,70 @@ case object NoCharacter extends Character {
   def color = 0xffffff00
   override def foreach(ev: CharacterView => Unit): Unit = {}
   def identifier = "basic_chars.no_character"
+}
+
+
+/** A character with common ruleset functionality.
+ */
+abstract class RulesetCharacter extends Character {
+  def stats: Stats
+  def inventory: Inventory
+}
+
+
+/** A regular character.
+ *  
+ *  Most characters are of this type. A regular character takes 1x1 space.
+ */
+abstract class RegularCharacter extends RulesetCharacter {
+  override def isRC: Boolean = true
+  
+  def canWalk(from: Slot, to: Slot) = math.abs(from.height - to.height) <= stats.heightStride
+}
+
+
+object RegularCharacter {
+  def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[RegularCharacter]) Some(e.id) else None
+}
+
+
+abstract class OrderCharacter extends RegularCharacter {
+oc =>
+  val order = cell[Order](DoNothing)
+  val management = cell[Manager](new OrderManager(oc))
+  
+  def manager = management()
+}
+
+
+object OrderCharacter {
+  def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[OrderCharacter]) Some(e.id) else None
+}
+
+
+trait PlayerCharacterView extends CharacterView {
+  def owner: PlayerId
+  def stats: rules.Stats
+}
+
+
+case class PlayerCharacter(pid: PlayerId, id: EntityId)(rs: rules.RuleSet) extends OrderCharacter with PlayerCharacterView {
+pc =>
+  
+  val stats = rs.newStats
+  val inventory = rs.newInventory
+  
+  override def isPC: Boolean = true
+  def owner = pid
+  def pov(area: AreaView) = area // TODO
+  def chr = '@'
+  def color = 0x0000ff00
+  def identifier = "basic_chars.playerchar"
+}
+
+
+object PlayerCharacter {
+  def simpleTestCharacter(pid: PlayerId)(rs: rules.RuleSet) = new PlayerCharacter(pid, (0l, 0l))(rs)
 }
 
 
