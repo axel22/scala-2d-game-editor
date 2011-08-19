@@ -28,6 +28,11 @@ object NoManager extends Manager {
 }
 
 
+object IdleManager extends Manager {
+  def action(area: AreaView) = (NoAction, NullTrigger)
+}
+
+
 class OrderManager(oc: OrderCharacter) extends Manager {
   def action(area: AreaView) = {
     val (act, nextord) = oc.order().apply(oc, area)

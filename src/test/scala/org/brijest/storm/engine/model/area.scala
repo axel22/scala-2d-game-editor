@@ -36,9 +36,9 @@ class AreaTests extends WordSpec with ShouldMatchers {
     
     "change terrain" in {
       val area = new Area
-      area.terrain(0, 0) should equal (HardRock0)
-      area.terrain(0, 0) = DungeonFloor0
-      area.terrain(0, 0) should equal (DungeonFloor0)
+      area.terrain(0, 0) should equal (new HardRock)
+      area.terrain(0, 0) = new DungeonFloor
+      area.terrain(0, 0) should equal (new DungeonFloor)
     }
     
     "be assigned an item" in {

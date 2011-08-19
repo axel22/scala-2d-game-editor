@@ -58,7 +58,7 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
     
     "simulate a simple test character" in {
       val area = Area.emptyArea
-      area.terrain.default = (x, y) => Some(DungeonFloor0)
+      area.terrain.default = (x, y) => Some(Slot[DungeonFloor](0))
       area.insert(PlayerCharacter.simpleTestCharacter(PlayerId(0l))(model.rules.enroute.EnrouteRuleSet))
       val s = new Simulator(area)
       val (acn, acts) = s.step()
@@ -69,7 +69,7 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
     
     "move a character along a path" in {
       val area = Area.emptyArea
-      area.terrain.default = (x, y) => Some(DungeonFloor0)
+      area.terrain.default = (x, y) => Some(Slot[DungeonFloor](0))
       area.resize(10, 10)
       val pc = PlayerCharacter.simpleTestCharacter(PlayerId(0l))(model.rules.enroute.EnrouteRuleSet)
       area.insert(pc)

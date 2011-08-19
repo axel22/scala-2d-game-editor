@@ -34,6 +34,8 @@ trait Slot extends Immutable {
 object Slot {
   private val cachedslots = mutable.Map[Class[_], mutable.Map[Int, Slot]]()
   
+  def apply[T <: Slot: Manifest](h: Int): Slot = apply(implicitly[Manifest[T]].erasure, h)
+  
   def apply(cls: Class[_], h: Int) = {
     def newslot = cls.getConstructor(classOf[Int]).newInstance(h.asInstanceOf[AnyRef]).asInstanceOf[Slot]
     cachedslots.get(cls) match {
@@ -53,7 +55,7 @@ object Slot {
 }
 
 
-class HardRock(val height: Int) extends Slot {
+case class HardRock(val height: Int) extends Slot {
   def this() = this(0)
   
   def walkable = false
@@ -64,7 +66,7 @@ class HardRock(val height: Int) extends Slot {
 }
 
 
-class DungeonFloor(val height: Int) extends Slot {
+case class DungeonFloor(val height: Int) extends Slot {
   def this() = this(0)
   
   def walkable = true

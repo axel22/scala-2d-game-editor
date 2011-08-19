@@ -21,7 +21,7 @@ import rules.{Stats, Inventory}
 class Rock(val id: EntityId) extends Character {
   dimensions := (3, 3)
   
-  def manager = NoManager
+  def manager = IdleManager
   def canWalk(from: Slot, to: Slot) = false
   def chr = '#'
   def identifier = ""
