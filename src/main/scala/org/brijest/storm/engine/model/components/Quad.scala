@@ -29,7 +29,7 @@ package immutable {
 }
 
 
-class Quad[T](w: Int, h: Int, d: (Int, Int) => Option[T], compress: Boolean) extends immutable.Quad[T] with Serializable {
+class Quad[T, Acc](w: Int, h: Int, d: (Int, Int) => Option[T], compress: Boolean) extends immutable.Quad[T] with Serializable {
   private var dflt: (Int, Int) => Option[T] = d
   private var dims: (Int, Int) = (w, h);
   private var root: QNode[T] = new QEmpty[T](QNode.calcSide(dims))
@@ -68,11 +68,11 @@ class Quad[T](w: Int, h: Int, d: (Int, Int) => Option[T], compress: Boolean) ext
   final def foreach(f: (Int, Int, T) => Unit) = root.foreach(0, 0, f)
   final def foreach[U](f: T => U): Unit = root.foreach(0, 0, (x, y, v) => f(v))
   
-  final def default_=(d: (Int, Int) => Option[T]) = dflt = d
-  final def dimensions_=(sz: (Int, Int)) = resize(sz)
-  final def update(x: Int, y: Int, elem: T) = upd(x, y, elem)
-  final def remove(x: Int, y: Int) = root = root.remove(0, 0, x, y, compress)
-  final def clear() = clr()
+  final def default_=(d: (Int, Int) => Option[T])(implicit rq: Acc) = dflt = d
+  final def dimensions_=(sz: (Int, Int))(implicit rq: Acc) = resize(sz)
+  final def update(x: Int, y: Int, elem: T)(implicit rq: Acc) = upd(x, y, elem)
+  final def remove(x: Int, y: Int)(implicit rq: Acc) = root = root.remove(0, 0, x, y, compress)
+  final def clear()(implicit rq: Acc) = clr()
 }
 
 

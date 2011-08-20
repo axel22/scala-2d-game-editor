@@ -21,24 +21,24 @@ trait ItemTableView extends Struct {
 }
 
 
-class ItemTable(w: Int, h: Int) extends ItemTableView {
-  private val dflt = Some(Nil)
-  private var rawlocs = quad[List[Item]](w, h, dflt)
+class ItemTable(w: Int, h: Int) extends ItemTableView with MutableEvidence {
+  private val dflt: Option[List[Item]] = Some(Nil)
+  private var rawlocs = access[mutable] quad(w, h, dflt)
   
-  val ids = table[EntityId, Item]
+  val ids = access[mutable].table[EntityId, Item]
   
   def locs = rawlocs
   
-  def insert(x: Int, y: Int, it: Item) {
+  def insert(x: Int, y: Int, it: Item)(implicit m: Area) {
     assert(!ids.contains(it.id))
     
     ids(it.id) = it
     locs(x, y) = it :: locs(x, y)
   }
   
-  def resize(w: Int, h: Int) {
+  def resize(w: Int, h: Int)(implicit m: Area) {
     val old = rawlocs
-    rawlocs = quad[List[Item]](w, h, dflt)
+    rawlocs = access[mutable].quad[List[Item]](w, h, dflt)
     old.foreach {
       (x, y, item) => rawlocs(x, y) = item
     }

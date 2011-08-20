@@ -65,7 +65,7 @@ engine =>
     private def processCommands() {
       engine.synchronized {
         for (comm <- commands) comm match {
-          case OrderCommand(plid, o) => pc.order := o
+          case OrderCommand(plid, o) => pc.order.:=(o)(area)
           case ScriptCommand(s) => script(s)
           case EmptyCommand => // do nothing
         }

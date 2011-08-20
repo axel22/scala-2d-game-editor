@@ -57,18 +57,20 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
     }
     
     "simulate a simple test character" in {
-      val area = Area.emptyArea
+      implicit val area = Area.emptyArea
       area.terrain.default = (x, y) => Some(Slot[DungeonFloor](0))
       area.insert(PlayerCharacter.simpleTestCharacter(PlayerId(0l))(model.rules.enroute.EnrouteRuleSet))
       val s = new Simulator(area)
       val (acn, acts) = s.step()
       
       acts.length should equal (1)
-      acts(0) should equal (NoAction)
+      acts(0) match {
+        case CompositeAction(acts) => acts.exists(NoAction ==) should equal (true)
+      }
     }
     
     "move a character along a path" in {
-      val area = Area.emptyArea
+      implicit val area = Area.emptyArea
       area.terrain.default = (x, y) => Some(Slot[DungeonFloor](0))
       area.resize(10, 10)
       val pc = PlayerCharacter.simpleTestCharacter(PlayerId(0l))(model.rules.enroute.EnrouteRuleSet)
@@ -84,7 +86,9 @@ class SimulatorTests extends WordSpec with ShouldMatchers {
       val (_, acts) = s.step()
       s.time should equal (1)
       area.isWalkable(0, 0) should equal (true)
-      acts(0) should equal (MoveRC(Pos(0, 0), Pos(0, 1)))
+      acts(0) match {
+        case CompositeAction(acts) => acts.exists(MoveRC(Pos(0, 0), Pos(0, 1)) ==) should equal (true)
+      }
       area.terrain(0, 1).walkable should equal (true)
       area.characters.locs.apply(0, 1) should equal (pc)
       pc.pos() should equal (Pos(0, 1))

@@ -41,27 +41,27 @@ object Action {
 
 
 sealed trait Action extends Immutable {
-  def apply(a: Area): Unit
+  def apply(implicit a: Area): Unit
 }
 
 
 object NoAction extends Action {
-  def apply(a: Area) {}
+  def apply(implicit a: Area) {}
 }
 
 
 case class CompositeAction(actions: Seq[Action]) extends Action {
-  def apply(a: Area) = for (act <- actions) act(a)
+  def apply(implicit a: Area) = for (act <- actions) act(a)
 }
 
 
 case class Conditional(c: AreaView => Boolean, action: Action) extends Action {
-  def apply(a: Area) = if (c(a)) action(a)
+  def apply(implicit a: Area) = if (c(a)) action(a)
 }
 
 
 case class HaltOC(id: EntityId) extends Action {
-  def apply(a: Area) = a.character(id) match {
+  def apply(implicit a: Area) = a.character(id) match {
     case oc: OrderCharacter => oc.order := DoNothing
     case c => illegalarg(c)
   }
@@ -71,7 +71,7 @@ case class HaltOC(id: EntityId) extends Action {
 case class MoveRC(from: Pos, to: Pos) extends Action {
   assert(from adjacent to)
   
-  def apply(a: Area) = a.character(from) match {
+  def apply(implicit a: Area) = a.character(from) match {
     case rc: RegularCharacter => a.move(rc, to)
     case _ => illegalarg(from + ", " + to)
   }
@@ -79,7 +79,7 @@ case class MoveRC(from: Pos, to: Pos) extends Action {
 
 
 case class SetOrder(id: EntityId, order: Order) extends Action {
-  def apply(a: Area) = a.characters.ids(id) match {
+  def apply(implicit a: Area) = a.characters.ids(id) match {
     case pc: PlayerCharacter => pc.order := order
     case x => illegalarg(id + " -> " + x)
   }

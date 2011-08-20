@@ -21,9 +21,6 @@ trait CharacterView extends EntityView {
   def pos: components.immutable.Cell[Pos]
   def dimensions: components.immutable.Cell[(Int, Int)]
   
-  final def isCharacter = true
-  final def isItem = false
-  def foreach(f: CharacterView => Unit) = f(this)
 }
 
 
@@ -33,8 +30,8 @@ trait CharacterView extends EntityView {
  *  depending on the current state.
  */
 abstract class Character extends Entity with CharacterView {
-  val pos = cell(Pos(0, 0))
-  val dimensions = cell((1, 1))
+  val pos = access[mutable] cell(Pos(0, 0))
+  val dimensions = access[mutable] cell((1, 1))
   
   def foreachPos(f: (Int, Int) => Unit) {
     var Pos(x, y) = pos()
@@ -57,6 +54,11 @@ abstract class Character extends Entity with CharacterView {
   
   def canWalk(from: Slot, to: Slot): Boolean
   
+  final def isCharacter = true
+  
+  final def isItem = false
+  
+  def foreach(f: Character => Unit) = f(this)
 }
 
 
@@ -72,7 +74,7 @@ case object NoCharacter extends Character {
   def canWalk(from: Slot, to: Slot) = unsupported()
   def chr = '@'
   def color = 0xffffff00
-  override def foreach(ev: CharacterView => Unit): Unit = {}
+  override def foreach(ev: Character => Unit): Unit = {}
   def identifier = "basic_chars.no_character"
 }
 
@@ -103,8 +105,8 @@ object RegularCharacter {
 
 abstract class OrderCharacter extends RegularCharacter {
 oc =>
-  val order = cell[Order](DoNothing)
-  val management = cell[Manager](new OrderManager(oc))
+  val order = access[mutable].cell[Order](DoNothing)
+  val management = access[mutable].cell[Manager](new OrderManager(oc))
   
   def manager = management()
 }
@@ -115,13 +117,7 @@ object OrderCharacter {
 }
 
 
-trait PlayerCharacterView extends CharacterView {
-  def owner: PlayerId
-  def stats: rules.Stats
-}
-
-
-case class PlayerCharacter(pid: PlayerId, id: EntityId)(rs: rules.RuleSet) extends OrderCharacter with PlayerCharacterView {
+case class PlayerCharacter(pid: PlayerId, id: EntityId)(rs: rules.RuleSet) extends OrderCharacter {
 pc =>
   
   val stats = rs.newStats

@@ -22,9 +22,10 @@ package immutable {
 }
 
 
-class Cell[T](private var v: T) extends immutable.Cell[T] with Serializable {
+class Cell[T, Acc](private var v: T) extends immutable.Cell[T] with Serializable {
   def this() = this(null.asInstanceOf[T])
   def apply() = v
-  def :=(nv: T) = v = nv
-  def +=(nv: T)(implicit n: Numeric[T]) = v = n.plus(v, nv)
+  def :=(nv: T)(implicit rq: Acc) = v = nv
+  def +=(nv: T)(implicit n: Numeric[T], rq: Acc) = v = n.plus(v, nv)
 }
+

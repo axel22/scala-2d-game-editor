@@ -36,7 +36,6 @@ object IdleManager extends Manager {
 class OrderManager(oc: OrderCharacter) extends Manager {
   def action(area: AreaView) = {
     val (act, nextord) = oc.order().apply(oc, area)
-    oc.order := nextord
-    (act, Sleep(oc.stats.delay))
+    (Action.composite(SetOrder(oc.id, nextord), act), Sleep(oc.stats.delay))
   }
 }

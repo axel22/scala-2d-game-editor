@@ -24,15 +24,15 @@ trait CharacterTableView extends Struct {
 }
 
 
-class CharacterTable(w: Int, h: Int) extends CharacterTableView {
+class CharacterTable(w: Int, h: Int) extends CharacterTableView with MutableEvidence {
   private val dflt = Some(NoCharacter)
-  val ids = table[EntityId, Character]
-  val locs = quad[Character](w, h, dflt)
-  val pcs = table[PlayerId, EntityId]
+  val ids = access[mutable].table[EntityId, Character]
+  val locs = access[mutable].quad[Character](w, h, dflt)
+  val pcs = access[mutable].table[PlayerId, EntityId]
   
   ids.defaultVal = dflt
   
-  def insert(c: Character) {
+  def insert(c: Character)(implicit m: Area) {
     assert(!ids.contains(c.id))
     c.foreachPos((x, y) => assert(locs(x, y) == NoCharacter))
     
@@ -44,7 +44,7 @@ class CharacterTable(w: Int, h: Int) extends CharacterTableView {
     }
   }
   
-  def resize(w: Int, h: Int) {
+  def resize(w: Int, h: Int)(implicit m: Area) {
     locs.dimensions = (w, h)
     
     for ((_, c) <- ids) c.foreachPos((x, y) => locs(x, y) = c)

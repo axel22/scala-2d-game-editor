@@ -23,7 +23,7 @@ package immutable {
 }
 
 
-class Queue[T] extends immutable.Queue[T] with ElemRef[T] with Serializable {
+class Queue[T, Acc] extends immutable.Queue[T] with ElemRef[T] with Serializable {
   private var start = new UNode[T]
   private var prelast = start
   private var lastnd = start
@@ -59,9 +59,9 @@ class Queue[T] extends immutable.Queue[T] with ElemRef[T] with Serializable {
   final def front = start.head
   final def length = sz
   final def apply(idx: Int) = start.apply(idx)
-  final def enqueue(elem: T) = enq(elem)
-  final def dequeue() = deq()
-  final def clear() = clr()
+  final def enqueue(elem: T)(implicit rq: Acc) = enq(elem)
+  final def dequeue()(implicit rq: Acc) = deq()
+  final def clear()(implicit rq: Acc) = clr()
 }
 
 

@@ -32,6 +32,8 @@ object World {
     def initializeArea(id: AreaId) = Area.emptyDungeon(60, 30)
     def initialPosition(p: Player) = 0L
     def initialPlace(p: Player, area: Area): PlayerCharacter = {
+      implicit val a = area
+      
       // find a location to place him in
       val pc = p.createPlayerCharacter(area.newEntityId())(ruleset)
       val (w, h) = area.terrain.dimensions

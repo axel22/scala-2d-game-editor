@@ -15,22 +15,20 @@ import collection._
 
 
 package immutable {
-  trait Heap[+T] extends Iterable[T] {
-    def size: Int
-    def head: T
-  }
+  trait UniSet[T] extends Set[T]
 }
 
 
-class Heap[T: Ordering, Acc] extends immutable.Heap[T] {
-  val pq = mutable.PriorityQueue[T]()
+class UniSet[T, Acc] extends immutable.UniSet[T] with Serializable {
+  val s = mutable.HashSet[T]()
   
-  @inline final override def head = pq.head
-  @inline final override def size = pq.size
-  @inline final def iterator = pq.iterator
+  @inline final override def size = s.size
+  @inline final def iterator = s.iterator
+  @inline def contains(v: T) = s.contains(v)
+  def -(v: T) = s - v
+  def +(v: T) = s + v
   
-  @inline final def enqueue(elem: T)(implicit acc: Acc) = pq.enqueue(elem)
-  @inline final def dequeue()(implicit acc: Acc): T = pq.dequeue()
-  @inline final def clear()(implicit acc: Acc) = pq.clear()
+  @inline final def add(elem: T)(implicit acc: Acc) = s.add(elem)
+  @inline final def remove(elem: T)(implicit acc: Acc) = s.remove(elem)
+  @inline final def clear()(implicit acc: Acc) = s.clear()
 }
-

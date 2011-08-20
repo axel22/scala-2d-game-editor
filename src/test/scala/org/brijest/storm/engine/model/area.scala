@@ -28,21 +28,21 @@ class AreaTests extends WordSpec with ShouldMatchers {
     }
     
     "change id" in {
-      val area = new Area
+      implicit val area = new Area
       area.id() should equal (invalidAreaId)
       area.id := 5
       area.id() should equal (5)
     }
     
     "change terrain" in {
-      val area = new Area
+      implicit val area = new Area
       area.terrain(0, 0) should equal (new HardRock)
       area.terrain(0, 0) = new DungeonFloor
       area.terrain(0, 0) should equal (new DungeonFloor)
     }
     
     "be assigned an item" in {
-      val area = new Area
+      implicit val area = new Area
       val it = new Item.SimpleTestItem((0l, 0l))
       area.items.insert(0, 0, it)
       area.entities.next() should equal (it)
@@ -50,13 +50,15 @@ class AreaTests extends WordSpec with ShouldMatchers {
     }
     
     "have a test item" in {
-      val area = Area.simpleTestArea
+      implicit val area = Area.simpleTestArea
       area.entities.next()
     }
     
   }
   
   "Item table" should {
+    
+    implicit val area = new Area
     
     "be inserted into" in {
       val tab = new ItemTable(1, 1)
@@ -68,6 +70,8 @@ class AreaTests extends WordSpec with ShouldMatchers {
   }
   
   "Character table" should {
+    
+    implicit val area = new Area
     
     "be inserted into" in {
       val tab = new CharacterTable(10, 10)

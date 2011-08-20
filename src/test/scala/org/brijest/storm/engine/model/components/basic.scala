@@ -20,12 +20,12 @@ class BasicTests extends WordSpec with ShouldMatchers {
   "Cell" should {
     
     "be read from" in {
-      val c = cell(10)
+      val c = access[free] cell(10)
       c() should equal (10)
     }
     
     "be reassigned" in {
-      val c = cell(10)
+      val c = access[free] cell(10)
       c := 7
       c() should equal (7)
     }
@@ -35,19 +35,19 @@ class BasicTests extends WordSpec with ShouldMatchers {
   "Queue" should {
     
     "be equal to the empty sequence" in {
-      val q = queue[Int]
+      val q = access[free].queue[Int]
       q should equal (Nil)
     }
     
     "enqueue and dequeue an element" in {
-      val q = queue[Int]
+      val q = access[free].queue[Int]
       q.enqueue(7)
       q.dequeue() should equal (7)
     }
     
     "enqueue and dequeue many elements" in {
       val many = 1000
-      val q = queue[Int]
+      val q = access[free].queue[Int]
       var i = 0
       do {
         q.enqueue(i)
@@ -62,7 +62,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "enqueue and dequeue many elements alternately" in {
       val many = 1000
-      val q = queue[Int]
+      val q = access[free].queue[Int]
       var i = 0
       var sz = 0
       var last = -1
@@ -84,7 +84,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "iterate its elements" in {
       val many = 1000
-      val q = queue[Int]
+      val q = access[free].queue[Int]
       var i = 0
       while (i < many) {
         assert(q.iterator.toSeq == (0 until i), i)
@@ -99,7 +99,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
   "Table" should {
     
     "insert, lookup and remove elements or be cleared" in {
-      val t = table[Int, Int]
+      val t = access[free].table[Int, Int]
       t.put(1, 2) should equal (None)
       t.size should equal (1)
       t(1) should equal (2)
@@ -113,7 +113,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     }
     
     "iterate its elements" in {
-      val t = table[Int, Int]
+      val t = access[free].table[Int, Int]
       t(1) = 2
       t(2) = 4
       t(3) = 6
@@ -125,17 +125,17 @@ class BasicTests extends WordSpec with ShouldMatchers {
   "Quad" should {
     
     "be created empty" in {
-      quad[Int](1, 1, None).size should equal (0)
-      quad[Int](2, 3, None).size should equal (0)
-      quad[Int](5, 5, None).size should equal (0)
-      quad[Int](9, 7, None).size should equal (0)
-      quad[Int](31, 32, None).size should equal (0)
-      quad[Int](260, 560, None).size should equal (0)
-      quad(260, 560, Some(1)).size should equal (0)
+      access[free].quad[Int](1, 1, None).size should equal (0)
+      access[free].quad[Int](2, 3, None).size should equal (0)
+      access[free].quad[Int](5, 5, None).size should equal (0)
+      access[free].quad[Int](9, 7, None).size should equal (0)
+      access[free].quad[Int](31, 32, None).size should equal (0)
+      access[free].quad[Int](260, 560, None).size should equal (0)
+      access[free].quad(260, 560, Some(1)).size should equal (0)
     }
 
     "have one element after insertion" in {
-      val q = quad[Int](10, 10, None)
+      val q = access[free].quad[Int](10, 10, None)
       
       q(5, 5) = 7
       
@@ -145,7 +145,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "have 9 elements after insertion" in {
       val total = 9
-      val q = quad[Int](10, 10, None)
+      val q = access[free].quad[Int](10, 10, None)
       
       for (i <- 0 until total) q(i, i) = i
       
@@ -154,7 +154,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     }
     
     "have 10 elements after insertion" in {
-      val q = quad[Int](10, 10, None)
+      val q = access[free].quad[Int](10, 10, None)
       q(0, 0) = 0
       q(0, 1) = 1
       q(0, 2) = 2
@@ -180,7 +180,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     }
     
     def testInsertions(d: Int, c: Boolean) {
-      val q = quad[Int](d, d, None, c)
+      val q = access[free].quad[Int](d, d, None, c)
       for (x <- 0 until d; y <- 0 until d) q(x, y) = x * y
       
       q.size should equal (d * d)
@@ -205,7 +205,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "have 200k elements after insertion" in {
       val n = 200000
-      val q = quad(2048, 2048, Some(-1))
+      val q = access[free].quad(2048, 2048, Some(-1))
       
       def convert(i: Int) = ((123 + (i >> 8)) % 2048, (i * 3) % 2048)
       
@@ -227,7 +227,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
       val r = 10
       val sz = 256
       val (x, y) = (50, 50)
-      val q = quad[Int](sz, sz, None)
+      val q = access[free].quad[Int](sz, sz, None)
       
       q(x, y) = 1
       q(x + r, y) = 1
@@ -244,7 +244,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "have all the elements within the entire square" in {
       val sz = 256
-      val q = quad[Int](sz, sz, None)
+      val q = access[free].quad[Int](sz, sz, None)
       for (x <- 0 until sz; y <- 0 until sz) q(x, y) = x * y
       q.within(Quad.square(sz / 2 - 1, sz / 2 - 1, sz / 2)).length should equal (sz * sz)
     }
@@ -252,7 +252,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     "have 30k elements within the entire square" in {
       val n = 30000
       val sz = 256
-      val q = quad[Int](sz, sz, None)
+      val q = access[free].quad[Int](sz, sz, None)
       
       def convert(i: Int) = ((123 + (i >> 8)) % 256, (i * 3) % 256)
       
@@ -263,7 +263,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "have 6 elements in the middle square" in {
       val sz = 4096
-      val q = quad[Int](sz, sz, None)
+      val q = access[free].quad[Int](sz, sz, None)
       q(2000, 2000) = 1
       q(2010, 2010) = 2
       q(1950, 2005) = 3
@@ -280,7 +280,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "have zero elements out of 4x4 after removal" in {
       val sz = 4
-      val q = quad[Int](sz, sz, None)
+      val q = access[free].quad[Int](sz, sz, None)
       for (x <- 0 until sz; y <- 0 until sz) q(x, y) = x * y
       var count = 16
       for (x <- 0 until sz; y <- 0 until sz) {
@@ -292,7 +292,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     }
     
     def testRemovals(sz: Int, c: Boolean) = {
-      val q = quad(sz, sz, Some(-1), c)
+      val q = access[free].quad(sz, sz, Some(-1), c)
       for (x <- 0 until sz; y <- 0 until sz) q(x, y) = x * y
       var count = sz * sz
       for (x <- 0 until sz; y <- 0 until sz) {
@@ -322,7 +322,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     }
     
     "be cleared" in {
-      val q = quad(10, 10, Some(-1))
+      val q = access[free].quad(10, 10, Some(-1))
       for (x <- 0 until 5; y <- 3 until 9) q(x, y) = x * y
       q.clear()
       q.size should equal (0)
@@ -330,7 +330,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     }
     
     "change dimensions" in {
-      val q = quad(10, 10, Some(-1))
+      val q = access[free].quad(10, 10, Some(-1))
       q.dimensions = (5, 5);
       for (x <- 0 until 5; y <- 0 until 5) q(x, y) should equal (-1)
       q.size should equal (0)
@@ -338,7 +338,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     }
     
     "change defaults" in {
-      val q = quad[Int](5, 5, None)
+      val q = access[free].quad[Int](5, 5, None)
       q.default = (x, y) => Some(7)
       for (x <- 0 until 5; y <- 0 until 5) q(x, y) should equal (7)
     }
@@ -348,7 +348,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
   "Heap" should {
     
     "be enqueued and then dequeued" in {
-      val h = heap[Int]
+      val h = access[free].heap[Int]
       
       h.enqueue(7)
       h.size should equal (1)
@@ -370,7 +370,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "be enqueued and dequeued with many elements" in {
       val many = 1000
-      val h = heap[Int]
+      val h = access[free].heap[Int]
       
       for (i <- 0 until many) h.enqueue(i)
       
@@ -405,7 +405,7 @@ class BasicTests extends WordSpec with ShouldMatchers {
     
     "be iterated" in {
       val sq = util.Random.shuffle((0 until 1000).toSeq)
-      val h = heap[Int]
+      val h = access[free].heap[Int]
       
       for (i <- sq) h.enqueue(i)
       h.size should equal (sq.size)

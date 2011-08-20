@@ -23,8 +23,8 @@ class Simulator(val area: Area) {
   
   private var actioncount: Long = 0L
   private var simtime = zeroTime
-  private val eventqueue = heap[(Time, EntityId)]
-  private val simulating = set[EntityId]
+  private val eventqueue = access[free].heap[(Time, EntityId)]
+  private val simulating = access[free].set[EntityId]
   
   def init() {
     actioncount = 0L
@@ -57,7 +57,7 @@ class Simulator(val area: Area) {
    */
   def step() = {
     val acnt = actioncount
-    val actions = queue[Action]
+    val actions = access[free].queue[Action]
     
     def awake(eid: EntityId, other: EntityId, t: Time) = if (!simulating(other)) enqueue(other, t)
     
