@@ -17,19 +17,12 @@ import rules.{Stats, Inventory}
 
 
 
-trait CharacterView extends EntityView {
-  def pos: components.immutable.Cell[Pos]
-  def dimensions: components.immutable.Cell[(Int, Int)]
-  
-}
-
-
 /** A basic, most general character.
  *  
  *  Each has a manager which controls what they do - choose their next action
  *  depending on the current state.
  */
-abstract class Character extends Entity with CharacterView {
+abstract class Character extends Entity {
   val pos = access[mutable] cell(Pos(0, 0))
   val dimensions = access[mutable] cell((1, 1))
   
@@ -128,7 +121,7 @@ pc =>
   def pov(area: AreaView) = area // TODO
   def chr = '@'
   def color = 0x0000ff00
-  def identifier = "basic_chars.playerchar"
+  def identifier = "basic_chars.playerchar" // TODO
 }
 
 

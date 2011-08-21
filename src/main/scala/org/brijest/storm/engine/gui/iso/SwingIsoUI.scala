@@ -62,7 +62,7 @@ class SwingIsoUI(val name: String) extends IsoUI {
     //println("Time to render: %d ms".format(t))
   }
   
-  def characterSprite(c: CharacterView) = c match {
+  def characterSprite(c: Character) = c match {
     case NoCharacter => new Sprite {
       def width = 0
       def height = 0
@@ -73,39 +73,44 @@ class SwingIsoUI(val name: String) extends IsoUI {
     } // TODO
   }
   
-  def maxSpriteHeight = 320
+  def maxSpriteHeight = Sprites.maxheight
   
   type Img = java.awt.Image
   
   def imageFromPngStream(stream: java.io.InputStream) = javax.imageio.ImageIO.read(stream)
   
-  class SwingDrawAdapter extends DrawAdapter {
-    val gr = buffer.getGraphics.asInstanceOf[Graphics2D]
-    
-    def drawLine(x1: Int, y1: Int, x2: Int, y2: Int) {
-      gr.drawLine(x1, y1, x2, y2)
-    }
-    def setColor(r: Int, g: Int, b: Int) {
-      gr.setColor(new java.awt.Color(r, g, b))
-    }
-    def drawString(s: String, x: Int, y: Int) {
-      gr.drawString(s, x, y)
-    }
-    def setFontSize(sz: Float) {
-      gr.setFont(gr.getFont.deriveFont(sz))
-    }
-    def drawPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
-      gr.drawPolyline(xpoints, ypoints, n)
-    }
-    def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
-      gr.fillPolygon(xpoints, ypoints, n)
-    }
-    def drawImage(image: Img, dx1: Int, dy1: Int, dx2: Int, dy2: Int, sx1: Int, sy1: Int, sx2: Int, sy2: Int) {
-      gr.drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null, null)
-    }
-
-  }
+  class SwingDrawAdapter extends ImageDrawAdapter(buffer) with DrawAdapter
   
+}
+
+
+abstract class ImageDrawAdapter(buffer: Image) {
+  val gr = buffer.getGraphics.asInstanceOf[Graphics2D]
+  
+  def drawLine(x1: Int, y1: Int, x2: Int, y2: Int) {
+    gr.drawLine(x1, y1, x2, y2)
+  }
+  def setColor(r: Int, g: Int, b: Int) {
+    gr.setColor(new java.awt.Color(r, g, b))
+  }
+  def drawString(s: String, x: Int, y: Int) {
+    gr.drawString(s, x, y)
+  }
+  def setFontSize(sz: Float) {
+    gr.setFont(gr.getFont.deriveFont(sz))
+  }
+  def drawPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
+    gr.drawPolyline(xpoints, ypoints, n)
+  }
+  def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
+    gr.fillPolygon(xpoints, ypoints, n)
+  }
+  def drawImage(image: Image, dx1: Int, dy1: Int, dx2: Int, dy2: Int, sx1: Int, sy1: Int, sx2: Int, sy2: Int) {
+    gr.drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null, null)
+  }
+  def fillRect(x1: Int, y1: Int, w: Int, h: Int) {
+    gr.fillRect(x1, y1, w, h)
+  }
 }
 
 

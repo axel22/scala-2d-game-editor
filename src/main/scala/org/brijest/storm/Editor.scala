@@ -44,7 +44,7 @@ class EditorConfigParser(config: Config) extends OptionParser(app.command) {
 
 
 class SwingEditor(config: Config) extends engine.gui.iso.SwingIsoUI(app.editorname) {
-  val area = Area.emptyDungeon(config.area.width, config.area.height)
+  val area = Area.emptyDungeonTest1(config.area.width, config.area.height)
   var lastpress = new java.awt.Point(0, 0)
   val refresher = new Thread {
     override def run() = while (true) {

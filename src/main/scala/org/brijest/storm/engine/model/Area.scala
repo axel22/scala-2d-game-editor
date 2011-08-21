@@ -126,14 +126,23 @@ object Area {
       area.terrain(w - 1, y) = Slot(classOf[HardRock], 4)
     }
     
-    if (w > 10 && h > 10) {
-      def insertrock(x: Int, y: Int) {
-        val rock = new characters.Rock(area.newEntityId())
+    area
+  }
+  
+  def emptyDungeonTest1(w: Int, h: Int): Area = {
+    implicit val area = emptyDungeon(w, h)
+    
+    if (w > 14 && h > 14) {
+      def insertrock(x: Int, y: Int, w: Int = 3, h: Int = 3) {
+        val rock = new characters.Rock(area.newEntityId(), (w, h))
         rock.pos := Pos(x, y)
         area.insert(rock)
       }
       insertrock(3, 3)
       insertrock(6, 5)
+      insertrock(3, 6, 3, 1)
+      insertrock(4, 7, 2, 4)
+      insertrock(6, 8, 5, 1)
     }
     
     area

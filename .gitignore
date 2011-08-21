@@ -8,6 +8,7 @@
 
 # garbage
 *.scala#
+tmp
 
 
 # project files

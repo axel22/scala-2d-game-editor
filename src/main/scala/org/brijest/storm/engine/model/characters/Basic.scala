@@ -18,8 +18,8 @@ import rules.{Stats, Inventory}
 
 
 
-class Rock(val id: EntityId) extends Character {
-  dimensions := (3, 3)
+class Rock(val id: EntityId, sz: (Int, Int) = (3, 3)) extends Character {
+  dimensions := sz
   
   def manager = IdleManager
   def canWalk(from: Slot, to: Slot) = false
@@ -28,3 +28,5 @@ class Rock(val id: EntityId) extends Character {
   def color = 0xffffff00
   def pov(area: AreaView) = area
 }
+
+

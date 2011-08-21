@@ -21,9 +21,8 @@ package object iso {
     getClass.getResourceAsStream("/iso/" + name + ".png")
   }
   
-  def foreachDiagonally[U](x0: Int, y0: Int, w: Int, h: Int)(f: (Int, Int) => U) {
-    for (i <- 0 until h; x <- 0 to i; y = i - x) f(x0 + x, y0 + y)
-    for (i <- 1 until w; x <- i until w; y = h - 1 + i - x) f(x0 + x, y0 + y)
+  object Sprites {
+    def maxheight = 320
   }
 }
 

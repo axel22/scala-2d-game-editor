@@ -30,6 +30,7 @@ trait Canvas {
     def drawString(s: String, x: Int, y: Int)
     def drawImage(image: Img, dx1: Int, dy1: Int, dx2: Int, dy2: Int, sx1: Int, sy1: Int, sx2: Int, sy2: Int)
     def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int)
+    def fillRect(x1: Int, y1: Int, w: Int, h: Int)
   }
 }
 
@@ -55,7 +56,7 @@ trait IsoCanvas extends Canvas {
       dims = oneone
       drawn = false
     }
-    def foreach[U](x0: Int, y0: Int)(f: (Int, Int) => U) = foreachDiagonally(x0, y0, dims._1, dims._2)(f)
+    def foreach[U](x0: Int, y0: Int)(f: (Int, Int) => U) = foreachNW2SE(x0, y0, dims._1, dims._2)(f)
     def contains(x0: Int, y0: Int, x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + dims._1) && y < (y0 + dims._2)
     def leftXY(x0: Int, y0: Int) = (x0, y0 + dims._2 - 1)
     def rightXY(x0: Int, y0: Int) = (x0 + dims._1 - 1, y0)
@@ -107,7 +108,7 @@ trait IsoCanvas extends Canvas {
       }
       if (next ne null) next.foreach(f)
     }
-    override def toString: String = array.mkString("[", ",", "]") + " --> " + (if (next ne null) next.toString else "")
+    override def toString: String = array.take(sz).mkString("[", ",", "]") + " --> " + (if (next ne null) next.toString else "")
   }
   
   def width: Int
@@ -124,6 +125,7 @@ trait IsoCanvas extends Canvas {
   
   object drawing {
     var outline = true
+    var seethrough = false
     var indices = true
     var background = true
   }
@@ -154,9 +156,11 @@ trait IsoCanvas extends Canvas {
   
   def maxPlanarHeight(mapsz: Int) = iso2planar(mapsz, mapsz, 0, mapsz)._2 + slotheight
   
-  def characterSprite(c: CharacterView): Sprite
+  def characterSprite(c: Character): Sprite
   
   def maxSpriteHeight: Int
+  
+  def background(area: AreaView) = stars
   
   def redrawBackground(area: AreaView, a: DrawAdapter) = if (drawing.background) {
     val w = 800
@@ -164,7 +168,10 @@ trait IsoCanvas extends Canvas {
     val x0 = pos._1 / 16 % w
     val y0 = pos._2 / 16 % h
     for (x <- -1 to (width / w + 1); y <- -1 to (height / h + 1))
-      a.drawImage(stars, x * w - x0, y * h - y0, x * w + w - x0, y * h + h - y0, 0, 0, w, h)
+      a.drawImage(background(area), x * w - x0, y * h - y0, x * w + w - x0, y * h + h - y0, 0, 0, w, h)
+  } else {
+    a.setColor(0, 0, 0)
+    a.fillRect(0, 0, width, height)
   }
   
   def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
@@ -221,7 +228,7 @@ trait IsoCanvas extends Canvas {
         // add everything in the rectangle to the dependency list
         for (xp <- xtop.toInt to xr; yp <- ytop.toInt to yl) {
           val up = iso2planar_u(xp, yp, 0, area.sidelength)
-          if (up > uleft && up < uright && !info.contains(x, y, xp, yp)) {
+          if (up >= uleft && up <= uright && !info.contains(x, y, xp, yp)) {
             val depinfo = slotinfo(xp, yp)
             if (depinfo ne null) {
               if (depinfo.isTop) info.deps = info.deps.add(xp, yp)
@@ -249,7 +256,7 @@ trait IsoCanvas extends Canvas {
     }
     @inline def drawRect(r: Int, g: Int, b: Int) {
       a.setColor(0, 0, 0)
-      a.fillPoly(xrect, yrect, 5)
+      if (!drawing.seethrough) a.fillPoly(xrect, yrect, 5)
       a.setColor(r, g, b)
       a.drawPoly(xrect, yrect, 5)
     }
@@ -300,19 +307,19 @@ trait IsoCanvas extends Canvas {
         // draw character
         area.characters(x, y) match {
           case NoCharacter => // do nothing
-          case c =>
+          case c =>x
             val s = characterSprite(c)
             val hgt = s.height
             val (lx, ly) = info.leftXY(x, y)
             val (rx, ry) = info.rightXY(x, y)
             val (bx, by) = info.bottomXY(x, y)
             val u1 = iso2planar_u(x, y, 0, area.sidelength) - u0
-            val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0
-            val u2 = iso2planar_u(lx, ly, 0, area.sidelength) - u0
+            val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0 - slotheight / 4
+            val u2 = iso2planar_u(lx, ly, 0, area.sidelength) - u0 - slotwidth / 4
             val v2 = iso2planar_v(lx, ly, 0, area.sidelength) - v0
             val u3 = iso2planar_u(bx, by, 0, area.sidelength) - u0
-            val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0
-            val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0
+            val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0 + slotheight / 4
+            val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0 + slotwidth / 4
             val v4 = iso2planar_v(rx, ry, 0, area.sidelength) - v0
             rect(u1, u2, u3, u4, v1 - hgt, v2 - hgt, v3 - hgt, v4 - hgt)
             drawRect(0, 200, 100)
@@ -341,7 +348,7 @@ trait IsoCanvas extends Canvas {
     }
     for (i <- 0 until h; x <- 0 to i; y = i - x) reverseDraw(x0 + x, y0 + y)
     for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) reverseDraw(x0 + x, y0 + y)
-   
+    
     // dispose dependencies
     for (i <- 0 until infos.length) {
       val info = infos(i)

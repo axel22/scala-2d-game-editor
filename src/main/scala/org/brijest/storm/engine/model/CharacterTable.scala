@@ -15,16 +15,7 @@ import components._
 
 
 
-trait CharacterTableView extends Struct {
-  def ids: components.immutable.Table[EntityId, CharacterView]
-  def locs: components.immutable.Quad[CharacterView]
-  def pcs: components.immutable.Table[PlayerId, EntityId]
-  
-  def apply(x: Int, y: Int) = locs(x, y)
-}
-
-
-class CharacterTable(w: Int, h: Int) extends CharacterTableView with MutableEvidence {
+class CharacterTable(w: Int, h: Int) extends MutableEvidence {
   private val dflt = Some(NoCharacter)
   val ids = access[mutable].table[EntityId, Character]
   val locs = access[mutable].quad[Character](w, h, dflt)
@@ -50,6 +41,7 @@ class CharacterTable(w: Int, h: Int) extends CharacterTableView with MutableEvid
     for ((_, c) <- ids) c.foreachPos((x, y) => locs(x, y) = c)
   }
   
+  def apply(x: Int, y: Int) = locs(x, y)
 }
 
 
