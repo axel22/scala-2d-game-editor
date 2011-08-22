@@ -1,7 +1,6 @@
 
 
-Transmuters:
-Transmuters are masters of manipulating and changing the material world around them. Versed in the art of alchemy, they start their art by creating potions and other concoctions, but soon grow more powerful and skilled in the use of transmutation signs which allow them to transmute substances around them, giving them different forms or compositions.
+Illusionist:
 
 
 
@@ -14,10 +13,6 @@ Druid:
 
 
 Necromancer:
-
-
-
-Illustionst:
 
 
 

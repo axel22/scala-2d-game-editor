@@ -1,0 +1,15 @@
+Excalibur
+- ignores lesser armors
+
+Oblivion
+- destroys lesser undead instantly
+- causes experience loss
+
+Rod of Saevill
+- fire damage
+- cast fireballs
+- red dragon control
+
+Rijndael
+- electrical damage
+- causes weather changes in exteriors
