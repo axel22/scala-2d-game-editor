@@ -1,8 +1,18 @@
 DONE
 ----
+- separate rules packages
+- hit points
+- stats
+- attributes
+- weight, encumbrance
 - fix the model - use evidence for mutations
 
 
 TODO
 ----
 - effects iso rendering
+- inventory
+- pick up items
+- equip items
+- melee attacks
+- different areas

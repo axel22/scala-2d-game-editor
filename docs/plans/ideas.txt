@@ -1,17 +1,3 @@
-Entrance to hell:
-The cemetery is located below a road. It appears to be very old and seems deserted. Few stairs along the road can be used to descend to the cemetery level. There are paintings along the cemetery wall which supports the road - they serve to hide entrances to crypts. Most paintings are disturbing - they depict unusual creatures and weird scenery, often involving scenes of violence. 
-One particular crypt entrance is covered with a painting of some sort of small hairy human-like creature with clawed feet standing in front of a hill below a yellow sky. The creature appears to be staring directly into the viewer.
-Few people have gone to the cemetery at night. Fewer still have noticed that between 11 o'clock and midnight the creature is not actually present on the painting. Coming closer reveals that it is in fact in front of the painting, standing very, very still. It remains unclear whether it is an inanimate statue or an actual fiend standing in the dark.
-This scene alone was enough to drive away all those who were ever close to the painting at this hour. None of them ever knew that if they tried to step into the hill scene behind the creature, they would find themselves inside the crypt, filled with dozens of similar motionless statues. For inside of that crypt, there are stairs leading lower to similar crypts, on and on, until finally reaching hell itself.
-If anybody ever entered and stayed after midnight, he would find himself having to spend a day inside. What would be a day on the outside, at least.
-
-
-Old hill cemetery:
-The cemetery is located behind a tall wall on the top of the cliff. Huge bars are raised on the front portal, leaving a feeling they would just drop if someone were to enter. Inside, there are hundreds of graves in the ground marked with sticks or simple crosses. There is a small hill in the middle of the yard and a large building on top. It seems as if it was a church or a mausoleum before, but was transformed into something sinister. The graves around this hall are decorated with obelisks.
-Not many have entered the yard and fewer still have gone towards the hall on the top of the hill and only those who survived the experience know that it is guarded by small dark grey creatures that raise from the graves surrounding it. Luckily, perhaps, for greater evils lurk inside the hall.
-The skies above are yellow.
-
-
 Tavern in the woods:
 There is an old tavern hidden in the woods, located near a small clearing next to a stream. During day it is closed, but during the night all kinds of scum comes there, mostly to get drunk or to do dirty business.
 
@@ -22,11 +8,6 @@ Once you drop it, it turns to a powerful magical companion. This companion can t
 
 Wild creatures:
 Not all wild beasts will attack the moment they spot you. Creatures of the wild are known to be very cunning and skillful hunters. Sometimes a beast will follow you for days without you knowing, only to find the best moment for assault. It may be while you sleep, or when you're weak or outnumbered. If you suspect that you're being followed, a good idea is to lure the beast by pretending to be an easy catch.
-
-
-High mountain temple:
-There is a temple on the top of the very high mountain. This temple has been slowly falling apart for years and nobody lives there obviously, yet it is filled with scrolls and tomes of a teaching long forgotten. It is said that only those who have not yet chosen their path and are able to understand magic have wild visions there, gaining insight into knowledges long forgotten.
-In any case, it's likely that this place holds the key to some ancient wisdom or a long forgotten art.
 
 
 The dragon man:
@@ -41,10 +22,6 @@ An ancient artifact said to give the wielder some sort of control over dragons.
 Ulzhan:
 The ancient warrior legend, a myth, say some, renowned for mastering both swordsmanship and martial arts, is said to have returned back to the land. Some rumours claim that Ulzhan wears a mask, and never speaks. Could this be a spectre of some sort?
 It is claimed among the commoners that Ulzhan fights with deadliness and grace, and this part is not renowned for the former.
-
-
-Nightcastle:
-People claim they've seen a castle on a hill near a forest at night. Their claims were discarded once the hill was found to be empty in the morning.
 
 
 The headless spectre:
@@ -72,18 +49,60 @@ Peasants sometimes claim they've seen a celestial island floating in the sky whi
 
 
 The smithy in the snow:
-In the cold hills in the northeast, there lies a smithy in the snow. They say it looks almost as if it is a picture to those who manage to reach it. Judging from the colds in those hills, it can appear nothing less than idyllic to weary traveller.
+In the cold hills in the northeast, there lies a smithy in the snow. They say it looks almost as if it is a picture to those who manage to reach it. Judging from the colds in those hills, it can appear nothing less than idyllic to a weary traveller.
 
 
-The white bird:
-The white bird is a bird from a children's poem, said to be trapped in a magical castle in a huge golden cage. The bird's song has died long ago, but the bird is said to sing a beatiful song to its brave rescuer, a song which refreshes the spirit.
+
+High mountain temple quest
+--------------------------
+
+There is a temple on the top of the very high mountain. This temple has been slowly falling apart for years and nobody lives there obviously, yet it is filled with scrolls and tomes of a teaching long forgotten. It is said that only those who have not yet chosen their path and are able to understand magic have wild visions there, gaining insight into knowledges long forgotten.
+In any case, it's likely that this place holds the key to some ancient wisdom or a long forgotten art.
 
 
-The Old Pass:
-In the days of the Great Count Gerald women were allowed to serve in the Guard for the first time. Count Gerald, a wise man, knew that he could boost the economy of his town if he allowed women to perform the chores reserved only for men. His decision was mocked and resisted at first, but it was soon proven that women are equal to men in martial arts, often making up for their lack of crude strength by their agility and persistence. One such girl was ordered to patrol the Old Pass - a rarely travelled passage among the hills north of the town. She disappeared after a few months and Count Gerald himself lead an investigation, with suspicions that the misdeed was done by the townfolk resisting the changes. It turned out that a band of thieves from the north stumbled upon the girl while she was patrolling the passage and took her life, stripping her of her armour, sword and other valuables. When they learned that the local count was very serious about his changes, they went to find her body and buried her in an old crypt near the Old Pass. Nonetheless, the count learned of this and those caught hanged.
-The Old Pass is travelled even less today, as strange forms wander through the forests near the pass at night. A curse is said to befall those who find and enter the crypt. Local patrons mocking the stories of townsmen who claim to have seen these strange apparitions. Needless to say, neither visit the place at night. A sage passing by some time back claimed that such things could only be set into motion by someone performing black arts, and such have not been seen in the lands for a long, long time, but he, too, postponed his journey forth until daylight.
+
+The white bird quest
+--------------------
+
+The white bird is a bird from a children's poem, said to be trapped in a magical castle in a huge golden cage. The bird's song has died long ago, but the bird is said to sing a beatiful song to its brave rescuer, a song which refreshes the spirit of benign characters.
 
 
+Nightcastle:
+People claim they've seen a castle on a hill near a forest at night. Their claims were discarded once the hill was found to be empty in the morning. Could it be that the castle disappears in the morning?
+When you get in there you hear a distant soothing music. There is a sound of a clock, which is getting faster as the morning approaches, as if signalling that the castle will be gone soon - and finding yourself in mid air would mean certain death.
+There is a ghostly shade of a bird in one room which tells you where to find the real castle where the bird is kept.
+
+
+
+The Old Pass quest
+------------------
+
+In the days of the Great Count Gerald women were allowed to serve in the Guard for the first time. Count Gerald, a wise man, knew that he could boost the economy of his town if he allowed women to perform the chores reserved only for men. His decision was mocked and resisted at first, but it was soon proven that women are equal to men in martial arts, often making up for their lack of crude strength by their agility and persistence. One such girl was ordered to patrol the Old Pass - a rarely travelled passage among the hills north of the town. She disappeared after a few months and Count Gerald himself lead an investigation, with suspicions that the misdeed was done by the townfolk resisting the changes. It turned out that a band of highwaymen from the north stumbled upon the girl while she was patrolling the passage and overwhelmed her, taking her sword and other valuables. The count caught them and interrogated them - they claimed not to have taken her life and that they left her in the wilderness without her sword, but with her armor. Nonetheless, they hanged on the town square soon after.
+The Old Pass is travelled even less today, as strange forms wander through the forests near the pass at night. Local patrons mocking the stories of townsmen who claim to have seen these strange apparitions. Needless to say, neither visit the place at night. A sage passing by some time back claimed that such things could only be set into motion by someone performing black arts, and such have not been seen in the lands for a long, long time, but he, too, postponed his journey forth until daylight.
+
+
+An old crone living on the outskirts of the town claims that the female guard was killed and buried, but not by the thieves. When asked to reveal more, she requests that you bring her some silvergrass from the nearby cliff, for she is too old to climb there. After getting her silvergrass, she says that the girl was slain by a necromancer passing through the land at that time and sacrificed in a dark ritual. He put her body into an old crypt beneath the Old Pass that was long forgotten. A few centuries ago, the crypt was made to bury a legendary warrior who died in the battle fought on the field above. Mages used powerful magic to protect the crypt from thieves and bandits, but this necromancer was apparently powerful enough to break the glyphs on the crypt. It's unclear whether the destruction of the glyphs or the desecration of the crypt caused the weird apparitions that now appear in the fields at night. The old crone says that these are the souls of the warriors that fell in the battle, released through some sort of a rift between planes opened by the necromancer's magic. While it is unclear to you what you should about this, the thought that a necromancer of such a power passed through the lands for some reason is intriguing. Perhaps you should seek out the crypt to find out more.
+
+
+
+The hell's gate quest
+--------------
+Entrance to hell:
+The cemetery is located below a road. It appears to be very old and seems deserted. Few stairs along the road can be used to descend to the cemetery level. There are paintings along the cemetery wall which supports the road - they serve to hide entrances to crypts. Most paintings are disturbing - they depict unusual creatures and weird scenery, often involving scenes of violence. 
+One particular crypt entrance is covered with a painting of some sort of small hairy human-like creature with clawed feet standing in front of a hill below a yellow sky. The creature appears to be staring directly into the viewer.
+Few people have gone to the cemetery at night. Fewer still have noticed that between 11 o'clock and midnight the creature is not actually present on the painting. Coming closer reveals that it is in fact in front of the painting, standing very, very still. It remains unclear whether it is an inanimate statue or an actual fiend standing in the dark.
+This scene alone was enough to drive away all those who were ever close to the painting at this hour. None of them ever knew that if they tried to step into the hill scene behind the creature, they would find themselves inside the crypt, filled with dozens of similar motionless statues. For inside of that crypt, there are stairs leading lower to similar crypts, on and on, until finally reaching hell itself.
+If anybody ever entered and stayed after midnight, he would find himself having to spend a day inside. What would be a day on the outside, at least.
+
+
+Old hill cemetery:
+The cemetery is located behind a tall wall on the top of the cliff. Huge bars are raised on the front portal, leaving a feeling they would just drop if someone were to enter. Inside, there are hundreds of graves in the ground marked with sticks or simple crosses. There is a small hill in the middle of the yard and a large building on top. It seems as if it was a church or a mausoleum before, but was transformed into something sinister. The graves around this hall are decorated with obelisks.
+Not many have entered the yard and fewer still have gone towards the hall on the top of the hill and only those who survived the experience know that it is guarded by small dark grey creatures that raise from the graves surrounding it. Luckily, perhaps, for greater evils lurk inside the hall.
+You notice that the skies above are strangely yellow as you near the walls.
+
+
+Mausoleum of the Old hill cemetery:
+A greater vampire lurks inside. A scroll in his casket describes how to reach an old cemetery.
 
 
 
