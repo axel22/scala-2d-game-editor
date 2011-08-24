@@ -10,15 +10,6 @@ Wild creatures:
 Not all wild beasts will attack the moment they spot you. Creatures of the wild are known to be very cunning and skillful hunters. Sometimes a beast will follow you for days without you knowing, only to find the best moment for assault. It may be while you sleep, or when you're weak or outnumbered. If you suspect that you're being followed, a good idea is to lure the beast by pretending to be an easy catch.
 
 
-The dragon man:
-There is man living in the outskirts of the city. A strange fellow, by all accounts, he doesn't say much and stays out of trouble's way. And trouble stays out of his, as local patrons consider him formidable and not to be taken lightly. Some travellers passing by claimed that this man is not really human.
-It is said that he would leave on a journey once he finds a proper companion. He visits a local inn every now and then, which is the only place he's known to be seen.
-
-
-The rod of Saevill:
-An ancient artifact said to give the wielder some sort of control over dragons.
-
-
 Ulzhan:
 The ancient warrior legend, a myth, say some, renowned for mastering both swordsmanship and martial arts, is said to have returned back to the land. Some rumours claim that Ulzhan wears a mask, and never speaks. Could this be a spectre of some sort?
 It is claimed among the commoners that Ulzhan fights with deadliness and grace, and this part is not renowned for the former.
@@ -52,12 +43,37 @@ The smithy in the snow:
 In the cold hills in the northeast, there lies a smithy in the snow. They say it looks almost as if it is a picture to those who manage to reach it. Judging from the colds in those hills, it can appear nothing less than idyllic to a weary traveller.
 
 
+The windy expanse:
+This world is a huge field spanning in all directions, covered with short dry yellow grass. The skies are covered with grey clouds which promise storm, which never seems to come. Strange creatures inhabit this field - jumping foots with one eye on the top and big fat humanoids with a trunk instead of a nose which can move incredibly fast for some reason. None of them appear benevolent.
+
+
+Volcanic jungle:
+This world is a huge, dense jungle with a lively seismic activity and filled with active volcanos. The jungle is full of life, and predators are all about. Creatures lower in the food chain here know well how to hide themselves to survive. There are signs of intelligent life too. Deep in these forests lives a strange race with an even stranger body - they have spider-like legs and a dozen eyes on long, flexible tentacles. These creatures are well versed in the art of magic, which is quite probably the reason why they are so successful in survival in this environment with such a frail body. They do not appear to be unfriendly, unless provoked.
+A malevolent force has apparently invaded this world some time ago, but it was somehow banished.
+
+
 
 High mountain temple quest
 --------------------------
 
 There is a temple on the top of the very high mountain. This temple has been slowly falling apart for years and nobody lives there obviously, yet it is filled with scrolls and tomes of a teaching long forgotten. It is said that only those who have not yet chosen their path and are able to understand magic have wild visions there, gaining insight into knowledges long forgotten.
 In any case, it's likely that this place holds the key to some ancient wisdom or a long forgotten art.
+
+
+
+The dragon man quest
+--------------------
+
+The dragon man:
+There is man living in the outskirts of the city. A strange fellow, by all accounts, he doesn't say much and stays out of trouble's way. And trouble stays out of his, as local patrons consider him formidable and not to be taken lightly. Some travellers passing by claimed that this man is not really human.
+It is said that he would leave on a journey once he finds a proper companion. He visits a local inn every now and then, which is the only place he's known to be seen.
+
+
+This man is actually a dragon seeking to destroy an ancient artifact which lead many of his race into disaster. He knows he needs a proper companion to do it - the artifact is kept in a place that's well protected.
+
+
+The rod of Saevill:
+An ancient artifact said to give the wielder some sort of control over dragons.
 
 
 
@@ -86,14 +102,7 @@ An old crone living on the outskirts of the town claims that the female guard wa
 
 
 The hell's gate quest
---------------
-Entrance to hell:
-The cemetery is located below a road. It appears to be very old and seems deserted. Few stairs along the road can be used to descend to the cemetery level. There are paintings along the cemetery wall which supports the road - they serve to hide entrances to crypts. Most paintings are disturbing - they depict unusual creatures and weird scenery, often involving scenes of violence. 
-One particular crypt entrance is covered with a painting of some sort of small hairy human-like creature with clawed feet standing in front of a hill below a yellow sky. The creature appears to be staring directly into the viewer.
-Few people have gone to the cemetery at night. Fewer still have noticed that between 11 o'clock and midnight the creature is not actually present on the painting. Coming closer reveals that it is in fact in front of the painting, standing very, very still. It remains unclear whether it is an inanimate statue or an actual fiend standing in the dark.
-This scene alone was enough to drive away all those who were ever close to the painting at this hour. None of them ever knew that if they tried to step into the hill scene behind the creature, they would find themselves inside the crypt, filled with dozens of similar motionless statues. For inside of that crypt, there are stairs leading lower to similar crypts, on and on, until finally reaching hell itself.
-If anybody ever entered and stayed after midnight, he would find himself having to spend a day inside. What would be a day on the outside, at least.
-
+---------------------
 
 Old hill cemetery:
 The cemetery is located behind a tall wall on the top of the cliff. Huge bars are raised on the front portal, leaving a feeling they would just drop if someone were to enter. Inside, there are hundreds of graves in the ground marked with sticks or simple crosses. There is a small hill in the middle of the yard and a large building on top. It seems as if it was a church or a mausoleum before, but was transformed into something sinister. The graves around this hall are decorated with obelisks.
@@ -102,7 +111,15 @@ You notice that the skies above are strangely yellow as you near the walls.
 
 
 Mausoleum of the Old hill cemetery:
-A greater vampire lurks inside. A scroll in his casket describes how to reach an old cemetery.
+A greater vampire lurks inside. A scroll in his casket describes how to reach a huge, abandoned cemetery.
+
+
+Entrance to hell:
+The cemetery is located below a road. It appears to be very old and seems deserted. Few stairs along the road can be used to descend to the cemetery level. There are paintings along the cemetery wall which supports the road - they serve to hide entrances to crypts. Most paintings are disturbing - they depict unusual creatures and weird scenery, often involving scenes of violence. 
+One particular crypt entrance is covered with a painting of some sort of small hairy human-like creature with clawed feet standing in front of a hill below a yellow sky. The creature appears to be staring directly into the viewer.
+Few people have gone to the cemetery at night. Fewer still have noticed that between 11 o'clock and midnight the creature is not actually present on the painting. Coming closer reveals that it is in fact in front of the painting, standing very, very still. It remains unclear whether it is an inanimate statue or an actual fiend standing in the dark.
+This scene alone was enough to drive away all those who were ever close to the painting at this hour. None of them ever knew that if they tried to step into the hill scene behind the creature, they would find themselves inside the crypt, filled with dozens of similar motionless statues. For inside of that crypt, there are stairs leading lower to similar crypts, on and on, until finally reaching hell itself.
+If anybody ever entered and stayed after midnight, he would find himself having to spend a day inside. What would be a day on the outside, at least.
 
 
 
