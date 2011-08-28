@@ -15,38 +15,80 @@ Steal item - the illusionists can use their abilities to create a distraction an
 
 Level 1:
 --------
+=> The illusions that you create are something barely more than mere tricks.
 
 Spark - creates a spark in the vicinity of the illusionist. This can distract some opponents.
+
+Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent and score a critical hit. This spell only succeeds if the opponent isn't already attacking the spellcaster.
 
 
 Level 2:
 --------
+=> Your illusions become more powerful and you feel the magic within them.
 
 Light - illuminates an area around the spellcaster.
 
 Blur - blurs the image of the spellcaster, increasing his defense abilities - the opponents have trouble hitting or shooting the caster.
 
+Firefly - summons a magical firefly and sends it to a location chosen by the illusionist. After reaching this location, the firefly tries to avoid other beings. It can be used to lure a melee opponent away, as long as the caster is careful not to lure the opponent towards himself.
+
 
 Level 3:
 --------
+=> Your illusions become more powerful and can disable enemies.
 
-Sleight of the Flame - these illusionary flames are known to cause those weak of will to panic and run. They may even cause characters to drop items held in their hands.
+Sleight of the Flame - these illusionary flames thrown at the opponent are known to cause him to panic and run if he is weak of will. They may even cause opponents to drop items held in their hands.
 
 Blinding Light - creates a burst of light, blinding the opponent which is not quick enough to close his eyes for some time.
+
+Firefly Swarm - summons magical fireflies which fly towards the opponent and envelop him, making him less perceptive and less aware of his surroundings. Those under effect will have trouble spotting things in the distance.
+
+Greater Blur - blurs the image of the spellcaster heavily, increasing his defense greatly. Critical hits on the spellcaster are much harder to score.
+
+Darkness - conjures a globe of darkness around the spellcaster.
+
+Wall of the Wasp - summons an illusionary wall of violent wasps in front of the caster. Opponent think twice before proceeding through it.
 
 
 Level 4:
 --------
+=> You are able to create illusions away from your immediate vicinity. Your illusions are able to now affect others much more than yourself.
 
-Serpent Sword - if the characters affected by the spell wield a melee weapon, they will perceive it as a venomous serpent. Those with either a weak strength of will or without the knowledge that this may be a trick usually drop the weapon instantly.
+Serpent Sword - if the characters affected by this spell wield a melee or a long range weapon, they will perceive it as a venomous serpent. Those with either a weak strength of will or without the knowledge that this may be a trick are quick to drop their weapons.
+
+Helmet of the Wasp - an opponent affected by this illusion which wears a helmet will see wasps inside of it. Those weak of will or not knowing this trick throw their helmet away instantly.
 
 Mirror Image - creates a mirror image of the spellcaster which mimics the things he does, but inflicts no damage. The opponents often attack the wrong person, buying the caster some time.
 
+Phantoms - summons illusionary monsters to distract or scare of the enemies.
+
+Interference - twists the images around an opponent so that he is unable to perceive his surroundings correctly. Those under effect of this illusion see things around them at wrong places, confusing them greatly. Less perceptive opponents are particularly vulnerable to this spell.
 
 
+Level 5:
+--------
+=> You gain more control over your illusions, and are able to refine them greatly to serve your purposes.
+
+Striking Resemblance - creates an aura around the illusionist allowing him to take form of another humanoid that is currently in the vicinity.
+
+Vile Visage - creates an aura around an opponent which makes him appear as a vile monster to others, possibly provoking an attack.
+
+Invisibility - renders the spellcaster invisible.
+
+Paralysis - renders an opponent paralyzed.
 
 
+Level 6:
+--------
+=> You begin to understand that there is no boundary between the illusion and reality, and gain more insight into the true nature of illusions. You start to comprehend that an object without an observer does not truly exist.
 
+Flame of Undril
+Origin: Little is known about where this scroll originated. Some say that a mage Undril living as a hermit in the mountains near the volcanos far north learned it by watching a fire elemental that used to conjure it for some reason. He first wrote the spell down with coal on stones near his establishment. It is now one of the favoured spells among the mages in the north.
+Description: Envelops an opponent with flames that feel very real. The opponent suffers fire damage until the flames dissipate.
+
+Globe of Kariim
+Origin: Long ago, in the harsh deserts in the south fierce warriors ruled the lands at this time and wizardry was perceived as nothing more than a mockery done for the amusement of the crowds at town centers. The heads of the warrior caste were well aware that the only way to prolong their rulership was to ban wizardry and wizard guilds. This lasted until a wizard known as Kariim invented a powerful spell which protected him from the warriors. It is said that he could create an impervious globe around himself that no sword could break. He shared his spell with other wizards of the lands and they forged an alliance against the tyranny of the warriors. Wizard schools and guilds were formed throughout the lands, and balance between might and magic was once again regained. Kariim enjoys great respect today among the wizards of the south.
+Decription: Creates an impenetrable globe around the caster, greatly increasing his protection value.
 
 
 
