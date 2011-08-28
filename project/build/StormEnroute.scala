@@ -86,26 +86,46 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   def fileName(f: Path) = f.asFile.getName
   
-  def createRunScript(name: String, dir: Path, libdir: Path, comment: String, maincls: String) {
+  def withFile(f: java.io.File)(op: java.io.PrintWriter => Unit) {
+    val p = new java.io.PrintWriter(f)
+    try { op(p) } finally { p.close() }
+  }
+  
+  def createRunScript(name: String, dir: Path, libdir: Path, comment: String, maincls: String, bat: Boolean) {
+    def declare(nm: String, v: String) = if (bat) "set %s=%s".format(nm, v) else "%s=%s".format(nm, v)
+    def variable(nm: String) = if (bat) "%" + nm + "%" else "$" + nm
+    def delimiter = if (bat) ";" else ":"
     val alljars = List(Deploy.dir / artifactname) ++ classpath ++ List(scalalibpath)
-    val jardecl = "JARS=%s".format(alljars.map(fileName(_)).map(libdir.asFile.getName / _).mkString(":"))
+    val jarstring = "%s".format(alljars.map(fileName(_)).map(libdir.asFile.getName / _).mkString(delimiter))
+    val jardecl = declare("JARS", jarstring)
     val flags = "-Dsun.java2d.opengl=True"
-    val startcommand = "java -cp $JARS %s %s %s".format(
+    val startcommand = "java -cp %s %s %s %s".format(
+      variable("JARS"),
       flags,
       maincls,
       "$@"
     )
-    val startscript = (dir / name).asFile
-    "echo # %s".format(comment) #> startscript !;
-    "echo \n%s".format(jardecl) #>> startscript !;
-    "echo \n%s".format(startcommand) #>> startscript !;
+    
+    val filename = name + (if (bat) ".bat" else "")
+    val startscript = (dir / filename).asFile
+    withFile(startscript) {
+      p =>
+      p.println("# %s".format(comment))
+      p.println("%s".format(jardecl))
+      p.println("%s".format(startcommand))
+    }
     "chmod a+x %s".format(startscript) !;
+    
+    if (!bat) createRunScript(name, dir, libdir, comment, maincls, true)
   }
   
   def createBaseDirRunScript(name: String, runscr: String, dir: Path) {
     val f = new File(name)
-    "echo cd %s".format(dir) #> f !;
-    "echo ./%s $@".format(runscr) #>> f !;
+    withFile(f) {
+      p =>
+      p.println("cd %s".format(dir))
+      p.println("./%s $@".format(runscr))
+    }
     "chmod a+x %s".format(name) !;
   }
   
@@ -126,8 +146,8 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     runsync("mkdir %s".format(Deploy.libzdir))
     runsync("mkdir %s".format(Deploy.areadir))
     copyDependencies(Deploy.libzdir)
-    createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir, "Storm Enroute", mainClass.get)
-    createRunScript(Deploy.editorcmd, Deploy.dir, Deploy.libzdir, "Editor", editorClass.get)
+    createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir, "Storm Enroute", mainClass.get, true)
+    createRunScript(Deploy.editorcmd, Deploy.dir, Deploy.libzdir, "Editor", editorClass.get, true)
     createBaseDirRunScript("deployrun", Deploy.stormcmd, Deploy.dir)
     None
   } dependsOn (`package`)

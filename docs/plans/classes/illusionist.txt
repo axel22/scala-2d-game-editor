@@ -1,13 +1,63 @@
-Spells
-------
+#############
+# Abilities #
+#############
 
 Level 1:
+--------
 
-Sleight of the Flame - these illusionary flames are known to cause those weak of will to panic and run. They may even cause characters to drop items held in their hands.
+Steal item - the illusionists can use their abilities to create a distraction and steal items from others.
+
+
+
+##########
+# Spells #
+##########
+
+Level 1:
+--------
+
+Spark - creates a spark in the vicinity of the illusionist. This can distract some opponents.
 
 
 Level 2:
+--------
+
+Light - illuminates an area around the spellcaster.
+
+Blur - blurs the image of the spellcaster, increasing his defense abilities - the opponents have trouble hitting or shooting the caster.
+
+
+Level 3:
+--------
+
+Sleight of the Flame - these illusionary flames are known to cause those weak of will to panic and run. They may even cause characters to drop items held in their hands.
+
+Blinding Light - creates a burst of light, blinding the opponent which is not quick enough to close his eyes for some time.
+
+
+Level 4:
+--------
 
 Serpent Sword - if the characters affected by the spell wield a melee weapon, they will perceive it as a venomous serpent. Those with either a weak strength of will or without the knowledge that this may be a trick usually drop the weapon instantly.
+
+Mirror Image - creates a mirror image of the spellcaster which mimics the things he does, but inflicts no damage. The opponents often attack the wrong person, buying the caster some time.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
