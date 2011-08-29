@@ -32,6 +32,8 @@ Blur - blurs the image of the spellcaster, increasing his defense abilities - th
 
 Firefly - summons a magical firefly and sends it to a location chosen by the illusionist. After reaching this location, the firefly tries to avoid other beings. It can be used to lure a melee opponent away, as long as the caster is careful not to lure the opponent towards himself.
 
+Dispel Apparition - dispels an illusion of level 3 or below.
+
 
 Level 3:
 --------
@@ -64,6 +66,8 @@ Phantoms - summons illusionary monsters to distract or scare of the enemies.
 
 Interference - twists the images around an opponent so that he is unable to perceive his surroundings correctly. Those under effect of this illusion see things around them at wrong places, confusing them greatly. Less perceptive opponents are particularly vulnerable to this spell.
 
+Dispel Illusion - dispels an illusion of level 5 or below.
+
 
 Level 5:
 --------
@@ -73,9 +77,9 @@ Striking Resemblance - creates an aura around the illusionist allowing him to ta
 
 Vile Visage - creates an aura around an opponent which makes him appear as a vile monster to others, possibly provoking an attack.
 
-Invisibility - renders the spellcaster invisible.
+Invisibility - renders the target invisible.
 
-Paralysis - renders an opponent paralyzed.
+Counterimage - enchants the target so that the next illusion of level 5 or below cast by it or cast on it fails.
 
 
 Level 6:
@@ -83,16 +87,24 @@ Level 6:
 => You begin to understand that there is no boundary between the illusion and reality, and gain more insight into the true nature of illusions. You start to comprehend that an object without an observer does not truly exist.
 
 Flame of Undril
-Origin: Little is known about where this scroll originated. Some say that a mage Undril living as a hermit in the mountains near the volcanos far north learned it by watching a fire elemental that used to conjure it for some reason. He first wrote the spell down with coal on stones near his establishment. It is now one of the favoured spells among the mages in the north.
+Origin: Little is known about where this scroll originated. Some say that a mage Undril living as a hermit in the mountains near the volcanos far north learned it by watching a fire elemental that used to invoke it for some reason. He first wrote the spell down with coal on stones near his establishment. It is now one of the favoured spells among the mages in the north.
 Description: Envelops an opponent with flames that feel very real. The opponent suffers fire damage until the flames dissipate.
 
 Globe of Kariim
 Origin: Long ago, in the harsh deserts in the south fierce warriors ruled the lands at this time and wizardry was perceived as nothing more than a mockery done for the amusement of the crowds at town centers. The heads of the warrior caste were well aware that the only way to prolong their rulership was to ban wizardry and wizard guilds. This lasted until a wizard known as Kariim invented a powerful spell which protected him from the warriors. It is said that he could create an impervious globe around himself that no sword could break. He shared his spell with other wizards of the lands and they forged an alliance against the tyranny of the warriors. Wizard schools and guilds were formed throughout the lands, and balance between might and magic was once again regained. Kariim enjoys great respect today among the wizards of the south.
 Decription: Creates an impenetrable globe around the caster, greatly increasing his protection value.
 
+Paralysis
+Origin: Its origins unknown to most, this spell was forbidden by the Great Count Gerald who declared it a form of necromancy, although he was no wizard himself. This was probably due to the fact that illusionists used it far too often to fulfill their own goals. In any case, the use of it is forbidden under penalty of death and any master illusionists today will claim that he knows it not, though this is less than likely.
+Description: Renders an opponent paralyzed.
 
+Ganilot's Persuasion
+Origin: The story of the first use of this spell is well known among illusionists of the lands. After a young king's wife succumbed to a disease, leaving him in depression and despair. When he refused to lead his armies to defend the kingdom against a barbarian attack, a wizard by the name of Ganilot created an illusion so real that the young king believed that his wife somehow came back to life. The illusion lasted long enough for the king to be persuaded to lead his defending armies. Knowing that the spell wouldn't last too long and fearing his king's retribution, the wizard Ganilot fleed the kingdom never to return. This spell has only later been used by illusionists of a less benevolent disposition to cause mischief and grief.
+Description: All summoned creature illusions become real for a brief period of time.
 
-
+Rhea's Light:
+Origin: Great wizardess Rhea devised this spell as part of her acceptance test for the wizard's guild, thus showing a high level of brilliance for her young age.
+Description: Creates a ray of light so strong that it causes physical damage to the target.
 
 
 
