@@ -17,9 +17,11 @@ Level 1:
 --------
 => The illusions that you create are something barely more than mere tricks.
 
-Spark - creates a spark in the vicinity of the illusionist. This can distract some opponents.
+Spark - creates sparks in the vicinity of the illusionist. This can distract some opponents.
 
 Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent and score a critical hit. This spell only succeeds if the opponent isn't already attacking the spellcaster. Also, intelligent and perceptive opponents may see through the roose.
+
+Friendlyness - gives an opponent a temporary illusion that the spellcaster is his friend. The illusion ends if the spellcaster attacks the target. This can lend the caster some time.
 
 
 Level 2:
@@ -122,7 +124,7 @@ Description: Creates a ray of light so strong that it causes physical damage to 
 
 Teleport
 Origin: One of the oldest known higher illusions, the origin of this spell is not well documented.
-Description: Teleports the spellcaster to a target location.
+Description: Teleports the spellcaster to a target location in the proximity of the spellcaster.
 
 Spatial Exchange
 Origin: Wizards of the south devised this spell to lure enemy warriors onto seemingly helpless and trapped allies. They would then exchange their locations, thus trapping the enemies.
@@ -133,5 +135,11 @@ Origin: Mages in ancient times were known to put a great number of protective en
 Description: Dispels all enchantments in the target area.
 
 
+Level 7
+-------
+=> Your ability to alter the reality around you becomes much more powerful.
 
+Dimension Door
+Origin: It is said that this spell was devised by the monks living in the mountains in the north to avoid going through dangerous and unfriendly wilderness to reach other monasteries.
+Description: Transports the spellcaster and creatures in his vicinity to other areas, possibly far away. The range is determined by the spellcaster's level and his attunement to magical energies. The dimension door can only be created in open areas and the target location may not be very accurate.
 

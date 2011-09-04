@@ -91,6 +91,10 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
     "correctly display area: empty dungeon test 3" in {
       testAreaDisplay(Area.emptyDungeonTest3(16, 16), "dungeon3")
     }
+    
+    "correctly display area: empty dungeon test 4" in {
+      testAreaDisplay(Area.emptyDungeonTest4(16, 16), "dungeon4")
+    }
   }
   
 }

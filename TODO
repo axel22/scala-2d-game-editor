@@ -10,9 +10,18 @@ DONE
 
 TODO
 ----
+- fix the characters
+- refactoring characters -> agents
 - effects iso rendering
+- world - maps - area + connected areas
+- editor ui
+  - terrain slot rendering
+  - edge rendering
+  - area editor - editing terrain, adding agents
+  - trigger system
+  - maps editor
 - inventory
 - pick up items
 - equip items
 - melee attacks
-- different areas
+- movement to different areas
