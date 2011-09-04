@@ -30,6 +30,7 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       class TestDrawingAdapter extends ImageDrawAdapter(img) with DrawAdapter
       
       drawing.background = false
+      drawing.indices = false
       
       type Img = java.awt.Image
       def maxSpriteHeight = Sprites.maxheight
@@ -68,18 +69,28 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       javax.imageio.ImageIO.write(img, "png", new java.io.File("tmp/" + name + ".png"))
     }
     
-    "correctly display area: empty dungeon test 1" in {
+    def testAreaDisplay(area: AreaView, picname: String) {
       val canvas = new TestIsoCanvas
-      val area = Area.emptyDungeonTest1(16, 16)
       
       canvas.redraw(area, IdleEngine, new canvas.TestDrawingAdapter())
       
       val result = canvas.img
-      save("dungeon1", result)
-      val expected = canvas.imageFromPngStream(pngStream("dungeon1"))
+      save(picname, result)
+      val expected = canvas.imageFromPngStream(pngStream(picname))
       equalImages(result, expected) should equal (true)
     }
     
+    "correctly display area: empty dungeon test 1" in {
+      testAreaDisplay(Area.emptyDungeonTest1(16, 16), "dungeon1")
+    }
+
+    "correctly display area: empty dungeon test 2" in {
+      testAreaDisplay(Area.emptyDungeonTest2(16, 16), "dungeon2")
+    }
+    
+    "correctly display area: empty dungeon test 3" in {
+      testAreaDisplay(Area.emptyDungeonTest3(16, 16), "dungeon3")
+    }
   }
   
 }

@@ -19,7 +19,7 @@ Level 1:
 
 Spark - creates a spark in the vicinity of the illusionist. This can distract some opponents.
 
-Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent and score a critical hit. This spell only succeeds if the opponent isn't already attacking the spellcaster.
+Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent and score a critical hit. This spell only succeeds if the opponent isn't already attacking the spellcaster. Also, intelligent and perceptive opponents may see through the roose.
 
 
 Level 2:
@@ -32,7 +32,9 @@ Blur - blurs the image of the spellcaster, increasing his defense abilities - th
 
 Firefly - summons a magical firefly and sends it to a location chosen by the illusionist. After reaching this location, the firefly tries to avoid other beings. It can be used to lure a melee opponent away, as long as the caster is careful not to lure the opponent towards himself.
 
-Dispel Apparition - dispels an illusion of level 3 or below.
+Dispel Apparition - dispels an illusion of level 3 or below, which has to be very close to the caster for this spell to work.
+
+Holy Symbol - summons an image of a holy symbol, which drives lower undead creatures away.
 
 
 Level 3:
@@ -41,7 +43,7 @@ Level 3:
 
 Sleight of the Flame - these illusionary flames thrown at the opponent are known to cause him to panic and run if he is weak of will. They may even cause opponents to drop items held in their hands.
 
-Blinding Light - creates a burst of light, blinding the opponent which is not quick enough to close his eyes for some time.
+Blinding Light - creates a burst of light, temporarily blinding the opponent which is not quick enough to close his eyes for some time.
 
 Firefly Swarm - summons magical fireflies which fly towards the opponent and envelop him, making him less perceptive and less aware of his surroundings. Those under effect will have trouble spotting things in the distance.
 
@@ -71,7 +73,7 @@ Dispel Illusion - dispels an illusion of level 5 or below.
 
 Level 5:
 --------
-=> You gain more control over your illusions, and are able to refine them greatly to serve your purposes.
+=> You gain more control over illusions, and are able to refine them greatly to serve your purposes.
 
 Striking Resemblance - creates an aura around the illusionist allowing him to take form of another humanoid that is currently in the vicinity.
 
@@ -81,10 +83,22 @@ Invisibility - renders the target invisible.
 
 Counterimage - enchants the target so that the next illusion of level 5 or below cast by it or cast on it fails.
 
+Optimism - changes the target's perception of the surroundings so that it is less susceptible to fear. A character under the influence of this spell will not panic, run away or suffer fighting performance penalties when overpowered.
+
+Pessimism - changes the target's perception of the surroundings so that it is more susceptible to fear. A character under the influence of this spell is more likely to lose focus, panic or run away.
+
+Magic Warding - illusions are less likely to succeed in the area enchanted by this spell.
+
+Backfire - enchants a target so that the next magic cast by it is turned into an explosion.
+
 
 Level 6:
 --------
 => You begin to understand that there is no boundary between the illusion and reality, and gain more insight into the true nature of illusions. You start to comprehend that an object without an observer does not truly exist.
+
+Counterspell
+Origin: This is a very old illusionist spell cast known to be cast by master mages since ancient times.
+Description: Enchants the target so that any next spell of level 6 or below cast by it or cast on it fails.
 
 Flame of Undril
 Origin: Little is known about where this scroll originated. Some say that a mage Undril living as a hermit in the mountains near the volcanos far north learned it by watching a fire elemental that used to invoke it for some reason. He first wrote the spell down with coal on stones near his establishment. It is now one of the favoured spells among the mages in the north.
@@ -99,18 +113,24 @@ Origin: Its origins unknown to most, this spell was forbidden by the Great Count
 Description: Renders an opponent paralyzed.
 
 Ganilot's Persuasion
-Origin: The story of the first use of this spell is well known among illusionists of the lands. After a young king's wife succumbed to a disease, leaving him in depression and despair. When he refused to lead his armies to defend the kingdom against a barbarian attack, a wizard by the name of Ganilot created an illusion so real that the young king believed that his wife somehow came back to life. The illusion lasted long enough for the king to be persuaded to lead his defending armies. Knowing that the spell wouldn't last too long and fearing his king's retribution, the wizard Ganilot fleed the kingdom never to return. This spell has only later been used by illusionists of a less benevolent disposition to cause mischief and grief.
+Origin: The story of the first use of this spell is well known among illusionists of the lands. After a young king's wife succumbed to a disease, leaving him in depression and despair. When he refused to lead his armies to defend the kingdom against a barbarian attack, a wizard by the name of Ganilot created an illusion so real that the young king believed that his wife somehow came back to life. The illusion lasted long enough for the king to be persuaded to lead his defending armies. Fearing his king's retribution once he'd find out about the truth, the wizard Ganilot fleed the kingdom never to return. This spell has only later been used by illusionists of a less benevolent disposition to cause mischief and grief.
 Description: All summoned creature illusions become real for a brief period of time.
 
-Rhea's Light:
+Rhea's Light
 Origin: Great wizardess Rhea devised this spell as part of her acceptance test for the wizard's guild, thus showing a high level of brilliance for her young age.
 Description: Creates a ray of light so strong that it causes physical damage to the target.
 
+Teleport
+Origin: One of the oldest known higher illusions, the origin of this spell is not well documented.
+Description: Teleports the spellcaster to a target location.
 
+Spatial Exchange
+Origin: Wizards of the south devised this spell to lure enemy warriors onto seemingly helpless and trapped allies. They would then exchange their locations, thus trapping the enemies.
+Description: Teleports the spellcaster to the location of the spell target. In turn, the target is teleported at the location of the spellcaster.
 
-
-
-
+Dispel Magic
+Origin: Mages in ancient times were known to put a great number of protective enchantments on themselves to avoid being obliterated by warriors or other mages. It is said that some of the mages were nearly invincible due to this, and it was not until a group of wandering wizards from the east brought knowledge about a powerful dispel magic that such a protective tactic lost its strength.
+Description: Dispels all enchantments in the target area.
 
 
 

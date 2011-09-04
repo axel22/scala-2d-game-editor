@@ -10,6 +10,9 @@ A legendary wizard from the south that formed the wizard's guild and defied the 
 Rhea:
 A wizardess from the time of Great Count Gerald. She was a brilliant illusionist and many illusion spells carry her name. Many say she was enlightened. She disappeared from the lands soon after Great Count Gerald's death.
 
+Ganilot:
+A talented wizard who fleed the lands after tricking his king for the good of the country. This was long ago.
+
 
 Uriel
 Morgana
@@ -57,3 +60,5 @@ Zahiir
 Elerea
 Gaelle
 Wordech Willy
+Yuanrui
+

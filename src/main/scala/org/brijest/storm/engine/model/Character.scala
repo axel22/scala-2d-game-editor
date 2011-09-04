@@ -26,7 +26,7 @@ abstract class Character extends Entity {
   val pos = access[mutable] cell(Pos(0, 0))
   val dimensions = access[mutable] cell((1, 1))
   
-  def foreachPos(f: (Int, Int) => Unit) {
+  def foreachPos[U](f: (Int, Int) => U) {
     var Pos(x, y) = pos()
     val sx = x
     val maxx = x + dimensions()._1

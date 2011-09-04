@@ -307,20 +307,27 @@ trait IsoCanvas extends Canvas {
         // draw character
         area.characters(x, y) match {
           case NoCharacter => // do nothing
-          case c =>x
+          case c =>
+            var maxheight = 0
+            c.foreachPos {
+              (x, y) =>
+              val h = area.terrain(x, y).height
+              if (h > maxheight) maxheight = h
+            }
+            var vdelta = maxheight * levelheight
             val s = characterSprite(c)
             val hgt = s.height
             val (lx, ly) = info.leftXY(x, y)
             val (rx, ry) = info.rightXY(x, y)
             val (bx, by) = info.bottomXY(x, y)
             val u1 = iso2planar_u(x, y, 0, area.sidelength) - u0
-            val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0 - slotheight / 4
+            val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0 - slotheight / 4 - vdelta
             val u2 = iso2planar_u(lx, ly, 0, area.sidelength) - u0 - slotwidth / 4
-            val v2 = iso2planar_v(lx, ly, 0, area.sidelength) - v0
+            val v2 = iso2planar_v(lx, ly, 0, area.sidelength) - v0 - vdelta
             val u3 = iso2planar_u(bx, by, 0, area.sidelength) - u0
-            val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0 + slotheight / 4
+            val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0 + slotheight / 4 - vdelta
             val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0 + slotwidth / 4
-            val v4 = iso2planar_v(rx, ry, 0, area.sidelength) - v0
+            val v4 = iso2planar_v(rx, ry, 0, area.sidelength) - v0 - vdelta
             rect(u1, u2, u3, u4, v1 - hgt, v2 - hgt, v3 - hgt, v4 - hgt)
             drawRect(0, 200, 100)
             rect(u2, u3, u3, u2, v2 - hgt, v3 - hgt, v3, v2)
