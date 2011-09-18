@@ -5,7 +5,9 @@
 Level 1:
 --------
 
-Steal item - the illusionists can use their abilities to create a distraction and steal items from others.
+Steal item - illusionists can use their abilities to create a distraction and steal items from others.
+
+
 
 
 
@@ -21,7 +23,13 @@ Spark - creates sparks in the vicinity of the illusionist. This can distract som
 
 Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent and score a critical hit. This spell only succeeds if the opponent isn't already attacking the spellcaster. Also, intelligent and perceptive opponents may see through the roose.
 
-Friendlyness - gives an opponent a temporary illusion that the spellcaster is his friend. The illusion ends if the spellcaster attacks the target. This can lend the caster some time.
+Friendlyness - gives the opponents a temporary illusion that the spellcaster is his friend. The illusion ends if the spellcaster attacks any of the opponents. This can lend the caster some time.
+
+Flash - all characters around the spellcaster suffer from a temporary decrease in perception.
+
+Veiling - hides the spellcaster from characters, given that the spellcaster is not too close and their perception is not too good. If the spellcaster moves, the veiling enchantment stops and he becomes visible again.
+
+Deceptive Throw - throws a missile weapon such as a dagger while in the same time casting a deceptive illusion, making it harder for the target to notice and evade the dagger.
 
 
 Level 2:
@@ -36,7 +44,15 @@ Firefly - summons a magical firefly and sends it to a location chosen by the ill
 
 Dispel Apparition - dispels an illusion of level 3 or below, which has to be very close to the caster for this spell to work.
 
-Holy Symbol - summons an image of a holy symbol, which drives lower undead creatures away.
+Holy Symbol - summons an image of a holy symbol, which drives most minor undead creatures away.
+
+Optimism - changes the target's perception of the surroundings so that it is less susceptible to fear. A character under the influence of this spell will not panic, run away or suffer fighting performance penalties when overpowered.
+
+Pessimism - changes the target's perception of the surroundings so that it is more susceptible to fear. A character under the influence of this spell is more likely to lose focus, panic or run away.
+
+Kaleidoscope - twists the light around the caster, creating double images. Each time an opponent misses the spellcaster, one of these images disappears. The chance of hitting the spellcaster is inversely proportionate to the number of images surrounding him.
+
+Touch of Vile Visage - creates an aura around an opponent which makes him appear as a vile monster to others, possibly provoking an attack.
 
 
 Level 3:
@@ -53,7 +69,13 @@ Greater Blur - blurs the image of the spellcaster heavily, increasing his defens
 
 Darkness - conjures a globe of darkness around the spellcaster.
 
-Wall of the Wasp - summons an illusionary wall of violent wasps in front of the caster. Opponent think twice before proceeding through it.
+Wall of the Wasp - summons an illusionary wall of violent wasps in front of the caster. Opponents think twice before proceeding through it.
+
+Hypnosis - puts the spellcaster and the target in a state of hypnosis. As long as the spellcaster does not move, cast spells, nor attack, the target cannot move, cast spells or attack. During this time, the target's defenses are lowered.
+
+Sequencer - stores spells that the spellcaster chooses. It can store the level of the spellcaster minus one spell. It gives spellcaster the ability to release these spells one after another, rapidly.
+
+Cloaking - magically cloaks the spellcaster so that opponents far enough and with a low perception fail to notice him. If the spellcaster attacks or casts a spell at some opponent, then only that opponent will notice him.
 
 
 Level 4:
@@ -61,6 +83,8 @@ Level 4:
 => You are able to create illusions away from your immediate vicinity. Your illusions are able to now affect others much more than yourself.
 
 Serpent Sword - if the characters affected by this spell wield a melee or a long range weapon, they will perceive it as a venomous serpent. Those with either a weak strength of will or without the knowledge that this may be a trick are quick to drop their weapons.
+
+Vile Visages - enchants an area, creating an aura around each character such that it appears as if it were vile monster. This can provoke attacks.
 
 Helmet of the Wasp - an opponent affected by this illusion which wears a helmet will see wasps inside of it. Those weak of will or not knowing this trick throw their helmet away instantly.
 
@@ -79,32 +103,30 @@ Level 5:
 
 Striking Resemblance - creates an aura around the illusionist allowing him to take form of another humanoid that is currently in the vicinity.
 
-Vile Visage - creates an aura around an opponent which makes him appear as a vile monster to others, possibly provoking an attack.
-
-Invisibility - renders the target invisible.
+Invisibility - renders the spellcaster invisible for a limited amount of time.
 
 Counterimage - enchants the target so that the next illusion of level 5 or below cast by it or cast on it fails.
-
-Optimism - changes the target's perception of the surroundings so that it is less susceptible to fear. A character under the influence of this spell will not panic, run away or suffer fighting performance penalties when overpowered.
-
-Pessimism - changes the target's perception of the surroundings so that it is more susceptible to fear. A character under the influence of this spell is more likely to lose focus, panic or run away.
 
 Magic Warding - illusions are less likely to succeed in the area enchanted by this spell.
 
 Backfire - enchants a target so that the next magic cast by it is turned into an explosion.
+
+Electrification - channels the static electricity in the environment onto the target, causing it to drop metal weapons and take damage proportionate to the number of equipped metallic items.
+
+Counterspell - Enchants the target so that any next spell of level 6 or below cast by it or cast on it fails.
 
 
 Level 6:
 --------
 => You begin to understand that there is no boundary between the illusion and reality, and gain more insight into the true nature of illusions. You start to comprehend that an object without an observer does not truly exist.
 
-Counterspell
-Origin: This is a very old illusionist spell cast known to be cast by master mages since ancient times.
-Description: Enchants the target so that any next spell of level 6 or below cast by it or cast on it fails.
-
 Flame of Undril
-Origin: Little is known about where this scroll originated. Some say that a mage Undril living as a hermit in the mountains near the volcanos far north learned it by watching a fire elemental that used to invoke it for some reason. He first wrote the spell down with coal on stones near his establishment. It is now one of the favoured spells among the mages in the north.
+Origin: Little is known about where the scroll for this spell originated. Some say that a mage Undril living as a hermit in the mountains near the volcanos far north learned it by watching a fire elemental that used to invoke it for some reason. He first wrote the spell down with coal on stones near his establishment. It is now one of the favoured spells among the mages in the north.
 Description: Envelops an opponent with flames that feel very real. The opponent suffers fire damage until the flames dissipate.
+
+Ring of Undril
+Origin: It is said that the hermit mage Undril learned this spell by following and observing fire elementals laying waste to lands in the north. Later, Undril had apprentices which spread knowledge of the spell throughout the lands.
+Description: Enchants an area in a ring of fire. Opponents that choose to remain in the ring will suffer continuous fire damage.
 
 Globe of Kariim
 Origin: Long ago, in the harsh deserts in the south fierce warriors ruled the lands at this time and wizardry was perceived as nothing more than a mockery done for the amusement of the crowds at town centers. The heads of the warrior caste were well aware that the only way to prolong their rulership was to ban wizardry and wizard guilds. This lasted until a wizard known as Kariim invented a powerful spell which protected him from the warriors. It is said that he could create an impervious globe around himself that no sword could break. He shared his spell with other wizards of the lands and they forged an alliance against the tyranny of the warriors. Wizard schools and guilds were formed throughout the lands, and balance between might and magic was once again regained. Kariim enjoys great respect today among the wizards of the south.
@@ -127,12 +149,20 @@ Origin: One of the oldest known higher illusions, the origin of this spell is no
 Description: Teleports the spellcaster to a target location in the proximity of the spellcaster.
 
 Spatial Exchange
-Origin: Wizards of the south devised this spell to lure enemy warriors onto seemingly helpless and trapped allies. They would then exchange their locations, thus trapping the enemies.
-Description: Teleports the spellcaster to the location of the spell target. In turn, the target is teleported at the location of the spellcaster.
+Origin: Wizards of the south devised this spell to lure enemy warriors onto seemingly helpless and trapped allies. They would then exchange their locations, thus trapping the enemy. This tactic is practiced to perfection in the south and is favoured among battle mages.
+Description: Teleports the spellcaster to the location of the spell target. In turn, the target is teleported at the previous location of the spellcaster.
 
 Dispel Magic
 Origin: Mages in ancient times were known to put a great number of protective enchantments on themselves to avoid being obliterated by warriors or other mages. It is said that some of the mages were nearly invincible due to this, and it was not until a group of wandering wizards from the east brought knowledge about a powerful dispel magic that such a protective tactic lost its strength.
-Description: Dispels all enchantments in the target area.
+Description: Dispels all enchantments of level 7 or below in the target area.
+
+Spatial Binding
+Origin: Devised long ago to prevent teleportation, this spell was adopted by the wizards of the south to prevent getting themselves teleported into a trap.
+Description: Enchants the target area so that no teleport, dimension door, gate or any similar spell can succeed.
+
+Entanglement
+Origin: This spell probably originated among the spider-worshippers living in the mountains in the north.
+Description: Envelops the target in a sticky web, thus immobilizing it for some time.
 
 
 Level 7
@@ -142,4 +172,44 @@ Level 7
 Dimension Door
 Origin: It is said that this spell was devised by the monks living in the mountains in the north to avoid going through dangerous and unfriendly wilderness to reach other monasteries.
 Description: Transports the spellcaster and creatures in his vicinity to other areas, possibly far away. The range is determined by the spellcaster's level and his attunement to magical energies. The dimension door can only be created in open areas and the target location may not be very accurate.
+
+Greater Warding
+Origin: Master mages employed by the rulers of the land often use this spell to protect the royal treasury or valuable artifacts and magic items from thieving hands.
+Description: Creates an impenetrable barrier. This enchantment lasts permanently and can only be removed by the spellcaster passing through it or his death. A more powerful form of a dispel may also be enough to remove the barrier.
+
+Reflection Globe
+Origin: An apprentice of Kariim is said to have devised this spell. When wizards started gaining advantage over the warriors in the south, they started turning against each other. This globe not only protected the caster, but turned the spells back against the attacking wizard.
+Description: Creates a globe around the caster such that any spell cast on him by others is reflected back at the source.
+
+Antimagic
+Origin: The history of this spell is not exactly known, but its uses have been recorded and known to historians for at least three centuries. Some claim it was given to humans as a gift from the avenfolk when the realm had to be defended against an invasion of vile creatures.
+Description: Enchants the area so that no spell of level 7 or below subsequently cast succeeds. All existing enchantments are dispelled, regardless of their level.
+
+Tracking Sword
+Origin: A subtle method of performing assassinations of various lords and leaders, this spell has been utilized by some wizards to serve their intents since fifty years ago when it was devised. It is said that an assassination attempt was made on the Great Count Gerald once, but he was nimble enough to avoid the sword and get away with merely a scar. He used the very same sword to slit the throat of the very same wizard who cast the spell on him.
+Description: Animates a target melee weapon so that it starts attacking the enemies of the spellcaster.
+
+
+Level 8
+-------
+=> You gain the ability to make your illusions permanent, thus being able to transform yourself and your surroundings.
+
+Spell Shear
+Origin: A refined and more powerful cousin of the simple counterspell, this ancient spell is cast only by the mages who achieved the highest levels of the Art.
+Description: Removes all enchantments in the area where it is cast, regardless of their level. If the target is another spellcaster currently casting a spell, his spellcasting will fail, unless he is also casting the Spell Shear.
+
+Bear Transformation
+Origin: While the druids of the lands usually oppose using it, this spell was neither conceived by them nor does it have any resemblance to their magic. Transformation spells are well kept and guarded in libraries throughout the lands, and masters of the art guard guard their transformation scrolls and spellbooks well. Not that anyone less than a master would understand it anyway...
+Description: Transforms the caster into a bear permanently, giving him supreme strength and toughness. All items are dropped and cannot be carried.
+
+Wolf Transformation
+Origin: This transformation was conceived by one of the wizards searching for lycanthropy enchantments. Some claim he was successful in his lycanthropy quest, thus being unable to claim the authorship for the wolf transformation spell.
+Description: Transforms the caster into a wolf permanently, giving him supreme speed and agility, and equipping him with deadly fangs. All items are dropped and cannot be carried.
+
+Inverse Transformation
+Origin: Although it exists far too long to remember when and where it was first used (even if there was a single place), wise men agree that this is the most useful transformation spell of all. Wizards achieving this level of prowess are advised to learn the inverse transformation spell before learning any other transformation. Only fools ignore this advice.
+Description: Transforms the caster into his original form.
+
+
+
 
