@@ -21,7 +21,7 @@ Level 1:
 
 Spark - creates sparks in the vicinity of the illusionist. This can distract some opponents.
 
-Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent and score a critical hit. This spell only succeeds if the opponent isn't already attacking the spellcaster. Also, intelligent and perceptive opponents may see through the roose.
+Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent and score a critical hit in melee combat. This spell only succeeds if the opponent isn't already attacking the spellcaster. Also, intelligent and perceptive opponents may see through the roose.
 
 Friendlyness - gives the opponents a temporary illusion that the spellcaster is his friend. The illusion ends if the spellcaster attacks any of the opponents. This can lend the caster some time.
 
@@ -54,6 +54,8 @@ Kaleidoscope - twists the light around the caster, creating double images. Each 
 
 Touch of Vile Visage - creates an aura around an opponent which makes him appear as a vile monster to others, possibly provoking an attack.
 
+Mirror Shield - creates an illusionary mirror around the caster, protecting him against light-based magic attacks. It additionally reflects these attacks back to their caster.
+
 
 Level 3:
 --------
@@ -63,7 +65,7 @@ Sleight of the Flame - these illusionary flames thrown at the opponent are known
 
 Blinding Light - creates a burst of light, temporarily blinding the opponent which is not quick enough to close his eyes for some time.
 
-Firefly Swarm - summons magical fireflies which fly towards the opponent and envelop him, making him less perceptive and less aware of his surroundings. Those under effect will have trouble spotting things in the distance.
+Firefly Swarm - summons magical fireflies which fly towards the opponent and envelop him, making him less perceptive and less aware of his surroundings. Those under effect will have trouble spotting things in the distance and suffer from decreased defensive abilities.
 
 Greater Blur - blurs the image of the spellcaster heavily, increasing his defense greatly. Critical hits on the spellcaster are much harder to score.
 
@@ -76,6 +78,8 @@ Hypnosis - puts the spellcaster and the target in a state of hypnosis. As long a
 Sequencer - stores spells that the spellcaster chooses. It can store the level of the spellcaster minus one spell. It gives spellcaster the ability to release these spells one after another, rapidly.
 
 Cloaking - magically cloaks the spellcaster so that opponents far enough and with a low perception fail to notice him. If the spellcaster attacks or casts a spell at some opponent, then only that opponent will notice him.
+
+Eagle Eye - temporarily increases the perception of the character touched by the spellcaster.
 
 
 Level 4:
@@ -92,9 +96,9 @@ Mirror Image - creates a mirror image of the spellcaster which mimics the things
 
 Phantoms - summons illusionary monsters to distract or scare of the enemies.
 
-Interference - twists the images around an opponent so that he is unable to perceive his surroundings correctly. Those under effect of this illusion see things around them at wrong places, confusing them greatly. Less perceptive opponents are particularly vulnerable to this spell.
-
 Dispel Illusion - dispels an illusion of level 5 or below.
+
+Deflagration - causes the target location to start burning. The fire is at first small and cannot do harm, but grows quickly and may damage opponents which decide not to move away from it.
 
 
 Level 5:
@@ -115,6 +119,10 @@ Electrification - channels the static electricity in the environment onto the ta
 
 Counterspell - Enchants the target so that any next spell of level 6 or below cast by it or cast on it fails.
 
+Interference - twists the images around a target opponent so that he is unable to perceive his surroundings correctly. Those under effect of this illusion see things around them at wrong places, confusing them greatly. Less perceptive opponents are particularly vulnerable to this spell.
+
+Local Scrying - allows the spellcaster to temporarily view what is happening on some other location in the same area.
+
 
 Level 6:
 --------
@@ -126,7 +134,7 @@ Description: Envelops an opponent with flames that feel very real. The opponent 
 
 Ring of Undril
 Origin: It is said that the hermit mage Undril learned this spell by following and observing fire elementals laying waste to lands in the north. Later, Undril had apprentices which spread knowledge of the spell throughout the lands.
-Description: Enchants an area in a ring of fire. Opponents that choose to remain in the ring will suffer continuous fire damage.
+Description: Enchants an area in a ring of fire. Opponents that choose to remain within the ring will suffer continuous fire damage.
 
 Globe of Kariim
 Origin: Long ago, in the harsh deserts in the south fierce warriors ruled the lands at this time and wizardry was perceived as nothing more than a mockery done for the amusement of the crowds at town centers. The heads of the warrior caste were well aware that the only way to prolong their rulership was to ban wizardry and wizard guilds. This lasted until a wizard known as Kariim invented a powerful spell which protected him from the warriors. It is said that he could create an impervious globe around himself that no sword could break. He shared his spell with other wizards of the lands and they forged an alliance against the tyranny of the warriors. Wizard schools and guilds were formed throughout the lands, and balance between might and magic was once again regained. Kariim enjoys great respect today among the wizards of the south.
@@ -137,18 +145,22 @@ Origin: Its origins unknown to most, this spell was forbidden by the Great Count
 Description: Renders an opponent paralyzed.
 
 Ganilot's Persuasion
-Origin: The story of the first use of this spell is well known among illusionists of the lands. After a young king's wife succumbed to a disease, leaving him in depression and despair. When he refused to lead his armies to defend the kingdom against a barbarian attack, a wizard by the name of Ganilot created an illusion so real that the young king believed that his wife somehow came back to life. The illusion lasted long enough for the king to be persuaded to lead his defending armies. Fearing his king's retribution once he'd find out about the truth, the wizard Ganilot fleed the kingdom never to return. This spell has only later been used by illusionists of a less benevolent disposition to cause mischief and grief.
+Origin: The story of the first use of this spell is well known among illusionists of the lands. A young king's wife succumbed to a disease, leaving him in depression and despair. When he refused to lead his armies to defend the kingdom against a barbarian attack, a wizard by the name of Ganilot created an illusion so real that the young king believed that his wife somehow came back to life. The illusion lasted long enough for the king to be persuaded to lead his defending armies. Fearing his king's retribution once he'd find out about the truth, the wizard Ganilot fleed the kingdom never to return. This spell has only later been used by illusionists of a less benevolent disposition to cause mischief and grief.
 Description: All summoned creature illusions become real for a brief period of time.
 
 Rhea's Light
 Origin: Great wizardess Rhea devised this spell as part of her acceptance test for the wizard's guild, thus showing a high level of brilliance for her young age.
 Description: Creates a ray of light so strong that it causes physical damage to the target.
 
+Coupled Teleswitch
+Origin: Neglected by many mages and generally regarded to have little use, this spell is said to have been devised by Urdevii enchanters.
+Description: Exchanges the locations of the caster and the target. After several seconds it exchanges their locations again.
+
 Teleport
 Origin: One of the oldest known higher illusions, the origin of this spell is not well documented.
 Description: Teleports the spellcaster to a target location in the proximity of the spellcaster.
 
-Spatial Exchange
+Teleswitch
 Origin: Wizards of the south devised this spell to lure enemy warriors onto seemingly helpless and trapped allies. They would then exchange their locations, thus trapping the enemy. This tactic is practiced to perfection in the south and is favoured among battle mages.
 Description: Teleports the spellcaster to the location of the spell target. In turn, the target is teleported at the previous location of the spellcaster.
 
@@ -162,7 +174,11 @@ Description: Enchants the target area so that no teleport, dimension door, gate 
 
 Entanglement
 Origin: This spell probably originated among the spider-worshippers living in the mountains in the north.
-Description: Envelops the target in a sticky web, thus immobilizing it for some time.
+Description: Envelops the target in a sticky web, thus immobilizing it for some time. The opponent can still attack or cast spells.
+
+Holy Voice
+Origin: This spell was probably first used by a sect of wandering priests from the north. One of their deflecting priests is said to have became a wizard who wrote the scroll for this spell down.
+Description: Enchants the area with a source of a trembling voice for a limited amount of time. Causes damage to nearby minor undead. Causes major undead to panic.
 
 
 Level 7
@@ -189,6 +205,14 @@ Tracking Sword
 Origin: A subtle method of performing assassinations of various lords and leaders, this spell has been utilized by some wizards to serve their intents since fifty years ago when it was devised. It is said that an assassination attempt was made on the Great Count Gerald once, but he was nimble enough to avoid the sword and get away with merely a scar. He used the very same sword to slit the throat of the very same wizard who cast the spell on him.
 Description: Animates a target melee weapon so that it starts attacking the enemies of the spellcaster.
 
+Fireburst
+Origin: Coming in far too many forms and variations to bear a clear origin, this destructive spell is preferred weapon in the arsenal of most master battle mages that fight alone. Those fighting in groups can endanger their friends with this spell, so they usually avoid it.
+Description: Releases a circular burst of flames around the caster which explodes violently, consuming anything in its path.
+
+Energy Ray
+Origin: It is said that this spell was devised by illusionist master mages working together with a now lost sect of solitary wizards that lived in monasteries high in the mountains. While these solitary wizards drew their magical power from the skies themselves and were thus able to tap into enormous amounts of energy from the sun, the illusionists were versed in working with the light and focusing it.
+Description: Releases a highly concentrated ray of light at the target, causing massive damage. This spell is much more effective when cast in open areas, during daylight.
+
 
 Level 8
 -------
@@ -203,13 +227,24 @@ Origin: While the druids of the lands usually oppose using it, this spell was ne
 Description: Transforms the caster into a bear permanently, giving him supreme strength and toughness. All items are dropped and cannot be carried.
 
 Wolf Transformation
-Origin: This transformation was conceived by one of the wizards searching for lycanthropy enchantments. Some claim he was successful in his lycanthropy quest, thus being unable to claim the authorship for the wolf transformation spell.
+Origin: This transformation was conceived by one of the wizards searching for lycanthropy enchantments. Some claim he was successful in his lycanthropy quest, thus ironically being unable to claim the authorship for the wolf transformation spell.
 Description: Transforms the caster into a wolf permanently, giving him supreme speed and agility, and equipping him with deadly fangs. All items are dropped and cannot be carried.
 
 Inverse Transformation
 Origin: Although it exists far too long to remember when and where it was first used (even if there was a single place), wise men agree that this is the most useful transformation spell of all. Wizards achieving this level of prowess are advised to learn the inverse transformation spell before learning any other transformation. Only fools ignore this advice.
-Description: Transforms the caster into his original form.
+Description: Transforms the caster into his original form. This spell can be cast even if the spellcaster was transformed into a form that cannot normally cast spells.
 
+Boar Transformation
+Origin: Conceived by the old illusionist masters, this spell is different in nature than the transformation magic used by druids, which shun its use. It's equally deadly nonetheless.
+Description: Transforms the caster into a wild boar, giving him great speed and agility, toughness to match and a set of deadly fangs. Wild boars can go berserk when in fight, becoming much more deadly. All items are dropped and cannot be carried.
+
+Urdevii Transformation
+Origin: Now kept in utmost secrecy by the dogfolk, this spell was once created in order to enter their ranks and learn of their secrets. After a great conflict between the Urdevii and a human kingdom in which the spell was devised, all scrolls with this spell were taken by the Urdevii mages and hidden well. The mages that devised the spell were executed.
+Description: Transforms the caster into an Urdevii.
+
+Power Equilibrium
+Origin: It's said that the wizard Kariim was exhausted after one of the battles and a traitor in his ranks decided to take advantage of this. He attempted to cast a swarm of magic missiles at his master. To his surprise, Kariim expertly stole some of his mana using a spell he previously devised and then created a reflective mantle to repel the missiles back.
+Description: Exchanges mana with the target character so that their mana levels become equal. Mana above the maximum mana level is always lost in this exchange.
 
 
 
