@@ -100,6 +100,8 @@ Dispel Illusion - dispels an illusion of level 5 or below.
 
 Deflagration - causes the target location to start burning. The fire is at first small and cannot do harm, but grows quickly and may damage opponents which decide not to move away from it.
 
+Counterimage - enchants the target so that the next illusion of level 5 or below cast by it or cast on it fails.
+
 
 Level 5:
 --------
@@ -109,15 +111,13 @@ Striking Resemblance - creates an aura around the illusionist allowing him to ta
 
 Invisibility - renders the spellcaster invisible for a limited amount of time.
 
-Counterimage - enchants the target so that the next illusion of level 5 or below cast by it or cast on it fails.
-
 Magic Warding - illusions are less likely to succeed in the area enchanted by this spell.
 
 Backfire - enchants a target so that the next magic cast by it is turned into an explosion.
 
 Electrification - channels the static electricity in the environment onto the target, causing it to drop metal weapons and take damage proportionate to the number of equipped metallic items.
 
-Counterspell - Enchants the target so that any next spell of level 6 or below cast by it or cast on it fails.
+Counterspell - enchants the target so that any next spell of level 6 or below cast by it or cast on it fails.
 
 Interference - twists the images around a target opponent so that he is unable to perceive his surroundings correctly. Those under effect of this illusion see things around them at wrong places, confusing them greatly. Less perceptive opponents are particularly vulnerable to this spell.
 
@@ -220,7 +220,7 @@ Level 8
 
 Spell Shear
 Origin: A refined and more powerful cousin of the simple counterspell, this ancient spell is cast only by the mages who achieved the highest levels of the Art.
-Description: Removes all enchantments in the area where it is cast, regardless of their level. If the target is another spellcaster currently casting a spell, his spellcasting will fail, unless he is also casting the Spell Shear.
+Description: Removes all enchantments in the area where it is cast, regardless of their level. If the target is another spellcaster currently casting a spell, his spellcasting will fail, unless he is also casting the Spell Shear. Furthermore, while the spell takes effect, he will not be able to cast any spell other than Spell Shear.
 
 Bear Transformation
 Origin: While the druids of the lands usually oppose using it, this spell was neither conceived by them nor does it have any resemblance to their magic. Transformation spells are well kept and guarded in libraries throughout the lands, and masters of the art guard guard their transformation scrolls and spellbooks well. Not that anyone less than a master would understand it anyway...
@@ -246,5 +246,7 @@ Power Equilibrium
 Origin: It's said that the wizard Kariim was exhausted after one of the battles and a traitor in his ranks decided to take advantage of this. He attempted to cast a swarm of magic missiles at his master. To his surprise, Kariim expertly stole some of his mana using a spell he previously devised and then created a reflective mantle to repel the missiles back.
 Description: Exchanges mana with the target character so that their mana levels become equal. Mana above the maximum mana level is always lost in this exchange.
 
-
+Sprite Transformation
+Origin: A wizard is said to have followed and studied a pack of sprites living in a huge forest, and learned enough about them to devise this spell. After producing the scroll, he disappeared mysteriously, and was never heard from again. Some claim he transformed himself into a sprite, and spent the rest of his days living with his new kin.
+Description: Transforms the caster into a sprite, trading toughness for great speed and agility. Sprites have the teleport ability, and can use it as much as they want.
 
