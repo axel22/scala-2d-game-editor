@@ -78,13 +78,13 @@ self =>
   
   def statsText(area: AreaView, s: Engine.State) = for (ng <- engine) yield {
     val pc = area.playerCharacter(ng.player.id)
-    val ms = for ((nm, stat) <- pc.stats.main) yield "%s: %s".format(nm.name, stat.niceString)
+    val ms = for ((nm, stat) <- pc.mainStats) yield "%s: %d".format(nm, stat)
     ms mkString "  "
   }
   
   def attribsText(area: AreaView, s: Engine.State) = for (ng <- engine) yield {
     val pc = area.playerCharacter(ng.player.id)
-    val att = for ((nm, stat) <- pc.stats.attributes) yield "%s: %s".format(nm.name, stat.niceString)
+    val att = for ((nm, stat) <- pc.attributes) yield "%s: %d".format(nm, stat)
     att mkString " "
   }
   

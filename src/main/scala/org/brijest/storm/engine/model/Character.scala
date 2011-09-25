@@ -13,7 +13,7 @@ package model
 
 
 import components._
-import rules.{Stats, Inventory}
+import rules._
 
 
 
@@ -74,9 +74,7 @@ case object NoCharacter extends Character {
 
 /** A character with common ruleset functionality.
  */
-abstract class RulesetCharacter extends Character {
-  def stats: Stats
-  def inventory: Inventory
+trait RulesetCharacter extends Character with Inventory with Stats {
 }
 
 
@@ -87,7 +85,7 @@ abstract class RulesetCharacter extends Character {
 abstract class RegularCharacter extends RulesetCharacter {
   override def isRC: Boolean = true
   
-  def canWalk(from: Slot, to: Slot) = math.abs(from.height - to.height) <= stats.heightStride
+  def canWalk(from: Slot, to: Slot) = math.abs(from.height - to.height) <= heightStride
 }
 
 
@@ -96,7 +94,7 @@ object RegularCharacter {
 }
 
 
-abstract class OrderCharacter extends RegularCharacter {
+trait OrderCharacter extends RulesetCharacter {
 oc =>
   val order = access[mutable].cell[Order](DoNothing)
   val management = access[mutable].cell[Manager](new OrderManager(oc))
@@ -110,12 +108,8 @@ object OrderCharacter {
 }
 
 
-case class PlayerCharacter(pid: PlayerId, id: EntityId)(rs: rules.RuleSet) extends OrderCharacter {
+abstract class PlayerCharacter(val pid: PlayerId, val id: EntityId) extends RegularCharacter with OrderCharacter {
 pc =>
-  
-  val stats = rs.newStats
-  val inventory = rs.newInventory
-  
   override def isPC: Boolean = true
   def owner = pid
   def pov(area: AreaView) = area // TODO
@@ -126,7 +120,7 @@ pc =>
 
 
 object PlayerCharacter {
-  def simpleTestCharacter(pid: PlayerId)(rs: rules.RuleSet) = new PlayerCharacter(pid, (0l, 0l))(rs)
+  def simpleTestCharacter(pid: PlayerId) = new PlayerCharacter(pid, (0l, 0l)) with rules.enroute.EnrouteRuleset
 }
 
 

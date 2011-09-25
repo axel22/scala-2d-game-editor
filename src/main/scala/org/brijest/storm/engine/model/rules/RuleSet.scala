@@ -12,9 +12,10 @@ package rules
 
 
 
+import collection._
 
 
 
-trait RuleSet extends StatsRules with InventoryRules {
-  def name: String
+trait Ruleset {
+  def canMove: Boolean
 }

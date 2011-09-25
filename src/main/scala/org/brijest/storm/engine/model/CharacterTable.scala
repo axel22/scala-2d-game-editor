@@ -30,7 +30,7 @@ class CharacterTable(w: Int, h: Int) extends MutableEvidence {
     ids(c.id) = c
     c.foreachPos((x, y) => locs(x, y) = c)
     c match {
-      case pc @ PlayerCharacter(plid, id) => pcs(plid) = id
+      case pc: PlayerCharacter => pcs(pc.pid) = pc.id
       case _ => // do nothing
     }
   }

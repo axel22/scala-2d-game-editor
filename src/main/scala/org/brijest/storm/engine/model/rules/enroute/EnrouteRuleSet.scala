@@ -17,35 +17,22 @@ import collection._
 
 
 
-object EnrouteRuleSet extends RuleSet
-with EnrouteStatsRules
-with EnrouteInventoryRules
-{
-  def name = "Enroute Ruleset"
+trait EnrouteStats {
+  def delay: Int = 20
+  def heightStride: Int = 2
+  def HP: Int = 10
+  def maxHP: Int = 10
+  def strength: Int = 10
 }
 
 
-trait EnrouteStatsRules {
-  def newStats = Stats(newBasicStats.all ++ newMainStats.all ++ newAttributes.all)
-  def newBasicStats = Stats(
-    'delay -> Nat(20),
-    'heightStride -> Nat(2)
-  )
-  def newMainStats = Stats(
-    'HP -> new Fract(10, 10) with Main
-  )
-  def newAttributes = Stats(
-    'ST -> new Nat(10) with Attribute
-  )
+trait EnrouteInventory {
+  val items = mutable.Set[Item]()
+  val equipped = mutable.Map() ++ (equipslots zip (0 until equipslots.size).map(x => None: Option[Item]))
+  def equipslots = Seq("Head", "Neck", "Left hand", "Right hand", "Armor", "Feet")
 }
 
 
-trait EnrouteInventoryRules {
-  def newInventory = new Inventory {
-    val items = mutable.Set[Item]()
-    def equipslots = Seq("Head", "Neck", "Left hand", "Right hand", "Armor", "Feet")
-    val equipped = mutable.Map() ++ (equipslots zip (0 until equipslots.size).map(x => None: Option[Item]))
-  }
-  def canMove(c: Character) = true
-  def additionalDelay(c: Character) = 0
+trait EnrouteRuleset extends EnrouteInventory with EnrouteStats {
+  def canMove = true
 }
