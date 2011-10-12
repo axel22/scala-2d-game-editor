@@ -23,6 +23,10 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   val scalaVersion = "2.9.1"
   
+  /* compiler */
+  
+  override def compileOptions = super.compileOptions ++ compileOptions("-g:vars")
+  
   /* dependencies */
   
   //val scopt = "com.github.scopt" % "scopt" % "1.0-SNAPSHOT" - not found?
@@ -91,32 +95,35 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     try { op(p) } finally { p.close() }
   }
   
-  def createRunScript(name: String, dir: Path, libdir: Path, comment: String, maincls: String, bat: Boolean) {
+  def createRunScript(name: String, dir: Path, libdir: Path, comment: String, maincls: String, bat: Boolean, dbg: Boolean) {
     def declare(nm: String, v: String) = if (bat) "set %s=%s".format(nm, v) else "%s=%s".format(nm, v)
     def variable(nm: String) = if (bat) "%" + nm + "%" else "$" + nm
     def delimiter = if (bat) ";" else ":"
+    val basedir = "BASEDIR=`dirname $0`"
     val alljars = List(Deploy.dir / artifactname) ++ classpath ++ List(scalalibpath)
-    val jarstring = "%s".format(alljars.map(fileName(_)).map(libdir.asFile.getName / _).mkString(delimiter))
+    val jarstring = "%s".format(
+      alljars.map(fileName(_)).map("$BASEDIR" + File.separator + libdir + File.separator + _).mkString(delimiter)
+    )
     val jardecl = declare("JARS", jarstring)
     val flags = "-Dsun.java2d.opengl=True"
-    val startcommand = "java -cp %s %s %s %s".format(
+    val startcommand = "%s -classpath %s %s %s %s".format(
+      if (dbg) "jdb" else "java",
       variable("JARS"),
       flags,
       maincls,
       "$@"
     )
     
-    val filename = name + (if (bat) ".bat" else "")
+    val filename = name + (if (dbg) "-dbg" else "") + (if (bat) ".bat" else "")
     val startscript = (dir / filename).asFile
     withFile(startscript) {
       p =>
       p.println("# %s".format(comment))
+      p.println(basedir)
       p.println("%s".format(jardecl))
       p.println("%s".format(startcommand))
     }
     "chmod a+x %s".format(startscript) !;
-    
-    if (!bat) createRunScript(name, dir, libdir, comment, maincls, true)
   }
   
   def createBaseDirRunScript(name: String, runscr: String, dir: Path) {
@@ -133,21 +140,24 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     val stormcmd = "storm-enroute"
     val editorcmd = "editor"
     val dir = "deploy"
-    val savedir = dir / "saves"
-    val libzdir = dir / "libz"
-    val areadir = dir / "areas"
+    val libzdir = "libz"
+    val savepath = dir / "saves"
+    val areapath = dir / "areas"
+    val libzpath = dir / libzdir
   }
   
   /* tasks */
   
   lazy val deploy = task {
-    runsync("rm -rf %s".format(Deploy.savedir))
+    runsync("rm -rf %s".format(Deploy.savepath))
     runsync("mkdir %s".format(Deploy.dir))
-    runsync("mkdir %s".format(Deploy.libzdir))
-    runsync("mkdir %s".format(Deploy.areadir))
-    copyDependencies(Deploy.libzdir)
-    createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir, "Storm Enroute", mainClass.get, false)
-    createRunScript(Deploy.editorcmd, Deploy.dir, Deploy.libzdir, "Editor", editorClass.get, false)
+    runsync("mkdir %s".format(Deploy.libzpath))
+    runsync("mkdir %s".format(Deploy.areapath))
+    copyDependencies(Deploy.libzpath)
+    for (bat <- Seq(false, true); dbg <- Seq(false, true)) {
+      createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir, "Storm Enroute", mainClass.get, bat, dbg)
+      createRunScript(Deploy.editorcmd, Deploy.dir, Deploy.libzdir, "Editor", editorClass.get, bat, dbg)
+    }
     createBaseDirRunScript("deployrun", Deploy.stormcmd, Deploy.dir)
     None
   } dependsOn (`package`)
