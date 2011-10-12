@@ -21,13 +21,13 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   /* config */
   
-  val scalaVersion = "2.9.0"
+  val scalaVersion = "2.9.1"
   
   /* dependencies */
   
   //val scopt = "com.github.scopt" % "scopt" % "1.0-SNAPSHOT" - not found?
-  val scalatest = "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
-  val slf4s = "com.weiglewilczek.slf4s" %% "slf4s" % "1.0.6"
+  val scalatest = "org.scalatest" % "scalatest_2.9.1" % "1.6.1"
+  val slf4s = "com.weiglewilczek.slf4s" %% "slf4s" % "1.0.7"
   val slf4j_jdk = "org.slf4j" % "slf4j-jdk14" % "1.6.1"
   val h2db = "com.h2database" % "h2" % "1.2.147"
   val scalaSwing = "org.scala-lang" % "scala-swing" % scalaVersion
@@ -146,8 +146,8 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     runsync("mkdir %s".format(Deploy.libzdir))
     runsync("mkdir %s".format(Deploy.areadir))
     copyDependencies(Deploy.libzdir)
-    createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir, "Storm Enroute", mainClass.get, true)
-    createRunScript(Deploy.editorcmd, Deploy.dir, Deploy.libzdir, "Editor", editorClass.get, true)
+    createRunScript(Deploy.stormcmd, Deploy.dir, Deploy.libzdir, "Storm Enroute", mainClass.get, false)
+    createRunScript(Deploy.editorcmd, Deploy.dir, Deploy.libzdir, "Editor", editorClass.get, false)
     createBaseDirRunScript("deployrun", Deploy.stormcmd, Deploy.dir)
     None
   } dependsOn (`package`)
