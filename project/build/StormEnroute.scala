@@ -106,7 +106,7 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     def declare(nm: String, v: String) = if (bat) "set %s=%s".format(nm, v) else "%s=%s".format(nm, v)
     def variable(nm: String) = if (bat) "%" + nm + "%" else "$" + nm
     def delimiter = if (bat) ";" else ":"
-    val basedir = declare("BASEDIR", "`dirname $0`")
+    val basedir = declare("BASEDIR", if (bat) "%~dp0" else "`dirname $0`")
     val alljars = List(Deploy.dir / artifactname) ++ classpath ++ List(scalalibpath)
     val jarstring = "%s".format(
       alljars.map(fileName(_)).map(variable("BASEDIR") + File.separator + libdir + File.separator + _).mkString(delimiter)
@@ -119,7 +119,7 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
       if (dbg) "-sourcepath " + variable("JARS") else "",
       flags,
       maincls,
-      "$@"
+      if (bat) "%*" else "$@"
     )
     
     val filename = name + (if (dbg) "-dbg" else "") + (if (bat) ".bat" else "")
