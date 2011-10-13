@@ -44,9 +44,15 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   def fullArtifactName(artname: String) = artname + "-" + version + "." + defaultMainArtifact.extension
   
+  def fullSrcArtifactName(artname: String) = artname + "-" + version + "-src." + defaultMainArtifact.extension
+  
   def artifactname = fullArtifactName(defaultMainArtifact.name)
   
+  def artifactsrcname = fullSrcArtifactName(defaultMainArtifact.name)
+  
   def artifactpath = "target" / ("scala_" + scalavers) / artifactname
+  
+  def artifactsrcpath = "target" / ("scala_" + scalavers) / artifactsrcname
   
   def scalalibpath = "project" / "boot" / ("scala-" + scalavers) / "lib" / "scala-library.jar"
   
@@ -82,6 +88,7 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
   
   def copyDependencies(dir: Path) {
     artifactpath.asFile #> (dir / artifactname).asFile !;
+    artifactsrcpath.asFile #> (dir / artifactsrcname).asFile !;
     scalalibpath.asFile #> (dir / fileName(scalalibpath)).asFile !;
     for (p <- classpath) {
       p.asFile #> (dir / fileName(p)).asFile !;
@@ -99,16 +106,17 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     def declare(nm: String, v: String) = if (bat) "set %s=%s".format(nm, v) else "%s=%s".format(nm, v)
     def variable(nm: String) = if (bat) "%" + nm + "%" else "$" + nm
     def delimiter = if (bat) ";" else ":"
-    val basedir = "BASEDIR=`dirname $0`"
+    val basedir = declare("BASEDIR", "`dirname $0`")
     val alljars = List(Deploy.dir / artifactname) ++ classpath ++ List(scalalibpath)
     val jarstring = "%s".format(
-      alljars.map(fileName(_)).map("$BASEDIR" + File.separator + libdir + File.separator + _).mkString(delimiter)
+      alljars.map(fileName(_)).map(variable("BASEDIR") + File.separator + libdir + File.separator + _).mkString(delimiter)
     )
     val jardecl = declare("JARS", jarstring)
     val flags = "-Dsun.java2d.opengl=True"
-    val startcommand = "%s -classpath %s %s %s %s".format(
+    val startcommand = "%s -classpath %s %s %s %s %s".format(
       if (dbg) "jdb" else "java",
       variable("JARS"),
+      if (dbg) "-sourcepath " + variable("JARS") else "",
       flags,
       maincls,
       "$@"
@@ -160,7 +168,7 @@ class StormEnroute(info: ProjectInfo) extends DefaultProject(info) {
     }
     createBaseDirRunScript("deployrun", Deploy.stormcmd, Deploy.dir)
     None
-  } dependsOn (`package`)
+  } dependsOn (`package`, packageSrc)
   
   lazy val deployRun = task { args =>
     task {
