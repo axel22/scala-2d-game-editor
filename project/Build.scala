@@ -17,8 +17,8 @@ import Keys._
 object StormEnrouteBuild extends Build {
   
   lazy val root = Project("storm-enroute", file(".")) dependsOn (
-    RootProject(uri("git://github.com/axel22/mempool.git")),
-    RootProject(uri("git://git.assembla.com/bufferz.git"))
+    RootProject(uri("git://github.com/axel22/mempool.git#HEAD")),
+    RootProject(uri("git://git.assembla.com/bufferz.git#HEAD"))
   )
   
 }
