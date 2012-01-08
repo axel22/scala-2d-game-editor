@@ -16,7 +16,7 @@ import collection._
 
 
 
-trait IsoUI extends UI with IsoCanvas {
+abstract class IsoUI extends IsoCanvas(24) with UI {
   var pos = (0, 0)
   var playerId: PlayerId = invalidPlayerId
   var engine: Option[Engine] = None
@@ -24,8 +24,6 @@ trait IsoUI extends UI with IsoCanvas {
   def width: Int
   
   def height: Int
-  
-  def slotheight = 24
   
   def update(actions: Seq[Action], area: AreaView, state: Engine.State) = refresh(area, state)
   

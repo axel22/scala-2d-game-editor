@@ -36,7 +36,7 @@ trait Canvas {
 }
 
 
-trait IsoCanvas extends Canvas {
+abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   lazy val stars = imageFromPngStream(pngStream("stars"))
   val deppool: singlethread.FreeList[DepNode] = new singlethread.FreeList(new DepNode)({ _.reset() }) {
     override def allocate() = {
@@ -66,7 +66,7 @@ trait IsoCanvas extends Canvas {
       dims = oneone
       drawn = false
     }
-    def foreach[U](x0: Int, y0: Int)(f: (Int, Int) => U) = foreachNW2SE(x0, y0, dims._1, dims._2)(f)
+    @inline def foreach[U](x0: Int, y0: Int)(f: (Int, Int) => U) = foreachNW2SE(x0, y0, dims._1, dims._2)(f)
     def contains(x0: Int, y0: Int, x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + dims._1) && y < (y0 + dims._2)
     def leftXY(x0: Int, y0: Int) = (x0, y0 + dims._2 - 1)
     def rightXY(x0: Int, y0: Int) = (x0 + dims._1 - 1, y0)
@@ -96,8 +96,8 @@ trait IsoCanvas extends Canvas {
   }
   
   final class DepNode extends singlethread.Linkable[DepNode] {
-    private val array = new Array[Int](32)
-    private var sz = 0
+    val array = new Array[Int](32)
+    var sz = 0
     var next: DepNode = null
     def reset() = sz = 0
     def add(x: Int, y: Int): DepNode = if (sz < 32) {
@@ -111,13 +111,18 @@ trait IsoCanvas extends Canvas {
       dp.add(x, y)
       dp
     }
-    @annotation.tailrec def foreach[U](f: (Int, Int) => U): Unit = {
-      var i = 0
-      while (i < sz) {
-        f(array(i), array(i + 1))
-        i += 2
+    @inline def foreach[U](f: (Int, Int) => U): Unit = {
+      var curr = this
+      while (curr != null) {
+        /* traverse contents of this depnode */
+        var i = 0
+        while (i < curr.sz) {
+          f(curr.array(i), curr.array(i + 1))
+          i += 2
+        }
+        /* move to next depnode */
+        curr = curr.next
       }
-      if (next ne null) next.foreach(f)
     }
     override def toString: String = array.take(sz).mkString("[", ",", "]") + " --> " + (if (next ne null) next.toString else "")
   }
@@ -125,8 +130,6 @@ trait IsoCanvas extends Canvas {
   def width: Int
   
   def height: Int
-  
-  def slotheight: Int
   
   def slotwidth = slotheight * ratio
   

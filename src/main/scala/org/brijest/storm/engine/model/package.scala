@@ -85,7 +85,7 @@ package object model {
   
   /** Traverses the elements in the rectangle diagonal-wise, northwest to southeast.
    */
-  def foreachNW2SE[U](x0: Int, y0: Int, w: Int, h: Int)(f: (Int, Int) => U) = if (w == h) {
+  @inline def foreachNW2SE[U](x0: Int, y0: Int, w: Int, h: Int)(f: (Int, Int) => U) = if (w == h) {
     for (i <- 0 until h; x <- 0 to i; y = i - x) f(x0 + x, y0 + y)
     for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) f(x0 + x, y0 + y)
   } else if (w > h) {

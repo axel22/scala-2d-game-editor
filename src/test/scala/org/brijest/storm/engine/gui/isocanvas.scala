@@ -24,7 +24,7 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
   
   "IsoCanvas" should {
     
-    class TestIsoCanvas extends IsoCanvas {
+    class TestIsoCanvas extends IsoCanvas(24) {
       val img = new BufferedImage(1280, 800, BufferedImage.TYPE_4BYTE_ABGR)
       
       class TestDrawingAdapter extends ImageDrawAdapter(img) with DrawAdapter
@@ -44,7 +44,6 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
           def height = 50
         }
       }
-      def slotheight = 24
       def pos = (0, 0);
       def width = img.getWidth
       def height = img.getHeight
