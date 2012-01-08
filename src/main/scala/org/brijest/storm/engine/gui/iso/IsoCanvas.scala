@@ -13,6 +13,7 @@ package gui.iso
 
 import model._
 import collection._
+import org.mempool._
 
 
 
@@ -37,14 +38,23 @@ trait Canvas {
 
 trait IsoCanvas extends Canvas {
   lazy val stars = imageFromPngStream(pngStream("stars"))
-  val deppool = new MemoryPool(new DepNode)
-  val infopool = new MemoryPool(new Info)
+  val deppool: singlethread.FreeList[DepNode] = new singlethread.FreeList(new DepNode)({ _.reset() }) {
+    override def allocate() = {
+      val dp = super.allocate()
+      if (dp.next != null) {
+        deppool.dispose(dp.next)
+        dp.next = null
+      }
+      dp
+    }
+  }
+  val infopool = Allocator.singleThread.freeList(new Info) { _.reset() }
   var infos: Array[Info] = null
   val xrect = new Array[Int](5)
   val yrect = new Array[Int](5)
   val oneone = (1, 1);
   
-  final class Info extends Linked[Info] {
+  final class Info extends singlethread.Linkable[Info] {
     var top: Pos = null
     var deps: DepNode = null
     var dims: (Int, Int) = oneone
@@ -85,9 +95,10 @@ trait IsoCanvas extends Canvas {
     }
   }
   
-  final class DepNode extends Linked[DepNode] {
+  final class DepNode extends singlethread.Linkable[DepNode] {
     private val array = new Array[Int](32)
     private var sz = 0
+    var next: DepNode = null
     def reset() = sz = 0
     def add(x: Int, y: Int): DepNode = if (sz < 32) {
       array(sz) = x
@@ -95,7 +106,7 @@ trait IsoCanvas extends Canvas {
       sz += 2
       this
     } else {
-      val dp = deppool.allocate
+      val dp = deppool.allocate()
       dp.next = this
       dp.add(x, y)
       dp
@@ -200,13 +211,13 @@ trait IsoCanvas extends Canvas {
     if ((infos eq null) || infos.length != w * h) infos = new Array[Info](w * h)
     for (x <- x0 until (x0 + w); y <- y0 until (y0 + h)) if (area.contains(x, y)) area.characters(x, y) match {
       case NoCharacter =>
-        val info = infopool.allocate
-        info.deps = deppool.allocate
+        val info = infopool.allocate()
+        info.deps = deppool.allocate()
         slotinfo(x, y) = info
       case c =>
-        val info = infopool.allocate
+        val info = infopool.allocate()
         if (c.pos().equalTo(x, y)) {
-          info.deps = deppool.allocate
+          info.deps = deppool.allocate()
           info.dims = c.dimensions()
         } else info.top = c.pos()
         slotinfo(x, y) = info
