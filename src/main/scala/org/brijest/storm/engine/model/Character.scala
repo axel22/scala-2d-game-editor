@@ -54,6 +54,7 @@ abstract class Character extends Entity {
   final def isItem = false
   
   def foreach(f: Character => Unit) = f(this)
+  
 }
 
 

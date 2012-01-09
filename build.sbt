@@ -5,7 +5,9 @@ version := "0.1"
 
 scalaVersion := "2.9.1"
 
-scalacOptions ++= Seq("-Yinline")
+scalacOptions ++= Seq(
+  "-Yinline"
+)
 
 libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.9"
 
@@ -22,5 +24,6 @@ libraryDependencies += "org.scala-lang" % "scala-swing" % "2.9.1"
 libraryDependencies += "commons-lang" % "commons-lang" % "2.2"
 
 libraryDependencies += "commons-io" % "commons-io" % "1.3.2"
+
 
 
