@@ -13,7 +13,7 @@ package gui.iso
 
 import model._
 import collection._
-import org.mempool._
+import org.scalapool._
 
 
 
