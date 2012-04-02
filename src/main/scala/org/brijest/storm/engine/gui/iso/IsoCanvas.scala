@@ -50,8 +50,6 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   }
   val infopool = Allocator.singleThread.freeList(new Info) { _.reset() }
   var infos: Array[Info] = null
-  val xrect = new Array[Int](5)
-  val yrect = new Array[Int](5)
   val oneone = (1, 1);
   
   final class Info extends singlethread.Linkable[Info] {
@@ -125,6 +123,110 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       }
     }
     override def toString: String = array.take(sz).mkString("[", ",", "]") + " --> " + (if (next ne null) next.toString else "")
+  }
+  
+  abstract class Drawer(a: DrawAdapter) {
+    val xrect = new Array[Int](5)
+    val yrect = new Array[Int](5)
+    
+    @inline implicit final def double2int(d: Double) = d.toInt
+    
+    @inline final def rect(x0: Int, x1: Int, x2: Int, x3: Int, y0: Int, y1: Int, y2: Int, y3: Int) {
+      xrect(0) = x0
+      xrect(1) = x1
+      xrect(2) = x2
+      xrect(3) = x3
+      xrect(4) = x0
+      yrect(0) = y0
+      yrect(1) = y1
+      yrect(2) = y2
+      yrect(3) = y3
+      yrect(4) = y0
+    }
+    
+    @inline final def drawRect(r: Int, g: Int, b: Int) {
+      a.setColor(0, 0, 0)
+      if (!drawing.seethrough) a.fillPoly(xrect, yrect, 5)
+      a.setColor(r, g, b)
+      a.drawPoly(xrect, yrect, 5)
+    }
+  }
+  
+  trait TerrainDrawer {
+    def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int)
+    def drawTerrainSides(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int)
+  }
+  
+  class TerrainOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
+    import a._
+    
+    def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+      rect(
+        up - slotwidth / 2, up, up + slotwidth / 2, up,
+        vp, vp - slotheight / 2, vp, vp + slotheight / 2
+      )
+      drawRect(0, 100, 200)
+      setFontSize(8)
+      if (drawing.indices) drawString("%s, %s".format(xp, yp), up - slotwidth / 4, vp)
+    }
+    
+    def drawTerrainSides(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+      val lslothgt = if (area.contains(xp, yp + 1)) area.terrain(xp, yp + 1).height else 0
+      if (slot.height > lslothgt) {
+        val lu = iso2planar_u(xp, yp + 1, lslothgt, area.sidelength) - u0
+        val lv = iso2planar_v(xp, yp + 1, lslothgt, area.sidelength) - v0
+        rect(
+          up - slotwidth / 2, up, lu + slotwidth / 2, lu,
+          vp, vp + slotheight / 2, lv, lv - slotheight / 2
+        )
+        drawRect(0, 100, 200)
+      }
+      val rslothgt = if (area.contains(xp + 1, yp)) area.terrain(xp + 1, yp).height else 0
+      if (slot.height > rslothgt) {
+        val lu = iso2planar_u(xp + 1, yp, rslothgt, area.sidelength) - u0
+        val lv = iso2planar_v(xp + 1, yp, rslothgt, area.sidelength) - v0
+        rect(
+          up, up + slotwidth / 2, lu, lu - slotwidth / 2,
+          vp + slotheight / 2, vp, lv - slotheight / 2, lv
+        )
+        drawRect(0, 100, 200)
+      }
+    }
+  }
+  
+  trait CharacterDrawer {
+    def drawCharacter(c: Character, x: Int, y: Int, info: Info)
+  }
+  
+  class CharacterOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with CharacterDrawer {
+    def drawCharacter(c: Character, x: Int, y: Int, info: Info) {
+      var maxheight = 0
+      c.foreachPos {
+        (x, y) =>
+        val h = area.terrain(x, y).height
+        if (h > maxheight) maxheight = h
+      }
+      var vdelta = maxheight * levelheight
+      val s = characterSprite(c)
+      val hgt = s.height
+      val (lx, ly) = info.leftXY(x, y)
+      val (rx, ry) = info.rightXY(x, y)
+      val (bx, by) = info.bottomXY(x, y)
+      val u1 = iso2planar_u(x, y, 0, area.sidelength) - u0
+      val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0 - slotheight / 4 - vdelta
+      val u2 = iso2planar_u(lx, ly, 0, area.sidelength) - u0 - slotwidth / 4
+      val v2 = iso2planar_v(lx, ly, 0, area.sidelength) - v0 - vdelta
+      val u3 = iso2planar_u(bx, by, 0, area.sidelength) - u0
+      val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0 + slotheight / 4 - vdelta
+      val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0 + slotwidth / 4
+      val v4 = iso2planar_v(rx, ry, 0, area.sidelength) - v0 - vdelta
+      rect(u1, u2, u3, u4, v1 - hgt, v2 - hgt, v3 - hgt, v4 - hgt)
+      drawRect(0, 200, 100)
+      rect(u2, u3, u3, u2, v2 - hgt, v3 - hgt, v3, v2)
+      drawRect(0, 200, 100)
+      rect(u3, u4, u4, u3, v3 - hgt, v4 - hgt, v4, v3)
+      drawRect(0, 200, 100)
+    }
   }
   
   def width: Int
@@ -210,7 +312,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       @inline def update(x: Int, y: Int, i: Info) = infos((y - y0) * w + (x - x0)) = i
     }
     
-    // initialize and group infos
+    // 1) initialize and group infos
     if ((infos eq null) || infos.length != w * h) infos = new Array[Info](w * h)
     for (x <- x0 until (x0 + w); y <- y0 until (y0 + h)) if (area.contains(x, y)) area.characters(x, y) match {
       case NoCharacter =>
@@ -226,7 +328,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
         slotinfo(x, y) = info
     }
     
-    // compute dependencies - iterate over all the infos diagonal-wise
+    // 2) compute dependencies - iterate over all the infos diagonal-wise
     def dependencies(x: Int, y: Int) {
       val info = slotinfo(x, y)
       if ((info ne null) && info.isTop) {
@@ -255,103 +357,26 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
     for (i <- 0 until h; x <- 0 to i; y = i - x) dependencies(x0 + x, y0 + y)
     for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) dependencies(x0 + x, y0 + y)
     
-    // reverse drawing
-    @inline def rect(x0: Int, x1: Int, x2: Int, x3: Int, y0: Int, y1: Int, y2: Int, y3: Int) {
-      xrect(0) = x0
-      xrect(1) = x1
-      xrect(2) = x2
-      xrect(3) = x3
-      xrect(4) = x0
-      yrect(0) = y0
-      yrect(1) = y1
-      yrect(2) = y2
-      yrect(3) = y3
-      yrect(4) = y0
-    }
-    @inline def drawRect(r: Int, g: Int, b: Int) {
-      a.setColor(0, 0, 0)
-      if (!drawing.seethrough) a.fillPoly(xrect, yrect, 5)
-      a.setColor(r, g, b)
-      a.drawPoly(xrect, yrect, 5)
-    }
+    // 3) reverse drawing
+    val terraindrawer = if (drawing.outline) new TerrainOutlineDrawer(a, area, u0, v0) else unsupported
+    val characterdrawer = if (drawing.outline) new CharacterOutlineDrawer(a, area, u0, v0) else unsupported
+    import terraindrawer._
+    import characterdrawer._
     def drawTop(x: Int, y: Int, info: Info) {
-      import a._
-      if (drawing.outline) {
-        // draw terrain and sides
-        @inline implicit def double2int(d: Double) = d.toInt
-        def drawTerrain(up: Int, vp: Int) {
-          rect(
-            up - slotwidth / 2, up, up + slotwidth / 2, up,
-            vp, vp - slotheight / 2, vp, vp + slotheight / 2
-          )
-          drawRect(0, 100, 200)
-          setFontSize(8)
-          if (drawing.indices) drawString("%s, %s".format(x, y), up - slotwidth / 4, vp)
-        }
-        def drawTerrainSides(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
-          val lslothgt = if (area.contains(xp, yp + 1)) area.terrain(xp, yp + 1).height else 0
-          if (slot.height > lslothgt) {
-            val lu = iso2planar_u(xp, yp + 1, lslothgt, area.sidelength) - u0
-            val lv = iso2planar_v(xp, yp + 1, lslothgt, area.sidelength) - v0
-            rect(
-              up - slotwidth / 2, up, lu + slotwidth / 2, lu,
-              vp, vp + slotheight / 2, lv, lv - slotheight / 2
-            )
-            drawRect(0, 100, 200)
-          }
-          val rslothgt = if (area.contains(xp + 1, yp)) area.terrain(xp + 1, yp).height else 0
-          if (slot.height > rslothgt) {
-            val lu = iso2planar_u(xp + 1, yp, rslothgt, area.sidelength) - u0
-            val lv = iso2planar_v(xp + 1, yp, rslothgt, area.sidelength) - v0
-            rect(
-              up, up + slotwidth / 2, lu, lu - slotwidth / 2,
-              vp + slotheight / 2, vp, lv - slotheight / 2, lv
-            )
-            drawRect(0, 100, 200)
-          }
-        }
-        info.foreach(x, y) { (xp, yp) =>
-          val slot = area.terrain(xp, yp)
-          val u = iso2planar_u(xp, yp, slot.height, area.sidelength) - u0
-          val v = iso2planar_v(xp, yp, slot.height, area.sidelength) - v0
-          drawTerrain(u, v)
-          drawTerrainSides(slot, xp, yp, u, v)
-        }
+      // draw terrain and sides
+      info.foreach(x, y) {
+        (xp, yp) =>
+        val slot = area.terrain(xp, yp)
+        val u = iso2planar_u(xp, yp, slot.height, area.sidelength) - u0
+        val v = iso2planar_v(xp, yp, slot.height, area.sidelength) - v0
+        drawTerrain(slot, xp, yp, u, v)
+        drawTerrainSides(slot, xp, yp, u, v)
+      }
         
-        // draw character
-        area.characters(x, y) match {
-          case NoCharacter => // do nothing
-          case c =>
-            var maxheight = 0
-            c.foreachPos {
-              (x, y) =>
-              val h = area.terrain(x, y).height
-              if (h > maxheight) maxheight = h
-            }
-            var vdelta = maxheight * levelheight
-            val s = characterSprite(c)
-            val hgt = s.height
-            val (lx, ly) = info.leftXY(x, y)
-            val (rx, ry) = info.rightXY(x, y)
-            val (bx, by) = info.bottomXY(x, y)
-            val u1 = iso2planar_u(x, y, 0, area.sidelength) - u0
-            val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0 - slotheight / 4 - vdelta
-            val u2 = iso2planar_u(lx, ly, 0, area.sidelength) - u0 - slotwidth / 4
-            val v2 = iso2planar_v(lx, ly, 0, area.sidelength) - v0 - vdelta
-            val u3 = iso2planar_u(bx, by, 0, area.sidelength) - u0
-            val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0 + slotheight / 4 - vdelta
-            val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0 + slotwidth / 4
-            val v4 = iso2planar_v(rx, ry, 0, area.sidelength) - v0 - vdelta
-            rect(u1, u2, u3, u4, v1 - hgt, v2 - hgt, v3 - hgt, v4 - hgt)
-            drawRect(0, 200, 100)
-            rect(u2, u3, u3, u2, v2 - hgt, v3 - hgt, v3, v2)
-            drawRect(0, 200, 100)
-            rect(u3, u4, u4, u3, v3 - hgt, v4 - hgt, v4, v3)
-            drawRect(0, 200, 100)
-        }
-      } else {
-        // TODO
-        unsupported
+      // draw character
+      area.characters(x, y) match {
+        case NoCharacter => // do nothing
+        case c => drawCharacter(c, x, y, info)
       }
     }
     def reverseDraw(x: Int, y: Int) {
@@ -370,7 +395,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
     for (i <- 0 until h; x <- 0 to i; y = i - x) reverseDraw(x0 + x, y0 + y)
     for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) reverseDraw(x0 + x, y0 + y)
     
-    // dispose dependencies
+    // 4) dispose dependencies and cleanup
     for (i <- 0 until infos.length) {
       val info = infos(i)
       if (info != null) {
@@ -382,3 +407,8 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   }
   
 }
+
+
+
+
+
