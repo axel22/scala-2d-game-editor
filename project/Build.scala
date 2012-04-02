@@ -38,10 +38,12 @@ object StormEnrouteBuild extends Build {
     
     // copy deps and artifacts
     val fullcp = classpath.map(_.data) :+ artifact
-    def lastName(file: File) = if (file.isFile) file.getName else file.getParentFile.getParentFile.getParent
-    for (file <- fullcp)
+    def lastName(file: File) = if (file.isFile) file.getName else file.getParentFile.getParentFile.getParentFile.getName
+    for (file <- fullcp) {
+      println("Copying: " + file + "; lastName: " + lastName(file))
       if (file.isFile) file #> (libzdir / lastName(file)).asFile !;
       else IO.copyDirectory(file, (libzdir / lastName(file)))
+    }
     
     // create run scripts
     IO.write(editorscript, Scripts.editor(fullcp.map(lastName(_))))
