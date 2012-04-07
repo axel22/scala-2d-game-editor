@@ -16,7 +16,7 @@ import collection._
 
 
 
-@deprecated
+@deprecated("", "")
 trait SpriteUI extends UI {
   var pos = (0, 0)
   var playerId: PlayerId = invalidPlayerId

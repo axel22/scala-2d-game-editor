@@ -42,13 +42,11 @@ object Config {
   
   object ui {
     val swingConsole = "swing-console"
-    val swingSprites = "swing-sprites"
     val swingIso = "swing-iso"
   }
   
   val uis = List(
     ui.swingConsole,
-    ui.swingSprites,
     ui.swingIso
   )
   

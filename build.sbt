@@ -6,7 +6,8 @@ version := "0.1"
 scalaVersion := "2.9.1"
 
 scalacOptions ++= Seq(
-  "-Yinline"
+  "-deprecation",
+  "-unchecked"
 )
 
 libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.9"

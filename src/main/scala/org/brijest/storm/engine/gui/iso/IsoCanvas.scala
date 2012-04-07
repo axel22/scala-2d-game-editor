@@ -50,11 +50,15 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   }
   val infopool = Allocator.singleThread.freeList(new Info) { _.reset() }
   var infos: Array[Info] = null
+  var effectbitmap: Array[Boolean] = null
+  var effectmap = mutable.Map[(Int, Int), mutable.Set[Info]]()
+  val hiddenCharacters = mutable.Set[Character]()
   val oneone = (1, 1);
   
   final class Info extends singlethread.Linkable[Info] {
     var top: Pos = null
     var deps: DepNode = null
+    var effectdeps: DepNode = null
     var dims: (Int, Int) = oneone
     var drawn = false
     def isTop = deps ne null
@@ -63,6 +67,13 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       deps = null
       dims = oneone
       drawn = false
+    }
+    def addDep(x: Int, y: Int) {
+      deps = deps.add(x, y)
+    }
+    def addEffectDep(x: Int, y: Int) {
+      if (effectdeps eq null) effectdeps = deppool.allocate()
+      effectdeps = effectdeps.add(x, y)
     }
     @inline def foreach[U](x0: Int, y0: Int)(f: (Int, Int) => U) = foreachNW2SE(x0, y0, dims._1, dims._2)(f)
     def contains(x0: Int, y0: Int, x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + dims._1) && y < (y0 + dims._2)
@@ -154,7 +165,18 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   
   trait TerrainDrawer {
     def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int)
-    def drawTerrainSides(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int)
+  }
+  
+  class TerrainSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
+    import a._
+    
+    def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+      // obtain sprite for slot
+      
+      // draw terrain slot
+      
+      // draw terrain sides
+    }
   }
   
   class TerrainOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
@@ -168,9 +190,11 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       drawRect(0, 100, 200)
       setFontSize(8)
       if (drawing.indices) drawString("%s, %s".format(xp, yp), up - slotwidth / 4, vp)
+      
+      drawTerrainSides(slot, xp, yp, up, vp)
     }
     
-    def drawTerrainSides(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+    private def drawTerrainSides(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
       val lslothgt = if (area.contains(xp, yp + 1)) area.terrain(xp, yp + 1).height else 0
       if (slot.height > lslothgt) {
         val lu = iso2planar_u(xp, yp + 1, lslothgt, area.sidelength) - u0
@@ -196,6 +220,14 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   
   trait CharacterDrawer {
     def drawCharacter(c: Character, x: Int, y: Int, info: Info)
+  }
+  
+  class CharacterSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with CharacterDrawer {
+    def drawCharacter(c: Character, x: Int, y: Int, info: Info) {
+      // get sprite for character
+      
+      // draw sprite
+    }
   }
   
   class CharacterOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with CharacterDrawer {
@@ -311,22 +343,53 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       @inline def apply(x: Int, y: Int) = if (onscreen(x, y)) infos((y - y0) * w + (x - x0)) else null
       @inline def update(x: Int, y: Int, i: Info) = infos((y - y0) * w + (x - x0)) = i
     }
+    object effects {
+      @inline def unsetbit(x: Int, y: Int) = if (onscreen(x, y)) effectbitmap((y - y0) * w + (x - x0)) = false
+      @inline def setbit(x: Int, y: Int) = if (onscreen(x, y)) effectbitmap((y - y0) * w + (x - x0)) = true
+      @inline def exist(x: Int, y: Int) = if (onscreen(x, y)) effectbitmap((y - y0) * w + (x - x0)) else false
+      @inline def apply(x: Int, y: Int) = if (onscreen(x, y)) effectmap((x, y)) else null
+      @inline def add(x: Int, y: Int, i: Info) = {
+        effectbitmap((y - y0) * w + (x - x0)) = true
+        effectmap.get((x, y)) match {
+          case Some(s) => s += i
+          case None => effectmap.put((x, y), mutable.Set(i))
+        }
+      }
+      @inline def remove(x: Int, y: Int, i: Info) = {
+        effectmap.get((x, y)) match {
+          case Some(s) =>
+            s -= i
+            if (s.isEmpty) {
+              effectbitmap((y - y0) * w + (x - x0)) = false
+              effectmap.remove((x, y))
+            }
+          case None =>
+        }
+      }
+    }
+    def hidden(c: Character) = hiddenCharacters(c)
     
     // 1) initialize and group infos
     if ((infos eq null) || infos.length != w * h) infos = new Array[Info](w * h)
-    for (x <- x0 until (x0 + w); y <- y0 until (y0 + h)) if (area.contains(x, y)) area.characters(x, y) match {
-      case NoCharacter =>
-        val info = infopool.allocate()
-        info.deps = deppool.allocate()
-        slotinfo(x, y) = info
-      case c =>
-        val info = infopool.allocate()
-        if (c.pos().equalTo(x, y)) {
+    if ((effectbitmap eq null) || effectbitmap.length != w * h) effectbitmap = new Array[Boolean](w * h)
+    for (x <- x0 until (x0 + w); y <- y0 until (y0 + h)) {
+      if (area.contains(x, y)) area.characters(x, y) match {
+        case NoCharacter =>
+          val info = infopool.allocate()
           info.deps = deppool.allocate()
-          info.dims = c.dimensions()
-        } else info.top = c.pos()
-        slotinfo(x, y) = info
+          slotinfo(x, y) = info
+        case c =>
+          val info = infopool.allocate()
+          if (c.pos().equalTo(x, y)) {
+            info.deps = deppool.allocate()
+            info.dims = c.dimensions()
+          } else info.top = c.pos()
+          slotinfo(x, y) = info
+      }
+      
+      effects.unsetbit(x, y)
     }
+    for (kv <- effectmap) effects.setbit(kv._1._1, kv._1._2)
     
     // 2) compute dependencies - iterate over all the infos diagonal-wise
     def dependencies(x: Int, y: Int) {
@@ -347,8 +410,15 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
           if (up >= uleft && up <= uright && !info.contains(x, y, xp, yp)) {
             val depinfo = slotinfo(xp, yp)
             if (depinfo ne null) {
-              if (depinfo.isTop) info.deps = info.deps.add(xp, yp)
-              else info.deps = info.deps.add(depinfo.top.x, depinfo.top.y)
+              if (depinfo.isTop) info.addDep(xp, yp)
+              else info.addDep(depinfo.top.x, depinfo.top.y)
+            }
+            if (effects.exist(xp, yp)) {
+              val effectinfos = effects(xp, yp)
+              for (e <- effectinfos) {
+                if (e.isTop) info.addEffectDep(xp, yp)
+                else info.addEffectDep(e.top.x, e.top.y)
+              }
             }
           }
         }
@@ -356,10 +426,11 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
     }
     for (i <- 0 until h; x <- 0 to i; y = i - x) dependencies(x0 + x, y0 + y)
     for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) dependencies(x0 + x, y0 + y)
+    // TODO add effect dependency computation
     
     // 3) reverse drawing
-    val terraindrawer = if (drawing.outline) new TerrainOutlineDrawer(a, area, u0, v0) else unsupported
-    val characterdrawer = if (drawing.outline) new CharacterOutlineDrawer(a, area, u0, v0) else unsupported
+    val terraindrawer = if (drawing.outline) new TerrainOutlineDrawer(a, area, u0, v0) else new TerrainSpriteDrawer(a, area, u0, v0)
+    val characterdrawer = if (drawing.outline) new CharacterOutlineDrawer(a, area, u0, v0) else new CharacterSpriteDrawer(a, area, u0, v0)
     import terraindrawer._
     import characterdrawer._
     def drawTop(x: Int, y: Int, info: Info) {
@@ -370,13 +441,12 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
         val u = iso2planar_u(xp, yp, slot.height, area.sidelength) - u0
         val v = iso2planar_v(xp, yp, slot.height, area.sidelength) - v0
         drawTerrain(slot, xp, yp, u, v)
-        drawTerrainSides(slot, xp, yp, u, v)
       }
         
       // draw character
       area.characters(x, y) match {
         case NoCharacter => // do nothing
-        case c => drawCharacter(c, x, y, info)
+        case c => if (!hidden(c)) drawCharacter(c, x, y, info)
       }
     }
     def reverseDraw(x: Int, y: Int) {
@@ -394,6 +464,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
     }
     for (i <- 0 until h; x <- 0 to i; y = i - x) reverseDraw(x0 + x, y0 + y)
     for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) reverseDraw(x0 + x, y0 + y)
+    // TODO integrate effects in the reverseDraw procedure
     
     // 4) dispose dependencies and cleanup
     for (i <- 0 until infos.length) {
@@ -401,6 +472,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       if (info != null) {
         infos(i) = null
         if (info.deps ne null) deppool.dispose(info.deps)
+        if (info.effectdeps ne null) deppool.dispose(info.effectdeps)
         infopool.dispose(info)
       }
     }

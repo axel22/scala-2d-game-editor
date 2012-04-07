@@ -141,7 +141,7 @@ engine =>
       case func ~ args => global(func)(args)
     }
     def argslist = "(" ~> repsep(expression, ",") <~ ")" ^^ {
-      case os: List[Any] => os
+      case os: List[_] => os
     }
   }
   

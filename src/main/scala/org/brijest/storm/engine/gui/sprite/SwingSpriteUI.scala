@@ -19,7 +19,7 @@ import org.brijest.storm.engine.model._
 
 
 
-@deprecated
+@deprecated("", "")
 class SwingSpriteUI(val name: String) extends SpriteUI {
   
   val underlying = new Component {
