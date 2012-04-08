@@ -276,7 +276,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
         val h = area.terrain(x, y).height
         if (h > maxheight) maxheight = h
       }
-      val s = characterSprite(c)
+      val s = palette.sprite(c)
       drawOutline(x, y, maxheight, s.height, info)
     }
   }
@@ -345,9 +345,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   
   def maxPlanarHeight(mapsz: Int) = iso2planar(mapsz, mapsz, 0, mapsz)._2 + slotheight
   
-  def characterSprite(c: Character): Sprite
-  
-  def maxSpriteHeight: Int
+  def palette: Palette
   
   def background(area: AreaView) = stars
   
@@ -369,7 +367,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
     // determine region
     val (u0, v0) = pos
     val pw = width
-    val ph = height + area.maxheight() * levelheight + maxSpriteHeight
+    val ph = height + area.maxheight() * levelheight + palette.maxSpriteHeight
     val (xtl, ytl) = planar2iso(u0, v0, area.sidelength)
     val (xtr, ytr) = planar2iso(u0 + pw, v0, area.sidelength)
     val (xbr, ybr) = planar2iso(u0 + pw, v0 + ph, area.sidelength)
@@ -437,7 +435,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
     def dependencies(x: Int, y: Int) {
       def regularDependencies(info: Info) {
         if ((info ne null) && info.isTop) {
-          val cspr = characterSprite(area.characters(x, y))
+          val cspr = palette.sprite(area.characters(x, y))
           val vhi = info.lowestV(x, y, area) - cspr.height
           val (u, v) = iso2planar(x, y, area.terrain(x, y).height, area.sidelength)
           val (xtop, ytop) = planar2iso(u, vhi, area.sidelength)

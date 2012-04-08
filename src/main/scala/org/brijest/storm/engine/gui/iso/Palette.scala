@@ -15,9 +15,35 @@ import model._
 
 
 
-trait Sprite {
-  def width: Int
-  def height: Int
-  def xoffset: Int
-  def yoffset: Int
-}  
+trait Palette {
+  
+  def sprite(c: Character): Sprite
+  
+  def sprite(e: Effect): Sprite
+  
+  def sprite(t: Slot): Sprite
+  
+  def maxSpriteHeight: Int
+  
+}
+
+
+class DefaultPalette extends Palette {
+  
+  class DummySprite(val width: Int, val height: Int) extends Sprite {
+    def xoffset = 0
+    def yoffset = 0
+  }
+  
+  def sprite(c: Character): Sprite = c match {
+    case NoCharacter => new DummySprite(0, 0)
+    case c => new DummySprite(20, 50)
+  }
+  
+  def sprite(e: Effect) = new DummySprite(30, 50)
+  
+  def sprite(t: Slot) = new DummySprite(48, 32)
+  
+  def maxSpriteHeight = Sprites.maxheight
+  
+}
