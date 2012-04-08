@@ -3,8 +3,8 @@
 **  _\ \  / / / /_/ / , _/ /|_/ / / _//    / , _/ /_/ / /_/ / / / / _/    **
 ** /___/ /_/  \____/_/|_/_/  /_/ /___/_/|_/_/|_|\____/\____/ /_/ /___/    **
 **                                                                        **
-**                                          Storm Enroute (c) 2011        **
-\*                                          www.storm-enroute.com         */
+**                                            Storm Enroute (c) 2011      **
+\*                                            www.storm-enroute.com       */
 
 
 
@@ -76,7 +76,7 @@ object Scripts {
     """#!/bin/sh
 BASEDIR=`dirname $0`
 JARS=%s
-java -classpath $JARS %s org.brijest.storm.Editor "$@"
+java -server -classpath $JARS %s org.brijest.storm.Editor "$@"
 """.format(
     jars.map("$BASEDIR/lib/" + _).mkString(":"),
     flags

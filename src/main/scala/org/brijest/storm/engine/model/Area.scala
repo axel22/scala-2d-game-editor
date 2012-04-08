@@ -209,5 +209,21 @@ object Area {
     area
   }
   
+  def emptyDungeonTest5(w: Int, h: Int): Area = {
+    implicit val area = emptyDungeon(w, h)
+    
+    if (w > 14 && h > 14) {
+      def insertrock(x: Int, y: Int, w: Int = 3, h: Int = 3) {
+        val rock = new characters.Rock(area.newEntityId(), (w, h))
+        rock.pos := Pos(x, y)
+        area.insert(rock)
+      }
+      insertrock(3, 3)
+      insertrock(6, 5)
+    }
+    
+    area
+  }
+  
 }
 
