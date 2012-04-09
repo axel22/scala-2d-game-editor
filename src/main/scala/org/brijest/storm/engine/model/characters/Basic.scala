@@ -24,7 +24,6 @@ class Rock(val id: EntityId, sz: (Int, Int) = (3, 3)) extends Character {
   def manager = IdleManager
   def canWalk(from: Slot, to: Slot) = false
   def chr = '#'
-  def identifier = ""
   def color = 0xffffff00
   def pov(area: AreaView) = area
 }

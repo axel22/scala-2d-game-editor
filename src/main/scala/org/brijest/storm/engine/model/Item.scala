@@ -36,7 +36,6 @@ object Item {
     def pov(a: AreaView) = a
     def chr = '~'
     def color = 0xffffff00
-    def identifier = "dungeon.testitem"
   }
   
 }
@@ -49,5 +48,4 @@ object NoItem extends Item {
   def action(area: AreaView) = unsupported()
   def chr = '?'
   def color = 0xffffff00
-  def identifier = "dungeon.no_item"
 }

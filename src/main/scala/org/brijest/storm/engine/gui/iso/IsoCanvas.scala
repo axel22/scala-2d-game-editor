@@ -497,7 +497,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
         val v = iso2planar_v(xp, yp, slot.height, area.sidelength) - v0
         drawTerrain(slot, xp, yp, u, v)
       }
-        
+      
       // draw character
       area.characters(x, y) match {
         case NoCharacter => // do nothing

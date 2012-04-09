@@ -71,7 +71,6 @@ case object NoCharacter extends Character {
   def chr = '@'
   def color = 0xffffff00
   override def foreach(ev: Character => Unit): Unit = {}
-  def identifier = "basic_chars.no_character"
 }
 
 
@@ -118,7 +117,6 @@ pc =>
   def pov(area: AreaView) = area // TODO
   def chr = '@'
   def color = 0x0000ff00
-  def identifier = "basic_chars.playerchar" // TODO
 }
 
 

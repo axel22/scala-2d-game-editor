@@ -6,18 +6,21 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
-package gui.iso
+package org.brijest.storm.util
 
 
 
-import model._
 
 
 
-trait Sprite {
-  def width: Int
-  def height: Int
-  def xoffset: Int
-  def yoffset: Int
-}  
+class CircularQueue[T <: AnyRef](val length: Int) {
+  private var pos = 0
+  private var array = new Array[AnyRef](length)
+  
+  def +=(elem: T): this.type = {
+    array(pos) = elem
+    pos = (pos + 1) % length
+    this
+  }
+  
+}
