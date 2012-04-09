@@ -33,17 +33,7 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       drawing.indices = false
       
       type Img = java.awt.Image
-      def maxSpriteHeight = Sprites.maxheight
-      def characterSprite(c: Character) = c match {
-        case NoCharacter => new Sprite {
-          def width = 0
-          def height = 0
-        }
-        case c => new Sprite {
-          def width = 20
-          def height = 50
-        }
-      }
+      def palette = new DefaultPalette
       def pos = (0, 0);
       def width = img.getWidth
       def height = img.getHeight
