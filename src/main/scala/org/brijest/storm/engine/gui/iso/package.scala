@@ -21,6 +21,10 @@ package object iso {
     getClass.getResourceAsStream("/iso/" + name + ".png")
   }
   
+  def txtStream(name: String): java.io.InputStream = {
+    getClass.getResourceAsStream("/iso/" + name + ".txt")
+  }
+  
   object Sprites {
     def maxheight = 320
   }

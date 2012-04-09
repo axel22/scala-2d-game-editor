@@ -28,7 +28,9 @@ trait Palette {
 }
 
 
-class DefaultPalette extends Palette {
+class DefaultSwingPalette extends Palette {
+  // load palette descriptors
+  // TODO
   
   class DummySprite(val width: Int, val height: Int) extends Sprite {
     def xoffset = 0

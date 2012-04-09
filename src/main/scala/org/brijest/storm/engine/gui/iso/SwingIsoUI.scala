@@ -62,7 +62,7 @@ class SwingIsoUI(val name: String) extends IsoUI {
     //println("Time to render: %d ms".format(t))
   }
   
-  def palette = new DefaultPalette
+  def palette = new DefaultSwingPalette
   
   type Img = java.awt.Image
   

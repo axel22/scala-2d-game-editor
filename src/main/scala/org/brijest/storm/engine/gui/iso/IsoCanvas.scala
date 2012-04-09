@@ -458,12 +458,19 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       def effectDependencies(info: Info) {
         if (info.isTop) for (
           xp <- info.top.x until (info.top.x + info.dims._1);
-          yp <- info.top.y until (info.top.y + info.dims._2);
-          if effects.exist(xp, yp);
-          e <- effects(xp, yp);
-          if !info.sameTop(x, y, e, xp, yp);
-          if (xp < x || (xp == x && (yp < y || (yp == y && info.id < e.id))))
-        ) info.addEffectDep(xp, yp, e)
+          yp <- info.top.y until (info.top.y + info.dims._2)
+        ) {
+          // overlapping effects
+          if (effects.exist(xp, yp)) for (e <- effects(xp, yp)) {
+            if (!info.sameTop(x, y, e, xp, yp))
+              if (xp < x || (xp == x && (yp < y || (yp == y && info.id < e.id))))
+                info.addEffectDep(xp, yp, e)
+          }
+          
+          // underlying elements
+          val slinfo = slotinfo(xp, yp)
+          if (slinfo ne null) info.addDep(xp, yp, slinfo)
+        }
       }
       regularDependencies(slotinfo(x, y))
       if (effects.exist(x, y)) for (effectinfo <- effects(x, y)) {
