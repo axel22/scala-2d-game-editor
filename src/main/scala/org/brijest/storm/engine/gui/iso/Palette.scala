@@ -127,8 +127,6 @@ class DefaultSwingPalette extends Palette with Parsing with Images with Caching 
   
   type Cachee = Sprite
   
-  /* model */
-  
   /* internal */
   
   def loadSprite(name: String) = {

@@ -28,6 +28,7 @@ object StormEnrouteBuild extends Build {
     val deploydir = new File("deploy")
     val libzdir = new File("deploy%slib".format(File.separator))
     val editorscript = new File("deploy%seditor".format(File.separator))
+    val pngtextscript = new File("deploy%spng-text".format(File.separator, File.separator))
     
     // clean old subdirectory
     deploydir.delete()
@@ -47,6 +48,7 @@ object StormEnrouteBuild extends Build {
     
     // create run scripts
     IO.write(editorscript, Scripts.editor(fullcp.map(lastName(_))))
+    IO.write(pngtextscript, Scripts.pngtext(fullcp.map(lastName(_))))
   } dependsOn (packageBin in Compile)
   
   
@@ -74,12 +76,21 @@ object Scripts {
   
   def editor(jars: Seq[String]) =
     """#!/bin/sh
-BASEDIR=`dirname $0`
-JARS=%s
-java -server -classpath $JARS %s org.brijest.storm.Editor "$@"
-""".format(
+  BASEDIR=`dirname $0`
+  JARS=%s
+  java -server -classpath $JARS %s org.brijest.storm.Editor "$@"
+  """.format(
     jars.map("$BASEDIR/lib/" + _).mkString(":"),
     flags
+  )
+  
+  def pngtext(jars: Seq[String]) =
+    """#!/bin/sh
+  BASEDIR=`dirname $0`
+  JARS=%s
+  java -server -classpath $JARS org.brijest.storm.tools.PngText "$@"
+  """.format(
+    jars.map("$BASEDIR/lib/" + _).mkString(":")
   )
   
 }
