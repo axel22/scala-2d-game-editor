@@ -40,7 +40,7 @@ trait Palette {
 trait Parsing extends Palette {
   import scala.util.parsing.combinator._
   
-  class Sprite extends super.Sprite {
+  trait Sprite extends super.Sprite {
     var width = 0
     var height = 0
     var xoffset = 0
@@ -64,8 +64,8 @@ trait Parsing extends Palette {
         case Error(msg, _) => sys.error("Error: " + msg)
       }
       
-      def entry: Parser[Unit] = ident ~ "=" ~ "{" ~ properties ~ "}" ^^ {
-        case nm ~ _ ~ _ ~ sprite ~ _ =>
+      def entry: Parser[Unit] = "{" ~ properties ~ "}" ^^ {
+        case _ ~ sprite ~ _ =>
       }
       def properties: Parser[Unit] = rep(prop) ^^ {
         case props => for (p <- props) s.set _

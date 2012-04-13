@@ -31,14 +31,29 @@ object PngText {
     var key: String = ""
     var value: String = ""
     var filename: String = ""
+    var print: Boolean = false
     
     help("h", "help", "Show this help message")
     opt("key", "The name of the text chunk key to add.", { v: String => key = v })
     opt("value", "The value of the text chunk to add.", { v: String => value = v })
+    opt("print", "If true, only print the text chunks in the png file.", { v: String => print = v.toBoolean })
     arg("<filename>", "The name of the png file to embed the text chunk into.", { v: String => filename = v })
   }
   
   def pngText(config: ToolConfigParser) {
+    if (!config.print) embed(config)
+    else printchunk(config)
+  }
+  
+  def printchunk(config: ToolConfigParser) {
+    val pngimage = new com.sixlegs.png.PngImage()
+    val image = pngimage.read(new java.io.FileInputStream(config.filename), true)
+    val dschunk = pngimage.getTextChunk(config.key)
+    if (dschunk != null) println(dschunk.getText)
+    else println("No tEXt chunk named %s!".format(config.key))
+  }
+  
+  def embed(config: ToolConfigParser) {
     val pngreader = new PNGImageReader(new PNGImageReaderSpi())
     val fis = new stream.FileImageInputStream(new File(config.filename))
     pngreader.setInput(fis, false, false)
