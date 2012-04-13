@@ -23,7 +23,7 @@ trait Slot extends Immutable {
   def height: Int
   def chr: Char
   def color: Int
-  def identifier: String
+  def identifier = this.getClass.getName
   
   assert(height >= 0)
   
@@ -62,7 +62,6 @@ case class HardRock(val height: Int) extends Slot {
   def seethrough = false
   def chr = '#'
   def color = 0x55555500
-  def identifier = "dungeon.rock"
 }
 
 
@@ -73,7 +72,6 @@ case class DungeonFloor(val height: Int) extends Slot {
   def seethrough = true
   def chr = '.'
   def color = 0x55555500
-  def identifier = "dungeon.floor"
 }
 
 

@@ -159,7 +159,7 @@ class DefaultSwingPalette extends Palette with Parsing with Images with Caching 
   
   def sprite(e: Effect) = null
   
-  def sprite(t: Slot) = null
+  def sprite(t: Slot) = sprite(t.identifier)
   
   def maxSpriteHeight = Sprites.maxheight
   
