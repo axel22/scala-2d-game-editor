@@ -52,6 +52,8 @@ trait Parsing extends Palette {
       case ("xoffset", xo) => xoffset = xo.toInt
       case ("yoffset", yo) => yoffset = yo.toInt
     }
+    
+    override def toString = "Sprite(%s, %s, %s, %s)".format(width, height, xoffset, yoffset)
   }
   
   def parseSpriteInfo(s: Sprite, text: String) = {
@@ -68,7 +70,7 @@ trait Parsing extends Palette {
         case _ ~ sprite ~ _ =>
       }
       def properties: Parser[Unit] = rep(prop) ^^ {
-        case props => for (p <- props) s.set _
+        case props => for (p <- props) s.set(p)
       }
       def prop: Parser[(String, String)] = ident ~ "=" ~ value ^^ {
         case nm ~ _ ~ v => (nm, v)
@@ -136,8 +138,6 @@ class DefaultSwingPalette extends Palette with Parsing with Images with Caching 
     val dschunk = pngimage.getTextChunk("descriptor")
     if (dschunk != null) parseSpriteInfo(s, dschunk.getText)
     s.image = image
-    // TODO remove this:
-    s.height = 50
     s
   }
   
