@@ -186,10 +186,13 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
     
     def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
       // obtain sprite for slot
+      val s = palette.sprite(slot)
       
       // draw terrain slot
+      drawImage(s.image, up, vp, up + s.width, vp + s.height, 0, 0, s.width, s.height)
       
       // draw terrain sides
+      // TODO
     }
   }
   
@@ -313,7 +316,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   def levelheight = 16
   
   object drawing {
-    var outline = true
+    var outline = false
     var seethrough = false
     var indices = true
     var background = true
@@ -345,7 +348,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   
   def maxPlanarHeight(mapsz: Int) = iso2planar(mapsz, mapsz, 0, mapsz)._2 + slotheight
   
-  def palette: Palette
+  def palette: Palette[Img]
   
   def background(area: AreaView) = stars
   

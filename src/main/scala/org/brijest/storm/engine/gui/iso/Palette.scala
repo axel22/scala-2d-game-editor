@@ -11,15 +11,17 @@ package gui.iso
 
 
 
+import java.awt.{Image => JImage}
 import org.brijest.storm.util.CircularQueue
 import collection._
 import model._
 
 
 
-trait Palette {
+trait Palette[Image] {
   
   trait Sprite {
+    def image: Image
     def width: Int
     def height: Int
     def xoffset: Int
@@ -37,7 +39,7 @@ trait Palette {
 }
 
 
-trait Parsing extends Palette {
+trait Parsing[Image] extends Palette[Image] {
   import scala.util.parsing.combinator._
   
   trait Sprite extends super.Sprite {
@@ -84,14 +86,12 @@ trait Parsing extends Palette {
 }
 
 
-trait Images extends Palette {
-  type Image
-  
+trait Images[Image] extends Palette[Image] {
   def newImage(name: String): Image
 }
 
 
-trait Caching extends Palette {
+trait Caching[Image] extends Palette[Image] {
   import java.lang.ref.SoftReference
   
   type Cachee >: Null <: AnyRef
@@ -111,7 +111,7 @@ trait Caching extends Palette {
 }
 
 
-class DefaultSwingPalette extends Palette with Parsing with Images with Caching {
+class DefaultSwingPalette extends Palette[JImage] with Parsing[JImage] with Images[JImage] with Caching[JImage] {
   
   /* types */
   
