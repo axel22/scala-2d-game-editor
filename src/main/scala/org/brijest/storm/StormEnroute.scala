@@ -29,7 +29,7 @@ object StormEnroute {
 }
 
 
-class ConfigParser(config: Config) extends OptionParser(app.command) {
+class ConfigParser(config: Config) extends DefaultParser(app.command) {
   opt("w", "world", "The specific world to simulate", { v: String => config.world = Some(v) })
   help("h", "help", "Show this help message")
   opt("logging", "Outputs logging info to the specified location, one of: " + Config.loggings.mkString(", "), { v: String => config.logging = Some(v) })

@@ -6,7 +6,8 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package gui.iso
 
 
@@ -316,10 +317,10 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   def levelheight = 16
   
   object drawing {
-    var outline = false
-    var seethrough = false
-    var indices = true
-    var background = true
+    var outline: Boolean = app.render.outline
+    var seethrough: Boolean = app.render.seethrough
+    var indices: Boolean = app.render.indices
+    var background: Boolean = app.render.background
   }
   
   def pos: (Int, Int)

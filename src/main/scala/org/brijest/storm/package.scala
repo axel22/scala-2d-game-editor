@@ -11,6 +11,7 @@ package org.brijest
 
 
 
+import collection._
 
 
 
@@ -43,6 +44,26 @@ package object storm {
     val name = "Storm Enroute"
     val editorname = "Storm Enroute Area Editor"
     val command = "storm-enroute"
+    
+    trait PropMap extends Dynamic {
+      private val propmap = mutable.Map[String, Any]()
+      
+      def applyDynamic[T](name: String)(v: T*): T = {
+        if (v.length > 0) propmap(name) = v(0)
+        propmap(name).asInstanceOf[T]
+      }
+    }
+    
+    object render extends PropMap {
+      this.outline(true)
+      this.seethrough(false)
+      this.indices(true)
+      this.background(true)
+    }
   }
   
 }
+
+
+
+

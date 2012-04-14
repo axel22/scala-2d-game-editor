@@ -7,7 +7,8 @@ scalaVersion := "2.9.1"
 
 scalacOptions ++= Seq(
   "-deprecation",
-  "-unchecked"
+  "-unchecked",
+  "-Xexperimental"
 )
 
 libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.9"

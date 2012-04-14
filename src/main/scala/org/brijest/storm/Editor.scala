@@ -35,7 +35,7 @@ object Editor {
 }
 
 
-class EditorConfigParser(config: Config) extends OptionParser(app.command) {
+class EditorConfigParser(config: Config) extends DefaultParser(app.command) {
   help("h", "help", "Show this help message")
   opt("width", "The width for the area, if it's newly created", { v: String => config.area.width = v.toInt })
   opt("height", "The height for the area, if it's newly created", { v: String => config.area.height = v.toInt })
@@ -44,7 +44,7 @@ class EditorConfigParser(config: Config) extends OptionParser(app.command) {
 
 
 class SwingEditor(config: Config) extends engine.gui.iso.SwingIsoUI(app.editorname) {
-  val area = Area.emptyDungeonTest4(config.area.width, config.area.height)
+  val area = Area.emptyDungeon(config.area.width, config.area.height)
   var lastpress = new java.awt.Point(0, 0)
   val refresher = new Thread {
     override def run() = while (true) {
