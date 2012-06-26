@@ -119,13 +119,11 @@ class DefaultSwingPalette extends Palette[JImage] with Parsing[JImage] with Imag
   
   def newImage(name: String) = javax.imageio.ImageIO.read(pngStream(name))
   
-  class Sprite extends super[Parsing].Sprite {
-    var image: Image = null
-  }
+  class Sprite(val image: Image) extends super[Parsing].Sprite
   
-  object NullSprite extends Sprite
+  object NullSprite extends Sprite(null)
   
-  def newSprite = new Sprite
+  def newSprite(img: Image) = new Sprite(img)
   
   type Cachee = Sprite
   
@@ -133,11 +131,10 @@ class DefaultSwingPalette extends Palette[JImage] with Parsing[JImage] with Imag
   
   def loadSprite(name: String) = {
     val pngimage = new com.sixlegs.png.PngImage()
-    val s = newSprite
     val image = pngimage.read(pngStream(name), true)
+    val s = newSprite(image)
     val dschunk = pngimage.getTextChunk("descriptor")
     if (dschunk != null) parseSpriteInfo(s, dschunk.getText)
-    s.image = image
     s
   }
   
