@@ -185,14 +185,20 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   class TerrainSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
     import a._
     
-    def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+    def drawTerrain(terrain: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
       // obtain sprite for slot
-      val s = palette.sprite(slot)
+      val slot = palette.sprite(terrain)
+      val wall = palette.wall(terrain)
       
       // draw terrain slot
-      drawImage(s.image, up, vp, up + s.width, vp + s.height, 0, 0, s.width, s.height)
+      def frame =
+        if (!slot.animated) math.abs(xp + yp * 0x9e3775cd) % slot.frames
+        else 0
+      drawImage(slot.image(frame), up, vp, up + slot.width, vp + slot.height, 0, 0, slot.width, slot.height)
+      //drawString(frame + "", up, vp)
       
       // draw terrain sides
+      //drawImage(wall.image(frame), up, vp, up + wall.width, vp + wall.height, 0, 0, wall.width, wall.height)
       // TODO
     }
   }

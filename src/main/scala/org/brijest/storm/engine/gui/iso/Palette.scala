@@ -11,8 +11,9 @@ package gui.iso
 
 
 
+import org.apache.commons.io.IOUtils
 import java.awt.{Image => JImage}
-import org.brijest.storm.util.CircularQueue
+import org.brijest.storm.util._
 import collection._
 import model._
 
@@ -21,11 +22,14 @@ import model._
 trait Palette[Image] {
   
   trait Sprite {
-    def image: Image
+    def img: Image = image(0)
+    def image(frame: Int): Image
     def width: Int
     def height: Int
     def xoffset: Int
     def yoffset: Int
+    def frames: Int
+    def animated: Boolean
   }
   
   def sprite(c: Character): Sprite
@@ -33,6 +37,8 @@ trait Palette[Image] {
   def sprite(e: Effect): Sprite
   
   def sprite(t: Slot): Sprite
+  
+  def wall(t: Slot): Sprite
   
   def maxSpriteHeight: Int
   
@@ -43,19 +49,23 @@ trait Parsing[Image] extends Palette[Image] {
   import scala.util.parsing.combinator._
   
   trait Sprite extends super.Sprite {
-    var width = 0
-    var height = 0
-    var xoffset = 0
-    var yoffset = 0
+    var width = 48
+    var height = 30
+    var xoffset = 24
+    var yoffset = 15
+    var animated = false
+    var frames = 0
     
     def set(kv: (String, String)) = kv match {
       case ("width", w) => width = w.toInt
       case ("height", h) => height = h.toInt
       case ("xoffset", xo) => xoffset = xo.toInt
       case ("yoffset", yo) => yoffset = yo.toInt
+      case ("animated", ani) => animated = ani.toBoolean
+      case ("frames", f) => frames = f.toInt
     }
     
-    override def toString = "Sprite(%s, %s, %s, %s)".format(width, height, xoffset, yoffset)
+    override def toString = "Sprite(%d, %d, %d, %d: x%d)".format(width, height, xoffset, yoffset, frames)
   }
   
   def parseSpriteInfo(s: Sprite, text: String) = {
@@ -115,26 +125,44 @@ class DefaultSwingPalette extends Palette[JImage] with Parsing[JImage] with Imag
   
   /* types */
   
-  type Image = java.awt.image.BufferedImage
+  type Img = java.awt.image.BufferedImage
   
   def newImage(name: String) = javax.imageio.ImageIO.read(pngStream(name))
   
-  class Sprite(val image: Image) extends super[Parsing].Sprite
-  
+  class Sprite(val images: Seq[Img]) extends super[Parsing].Sprite {
+    def image(frame: Int) = images(frame)
+  }
+
   object NullSprite extends Sprite(null)
   
-  def newSprite(img: Image) = new Sprite(img)
+  def newSprite(imgs: Seq[Img]) = new Sprite(imgs)
   
   type Cachee = Sprite
   
   /* internal */
   
   def loadSprite(name: String) = {
-    val pngimage = new com.sixlegs.png.PngImage()
-    val image = pngimage.read(pngStream(name), true)
-    val s = newSprite(image)
+    val pngimage = new com.sixlegs.png.AnimatedPngImage()
+    val tmpfile = java.io.File.createTempFile("storm", "tmp")
+    tmpfile.deleteOnExit()
+    val pngis = pngStream(name)
+    val tmpfos = new java.io.FileOutputStream(tmpfile)
+    try {
+      IOUtils.copy(pngis, tmpfos)
+    } finally {
+      pngis.close()
+      tmpfos.close()
+    }
+    val images = pngimage.readAllFrames(tmpfile)
+    val s = newSprite(images)
     val dschunk = pngimage.getTextChunk("descriptor")
     if (dschunk != null) parseSpriteInfo(s, dschunk.getText)
+    
+    // set known
+    s.width = s.img.getWidth(null)
+    s.height = s.img.getHeight(null)
+    s.frames = s.images.length
+    
     s
   }
   
@@ -157,6 +185,8 @@ class DefaultSwingPalette extends Palette[JImage] with Parsing[JImage] with Imag
   def sprite(e: Effect) = null
   
   def sprite(t: Slot) = sprite(t.identifier)
+  
+  def wall(t: Slot) = sprite(t.identifier + "-wall")
   
   def maxSpriteHeight = Sprites.maxheight
   
