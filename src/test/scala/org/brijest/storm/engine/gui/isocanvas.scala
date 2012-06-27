@@ -40,18 +40,26 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       def imageFromPngStream(stream: java.io.InputStream) = javax.imageio.ImageIO.read(stream)
     }
     
-    def equalImages(a: BufferedImage, b: BufferedImage): Boolean = {
+    def equalImages(a: BufferedImage, b: BufferedImage, diffname: String): Boolean = {
       val abuff = a.getData.getDataBuffer
-      val bbuff = b.getData.getDataBuffer
+      val braster = b.getData
+      val bbuff = braster.getDataBuffer
       
-      if (abuff.size != bbuff.size) false else {
+      var same = true
+      if (abuff.size != bbuff.size) return false else {
         var i = 0
         while (i < abuff.size) {
-          if (abuff.getElem(i) != bbuff.getElem(i)) return false
+          if (abuff.getElem(i) != bbuff.getElem(i)) {
+            same = false
+            bbuff.setElem(i, 0xff000000)
+          } else bbuff.setElem(i, 0x000000ff)
           i += 1
         }
-        true
       }
+      
+      b.setData(braster)
+      save(diffname, b)
+      same
     }
     
     def save(name: String, img: BufferedImage) {
@@ -66,7 +74,7 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       val result = canvas.img
       save(picname, result)
       val expected = canvas.imageFromPngStream(pngStream(picname))
-      equalImages(result, expected) should equal (true)
+      equalImages(result, expected, "diff-" + picname) should equal (true)
     }
     
     "correctly display area: empty dungeon test 1" in {
