@@ -24,6 +24,8 @@ object Editor {
     val config = new Config
     val parser = new EditorConfigParser(config)
     
+    Initializer.default()
+    
     if (parser.parse(args)) {
       startEditor(config)
     }

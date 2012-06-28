@@ -25,15 +25,26 @@ libraryDependencies += "org.scala-lang" % "scala-swing" % "2.9.1"
 
 libraryDependencies += "commons-lang" % "commons-lang" % "2.2"
 
-libraryDependencies += "commons-io" % "commons-io" % "1.3.2"
+libraryDependencies += "commons-io" % "commons-io" % "2.3"
 
 libraryDependencies += "net.java.dev.jogl" % "jogl" % "1.1.1-rc6"
 
 libraryDependencies += {
   sys.props("os.name") match {
     // "net.java.dev.jogl" % "jogl-windows-i586" % "1.1.1-rc6"
-    // "net.java.dev.jogl" % "jogl-linux-i586" % "1.1.1-rc6"
+    case "Linux" => "net.java.dev.jogl" % "jogl-linux-i586" % "1.1.1-rc6"
     case "Mac OS X" => "net.java.dev.jogl" % "jogl-macosx-universal" % "1.1.1-rc6"
+    case os => sys.error("Cannot build for OS: " + os)
+  }
+}
+
+libraryDependencies += "net.java.dev.gluegen" % "gluegen-rt" % "1.0b05"
+
+libraryDependencies += {
+  sys.props("os.name") match {
+    // "net.java.dev.jogl" % "jogl-windows-i586" % "1.1.1-rc6"
+    case "Linux" => "net.java.dev.gluegen" % "gluegen-rt-linux-i586" % "1.0b05"
+    case "Mac OS X" => "net.java.dev.gluegen" % "gluegen-rt-macosx-universal" % "1.0b05"
     case os => sys.error("Cannot build for OS: " + os)
   }
 }

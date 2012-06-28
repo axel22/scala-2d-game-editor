@@ -6,7 +6,8 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package gui.iso
 
 
@@ -26,7 +27,6 @@ import org.brijest.storm.engine.model._
 class SwingIsoUI(val name: String) extends IsoUI {
   
   class AreaDisplay extends GLCanvas(caps)
-  println(sys.props("java.library.path"))
   
   val caps = new GLCapabilities()
   var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
