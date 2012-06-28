@@ -27,5 +27,14 @@ libraryDependencies += "commons-lang" % "commons-lang" % "2.2"
 
 libraryDependencies += "commons-io" % "commons-io" % "1.3.2"
 
+libraryDependencies += "net.java.dev.jogl" % "jogl" % "1.1.1-rc6"
 
+libraryDependencies += {
+  sys.props("os.name") match {
+    // "net.java.dev.jogl" % "jogl-windows-i586" % "1.1.1-rc6"
+    // "net.java.dev.jogl" % "jogl-linux-i586" % "1.1.1-rc6"
+    case "Mac OS X" => "net.java.dev.jogl" % "jogl-macosx-universal" % "1.1.1-rc6"
+    case os => sys.error("Cannot build for OS: " + os)
+  }
+}
 

@@ -15,32 +15,40 @@ import collection._
 import swing._
 import java.awt.image._
 import java.lang.ref.SoftReference
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
+import javax.media.opengl._
+import javax.media.opengl.GLCanvas
 import org.brijest.storm.engine.model._
 
 
 
 class SwingIsoUI(val name: String) extends IsoUI {
   
+  class AreaDisplay extends GLCanvas(caps)
+  println(sys.props("java.library.path"))
+  
+  val caps = new GLCapabilities()
   var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
   val areadisplay = new AreaDisplay
-  
-  class AreaDisplay extends Component {
-    override def paintComponent(g: Graphics2D) {
-      super.paintComponent(g)
-      g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
-                         java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
-      
-      this.synchronized {
-        g.drawImage(buffer, 0, 0, width, height, 0, 0, width, height, null, null)
-      }
-    }
-  }
-  
   val frame = new Frame {
     title = name
-    contents = areadisplay
+    peer.add(areadisplay)
     areadisplay.requestFocus()
   }
+  
+  // Component {
+    // val canvas = new GLCanvas(caps)
+    // override def paintComponent(g: Graphics2D) {
+    //   super.paintComponent(g)
+    //   g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
+    //                      java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
+      
+    //   this.synchronized {
+    //     g.drawImage(buffer, 0, 0, width, height, 0, 0, width, height, null, null)
+    //   }
+    // }
+  // }
   
   frame.size = new Dimension(640, 480)
   frame.peer.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
