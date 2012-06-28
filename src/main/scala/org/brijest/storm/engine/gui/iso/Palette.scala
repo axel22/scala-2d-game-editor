@@ -51,8 +51,8 @@ trait Parsing[Image] extends Palette[Image] {
   trait Sprite extends super.Sprite {
     var width = 48
     var height = 30
-    var xoffset = 24
-    var yoffset = 15
+    var xoffset = 0
+    var yoffset = 3
     var animated = false
     var frames = 0
     

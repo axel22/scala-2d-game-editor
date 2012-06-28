@@ -34,6 +34,14 @@ trait Canvas {
     def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int)
     def fillRect(x1: Int, y1: Int, w: Int, h: Int)
   }
+  
+  /* constants */
+  
+  def tileWidth = 48
+  def tileHeight = 24
+  def wallHeight = 64
+  def wallWidth = 48
+  
 }
 
 
@@ -185,21 +193,46 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   class TerrainSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
     import a._
     
-    def drawTerrain(terrain: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
-      // obtain sprite for slot
-      val slot = palette.sprite(terrain)
-      val wall = palette.wall(terrain)
+    def drawTerrain(curr: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+      def random(x: Int, y: Int) = math.abs(x + y * 0x9e3775cd)
       
-      // draw terrain slot
-      def frame =
-        if (!slot.animated) math.abs(xp + yp * 0x9e3775cd) % slot.frames
-        else 0
-      drawImage(slot.image(frame), up, vp, up + slot.width, vp + slot.height, 0, 0, slot.width, slot.height)
-      //drawString(frame + "", up, vp)
+      // obtain sprite for slot
+      val tile = palette.sprite(curr)
+      val wall = palette.wall(curr)
       
       // draw terrain sides
-      //drawImage(wall.image(frame), up, vp, up + wall.width, vp + wall.height, 0, 0, wall.width, wall.height)
-      // TODO
+      def drawSide(nbheight: Int, nx: Int, ny: Int, walloffset: Int) {
+        if (nbheight < curr.height) {
+          val lu = iso2planar_u(nx, ny, nbheight, area.sidelength) - u0 + tileWidth / 2
+          var lv = iso2planar_v(nx, ny, nbheight, area.sidelength) - v0 + tileHeight / 2
+          val limit = lv - levelheight * (curr.height - nbheight)
+          var i = 0
+          while (lv > limit) {
+            val neededhgt = math.min(wallHeight, lv - limit + tileHeight / 2)
+            val frm = random(nx + i, ny + i) % wall.frames
+            drawImage(
+              wall.image(frm),
+              lu - wallWidth / 2 + walloffset, lv - neededhgt, lu + walloffset, lv,
+              walloffset, wallHeight - neededhgt, wallWidth / 2 + walloffset, wallHeight
+            )
+            lv -= wallHeight - tileHeight / 2
+            i += 1
+          }
+        }
+      }
+      drawSide(
+        if ((yp + 1) < area.terrain.dimensions._2) area.terrain(xp, yp + 1).height else 0,
+        xp, yp + 1, wallWidth / 2
+      )
+      drawSide(
+        if ((xp + 1) < area.terrain.dimensions._1) area.terrain(xp + 1, yp).height else 0,
+        xp + 1, yp, 0
+      )
+      
+      // draw terrain tile
+      def frame = if (!tile.animated) random(xp, yp) % tile.frames else 0
+      drawImage(tile.image(frame), up, vp, up + tile.width, vp + tile.height, tile.xoffset, tile.yoffset, tile.xoffset + tile.width, tile.yoffset + tile.height)
+      // drawString(frame + "", up, vp)
     }
   }
   
