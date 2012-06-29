@@ -47,7 +47,6 @@ object Initializer extends Logging {
         val entry = entries.nextElement()
         if (entry.getName.contains(natext)) {
           FileUtils.copyInputStreamToFile(archive.getInputStream(entry), new File("lib/" + entry.getName))
-          System.loadLibrary(entry.getName)
           logger.info("unpacked native lib: " + entry.getName)
         }
       }
