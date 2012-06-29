@@ -29,11 +29,13 @@ object Initializer extends Logging {
     val natstr = os match {
       case "Linux" => "linux-i586"
       case "Mac OS X" => "macosx-universal"
+      case os if os.startsWith("Windows") => "windows-i586"
       case os => sys.error("Unknown OS: " + os)
     }
     val natext = os match {
       case "Linux" => "so"
       case "Mac OS X" => "jnilib"
+      case os if os.startsWith("Windows") => "dll"
       case os => sys.error("Unknown OS: " + os)
     }
     
