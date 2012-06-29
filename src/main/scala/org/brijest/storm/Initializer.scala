@@ -19,7 +19,7 @@ import engine.model.{World, Player}
 
 
 
-object Initializer {
+object Initializer extends Logging {
   
   import Config._
   import impl._
@@ -47,17 +47,20 @@ object Initializer {
         val entry = entries.nextElement()
         if (entry.getName.contains(natext)) {
           FileUtils.copyInputStreamToFile(archive.getInputStream(entry), new File("lib/" + entry.getName))
+          System.loadLibrary(entry.getName)
+          logger.info("unpacked native lib: " + entry.getName)
         }
       }
     }
   }
   
   def default() {
-    // unpack gluegen-rt and jogl native libs
-    unpackNativeLibs()
-    
     // set java library path
     app.sys.props("java.library.path") = "lib/" + java.io.File.pathSeparator + app.sys.props("java.library.path")
+    logger.info("java.library.path = " + app.sys.props("java.library.path"))
+    
+    // unpack gluegen-rt and jogl native libs
+    unpackNativeLibs()
   }
   
   def apply(config: Config): Client = {
@@ -66,7 +69,7 @@ object Initializer {
       case Some(logging.screen) =>
         import java.util.logging._
         LogManager.getLogManager.readConfiguration(javaLoggingScreen)
-      case _ => 
+      case _ =>
     }
     
     // setup engine
