@@ -24,54 +24,26 @@ import org.brijest.storm.engine.model._
 
 
 class SwingIsoUI(val name: String) extends IsoUI {
-  
-  class AreaDisplay extends GLCanvas(caps)
-  
-  val caps = new GLCapabilities()
   var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
   val areadisplay = new AreaDisplay
-  val frame = new Frame {
-    title = name
-    peer.add(areadisplay)
-    areadisplay.requestFocus()
+  
+  class AreaDisplay extends Component {
+    override def paintComponent(g: Graphics2D) {
+      super.paintComponent(g)
+      g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
+                         java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
+      
+      this.synchronized {
+        g.drawImage(buffer, 0, 0, width, height, 0, 0, width, height, null, null)
+      }
+    }
   }
   
-  areadisplay.addGLEventListener(new GLEventListener {
-    def display(drawable: GLAutoDrawable) {
-      val gl = drawable.getGL()
-      
-      gl.glBegin(GL.GL_TRIANGLES)
-      gl.glColor3f(1, 0, 0)
-      gl.glVertex2f(-1, -1)
-      gl.glColor3f(0, 1, 0)
-      gl.glVertex2f(0, 1)
-      gl.glColor3f(0, 0, 1)
-      gl.glVertex2f(1, -1)
-      gl.glEnd()
-    }
-
-    def init(drawable: GLAutoDrawable) {
-    }
-
-    def displayChanged(drawable: GLAutoDrawable, mode: Boolean, device: Boolean) {
-    }
-
-    def reshape(drawable: GLAutoDrawable, x: Int, y: Int, width: Int, height: Int) {
-    }
-  })
-  
-  // Component {
-    // val canvas = new GLCanvas(caps)
-    // override def paintComponent(g: Graphics2D) {
-    //   super.paintComponent(g)
-    //   g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
-    //                      java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
-      
-    //   this.synchronized {
-    //     g.drawImage(buffer, 0, 0, width, height, 0, 0, width, height, null, null)
-    //   }
-    // }
-  // }
+  val frame = new Frame {
+    title = name
+    contents = areadisplay
+    areadisplay.requestFocus()
+  }
   
   frame.size = new Dimension(640, 480)
   frame.peer.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
@@ -95,16 +67,14 @@ class SwingIsoUI(val name: String) extends IsoUI {
   
   val palette = new DefaultSwingPalette
   
-  type Img = java.awt.Image
-  
-  def imageFromPngStream(stream: java.io.InputStream) = javax.imageio.ImageIO.read(stream)
+  type Img = java.awt.image.BufferedImage
   
   class SwingDrawAdapter extends ImageDrawAdapter(buffer) with DrawAdapter
   
 }
 
 
-abstract class ImageDrawAdapter(buffer: Image) {
+abstract class ImageDrawAdapter(buffer: java.awt.image.BufferedImage) {
   val gr = buffer.getGraphics.asInstanceOf[Graphics2D]
   
   def drawLine(x1: Int, y1: Int, x2: Int, y2: Int) {
@@ -125,15 +95,12 @@ abstract class ImageDrawAdapter(buffer: Image) {
   def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
     gr.fillPolygon(xpoints, ypoints, n)
   }
-  def drawImage(image: Image, dx1: Int, dy1: Int, dx2: Int, dy2: Int, sx1: Int, sy1: Int, sx2: Int, sy2: Int) {
+  def drawImage(image: java.awt.image.BufferedImage, dx1: Int, dy1: Int, dx2: Int, dy2: Int, sx1: Int, sy1: Int, sx2: Int, sy2: Int) {
     gr.drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null, null)
   }
   def fillRect(x1: Int, y1: Int, w: Int, h: Int) {
     gr.fillRect(x1, y1, w, h)
   }
 }
-
-
-
 
 

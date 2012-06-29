@@ -46,7 +46,8 @@ class EditorConfigParser(config: Config) extends DefaultParser(app.command) {
 }
 
 
-class Editor(config: Config) extends SwingIsoUI(app.editorname) {
+class Editor(config: Config)
+extends GLIsoUI(app.editorname) {
   val area = Area.emptyDungeon(config.area.width, config.area.height)
   var lastpress = new java.awt.Point(0, 0)
   val refresher = new Thread {
@@ -59,6 +60,10 @@ class Editor(config: Config) extends SwingIsoUI(app.editorname) {
   refresher.start()
   engine = Some(org.brijest.storm.engine.IdleEngine)
   refresh(area, engine.get)
+  
+  
+  
+  /* event handlers for the swing ui */
   
   // areadisplay.listenTo(areadisplay.mouse.clicks)
   // areadisplay.listenTo(areadisplay.mouse.moves)

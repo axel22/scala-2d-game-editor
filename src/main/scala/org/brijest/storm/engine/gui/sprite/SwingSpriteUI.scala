@@ -34,6 +34,8 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
     }
   }
   
+  def area: AreaView = null
+  
   val frame = new Frame {
     title = name
     contents = underlying

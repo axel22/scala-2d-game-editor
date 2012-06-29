@@ -69,18 +69,18 @@ object Initializer {
       case _ => 
     }
     
-    // setup ui
-    val ui = createUI(config)
-    
     // setup engine
     val ng = config.engine match {
       case engine.local => new local.LocalEngine(config, Player.default(model.defaultPlayerId), createWorld(config))
       case e => exit("Engine '%s' not recognized.".format(e))
     }
     
+    // setup ui
+    val ui = createUI(config)
+    
     // start engine
-    ng.listen(ui)
     ui.engine = Some(ng)
+    ng.listen(ui)
     ng.start()
     
     new Client(ng, ui)

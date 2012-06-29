@@ -43,11 +43,13 @@ object Config {
   object ui {
     val swingConsole = "swing-console"
     val swingIso = "swing-iso"
+    val glIso = "gl-iso"
   }
   
   val uis = List(
     ui.swingConsole,
-    ui.swingIso
+    ui.swingIso,
+    ui.glIso
   )
   
   object engine {

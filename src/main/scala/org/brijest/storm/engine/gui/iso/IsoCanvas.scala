@@ -21,7 +21,9 @@ import org.scalapool._
 trait Canvas {
   type Img
   
-  def imageFromPngStream(stream: java.io.InputStream): Img
+  def palette: Palette[Img]
+  
+  def imageFromPngStream(stream: java.io.InputStream) = palette.newImageFromPngStream(stream)
   
   trait DrawAdapter {
     def setColor(r: Int, g: Int, b: Int)
@@ -387,8 +389,6 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   def maxPlanarWidth(mapsz: Int) = iso2planar(mapsz, 0, 0, mapsz)._1 + slotwidth
   
   def maxPlanarHeight(mapsz: Int) = iso2planar(mapsz, mapsz, 0, mapsz)._2 + slotheight
-  
-  def palette: Palette[Img]
   
   def background(area: AreaView) = stars
   

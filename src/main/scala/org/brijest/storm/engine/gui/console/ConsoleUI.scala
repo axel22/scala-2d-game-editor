@@ -18,6 +18,7 @@ import model._
 
 
 
+@deprecated("", "")
 class ConsoleUI(val shell: Shell with Buffers) extends UI {
 self =>
   import shell._
@@ -29,6 +30,8 @@ self =>
   def playerId_=(p: PlayerId) = synchronized { plid = p }
   
   /* drawing */
+  
+  def area: AreaView = null
   
   private def redraw(area: AreaView, s: Engine.State) = {
     uistate.Main.center(area)
