@@ -24,7 +24,7 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
   
   "IsoCanvas" should {
     
-    class TestIsoCanvas extends IsoCanvas(24) {
+    class TestIsoCanvas extends IsoCanvas(24) with SwingPaletteCanvas {
       val img = new BufferedImage(1280, 800, BufferedImage.TYPE_4BYTE_ABGR)
       
       class TestDrawingAdapter extends ImageDrawAdapter(img) with DrawAdapter
@@ -32,12 +32,10 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       drawing.background = false
       drawing.indices = false
       
-      type Img = java.awt.Image
       def palette = new DefaultSwingPalette
       def pos = (0, 0);
       def width = img.getWidth
       def height = img.getHeight
-      def imageFromPngStream(stream: java.io.InputStream) = javax.imageio.ImageIO.read(stream)
     }
     
     def equalImages(a: BufferedImage, b: BufferedImage, diffname: String): Boolean = {

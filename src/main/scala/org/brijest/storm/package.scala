@@ -10,6 +10,7 @@ package org.brijest
 
 
 
+import com.weiglewilczek._
 import collection._
 
 
@@ -29,6 +30,14 @@ package object storm {
     sys.exit(1)
     sys.error("unreachable")
   }
+  
+  /* logging */
+  
+  val Logger = slf4s.Logger
+  
+  type Logger = slf4s.Logger
+  
+  type Logging = slf4s.Logging
   
   /* pimps */
   
