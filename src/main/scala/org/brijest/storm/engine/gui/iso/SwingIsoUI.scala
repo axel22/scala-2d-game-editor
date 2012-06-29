@@ -19,7 +19,6 @@ import java.lang.ref.SoftReference
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.media.opengl._
-import javax.media.opengl.GLCanvas
 import org.brijest.storm.engine.model._
 
 
@@ -36,6 +35,30 @@ class SwingIsoUI(val name: String) extends IsoUI {
     peer.add(areadisplay)
     areadisplay.requestFocus()
   }
+  
+  areadisplay.addGLEventListener(new GLEventListener {
+    def display(drawable: GLAutoDrawable) {
+      val gl = drawable.getGL()
+      
+      gl.glBegin(GL.GL_TRIANGLES)
+      gl.glColor3f(1, 0, 0)
+      gl.glVertex2f(-1, -1)
+      gl.glColor3f(0, 1, 0)
+      gl.glVertex2f(0, 1)
+      gl.glColor3f(0, 0, 1)
+      gl.glVertex2f(1, -1)
+      gl.glEnd()
+    }
+
+    def init(drawable: GLAutoDrawable) {
+    }
+
+    def displayChanged(drawable: GLAutoDrawable, mode: Boolean, device: Boolean) {
+    }
+
+    def reshape(drawable: GLAutoDrawable, x: Int, y: Int, width: Int, height: Int) {
+    }
+  })
   
   // Component {
     // val canvas = new GLCanvas(caps)

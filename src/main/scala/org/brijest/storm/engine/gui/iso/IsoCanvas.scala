@@ -232,7 +232,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       // draw terrain tile
       def frame = if (!tile.animated) random(xp, yp) % tile.frames else 0
       drawImage(tile.image(frame), up, vp, up + tile.width, vp + tile.height, tile.xoffset, tile.yoffset, tile.xoffset + tile.width, tile.yoffset + tile.height)
-      // drawString(frame + "", up, vp)
+      //drawString(frame + "", up, vp)
     }
   }
   
