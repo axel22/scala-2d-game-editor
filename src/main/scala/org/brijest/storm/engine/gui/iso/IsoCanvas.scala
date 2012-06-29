@@ -21,8 +21,6 @@ import org.scalapool._
 trait Canvas {
   type Img
   
-  def imageFromPngStream(stream: java.io.InputStream): Img
-  
   trait DrawAdapter {
     def setColor(r: Int, g: Int, b: Int)
     def setFontSize(sz: Float)
@@ -45,7 +43,7 @@ trait Canvas {
 }
 
 
-abstract class IsoCanvas(val slotheight: Int) extends Canvas {
+abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas {
   lazy val stars = imageFromPngStream(pngStream("stars"))
   val deppool: singlethread.FreeList[DepNode] = new singlethread.FreeList(new DepNode)({ _.reset() }) {
     override def allocate() = {
@@ -232,7 +230,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
       // draw terrain tile
       def frame = if (!tile.animated) random(xp, yp) % tile.frames else 0
       drawImage(tile.image(frame), up, vp, up + tile.width, vp + tile.height, tile.xoffset, tile.yoffset, tile.xoffset + tile.width, tile.yoffset + tile.height)
-      // drawString(frame + "", up, vp)
+      //drawString(frame + "", up, vp)
     }
   }
   
@@ -387,8 +385,6 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas {
   def maxPlanarWidth(mapsz: Int) = iso2planar(mapsz, 0, 0, mapsz)._1 + slotwidth
   
   def maxPlanarHeight(mapsz: Int) = iso2planar(mapsz, mapsz, 0, mapsz)._2 + slotheight
-  
-  def palette: Palette[Img]
   
   def background(area: AreaView) = stars
   

@@ -20,6 +20,8 @@ object StormEnroute {
     val config = new Config
     val parser = new ConfigParser(config)
     
+    Initializer.default()
+    
     if (parser.parse(args)) {
       val c = Initializer(config)
       c.awaitTermination()

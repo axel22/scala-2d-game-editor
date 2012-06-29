@@ -76,20 +76,20 @@ object Scripts {
   
   def editor(jars: Seq[String]) =
     """#!/bin/sh
-  BASEDIR=`dirname $0`
-  JARS=%s
-  java -server -classpath $JARS %s org.brijest.storm.Editor "$@"
-  """.format(
+BASEDIR=`dirname $0`
+JARS=%s
+java -server -classpath $JARS %s org.brijest.storm.Editor "$@"
+""".format(
     jars.map("$BASEDIR/lib/" + _).mkString(":"),
     flags
   )
   
   def pngtext(jars: Seq[String]) =
     """#!/bin/sh
-  BASEDIR=`dirname $0`
-  JARS=%s
-  java -server -classpath $JARS org.brijest.storm.tools.PngText "$@"
-  """.format(
+BASEDIR=`dirname $0`
+JARS=%s
+java -server -classpath $JARS org.brijest.storm.tools.PngText "$@"
+""".format(
     jars.map("$BASEDIR/lib/" + _).mkString(":")
   )
   

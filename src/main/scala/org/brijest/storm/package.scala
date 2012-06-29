@@ -59,6 +59,21 @@ package object storm {
       this.indices(true)
       this.background(true)
     }
+    
+    object sys {
+      
+      object props {
+        def apply(name: String) = scala.sys.props(name)
+        
+        def update(name: String, value: String) {
+          scala.sys.props(name) = value
+          
+          val fieldSysPath = classOf[ClassLoader].getDeclaredField("sys_paths");
+          fieldSysPath.setAccessible( true );
+          fieldSysPath.set( null, null );
+        }
+      }
+    }
   }
   
 }
