@@ -23,7 +23,7 @@ import org.brijest.storm.engine.model._
 
 
 
-class SwingIsoUI(val name: String) extends IsoUI {
+class SwingIsoUI(val name: String) extends IsoUI with SwingPaletteCanvas {
   var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
   val areadisplay = new AreaDisplay
   
@@ -66,8 +66,6 @@ class SwingIsoUI(val name: String) extends IsoUI {
   }
   
   val palette = new DefaultSwingPalette
-  
-  type Img = java.awt.image.BufferedImage
   
   class SwingDrawAdapter extends ImageDrawAdapter(buffer) with DrawAdapter
   

@@ -21,10 +21,6 @@ import org.scalapool._
 trait Canvas {
   type Img
   
-  def palette: Palette[Img]
-  
-  def imageFromPngStream(stream: java.io.InputStream) = palette.newImageFromPngStream(stream)
-  
   trait DrawAdapter {
     def setColor(r: Int, g: Int, b: Int)
     def setFontSize(sz: Float)
@@ -47,7 +43,7 @@ trait Canvas {
 }
 
 
-abstract class IsoCanvas(val slotheight: Int) extends Canvas {
+abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas {
   lazy val stars = imageFromPngStream(pngStream("stars"))
   val deppool: singlethread.FreeList[DepNode] = new singlethread.FreeList(new DepNode)({ _.reset() }) {
     override def allocate() = {
