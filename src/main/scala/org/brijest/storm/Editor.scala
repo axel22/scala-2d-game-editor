@@ -49,7 +49,6 @@ class EditorConfigParser(config: Config) extends DefaultParser(app.command) {
 class Editor(config: Config)
 extends GLIsoUI(app.editorname) {
   val area = Area.emptyDungeon(config.area.width, config.area.height)
-  var lastpress = new java.awt.Point(0, 0)
   val refresher = new Thread {
     override def run() = while (true) {
       areadisplay.repaint()
@@ -61,9 +60,45 @@ extends GLIsoUI(app.editorname) {
   engine = Some(org.brijest.storm.engine.IdleEngine)
   refresh(area, engine.get)
   
+  /* events */
   
+  var lastpress = (0, 0);
+  var mode = 'none
   
-  /* event handlers for the swing ui */
+  def onMiddleDrag(p: (Int, Int)) {
+    pos = ((pos._1 + lastpress._1 - p._1).toInt, (pos._2 + lastpress._2 - p._2).toInt);
+    lastpress = p
+  }
+  
+  def onMiddlePress(p: (Int, Int)) {
+    lastpress = p
+    mode = 'drag
+  }
+  
+  def onMiddleRelease(p: (Int, Int)) {
+    mode = 'none
+  }
+  
+  /* awt events */
+  
+  import java.awt.event._
+  
+  areadisplay.addMouseListener(new MouseAdapter {
+    override def mousePressed(me: MouseEvent) {
+      if (me.getButton == MouseEvent.BUTTON2) onMiddlePress((me.getX, me.getY))
+    }
+    override def mouseReleased(me: MouseEvent) {
+      if (me.getButton == MouseEvent.BUTTON2) onMiddleRelease((me.getX, me.getY))
+    }
+  })
+  
+  areadisplay.addMouseMotionListener(new MouseMotionAdapter {
+    override def mouseDragged(me: MouseEvent) {
+      if (mode == 'drag) onMiddleDrag((me.getX, me.getY))
+    }
+  })
+  
+  /* former event handlers for the swing ui */
   
   // areadisplay.listenTo(areadisplay.mouse.clicks)
   // areadisplay.listenTo(areadisplay.mouse.moves)
