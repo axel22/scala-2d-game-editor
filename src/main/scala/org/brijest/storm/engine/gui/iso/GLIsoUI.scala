@@ -19,6 +19,7 @@ import java.lang.ref.SoftReference
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.media.opengl._
+import javax.media.opengl.glu.GLU
 import com.sun.opengl.util.GLUT
 import org.brijest.storm.engine.model._
 
@@ -28,7 +29,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   
   class AreaDisplay extends GLCanvas(caps)
   
-  var timesResized = 0L
+  var resizestamp = 0L
   val caps = new GLCapabilities()
   var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
   val areadisplay = new AreaDisplay
@@ -42,21 +43,21 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     def display(drawable: GLAutoDrawable) {
       val gl = drawable.getGL()
       
-      // copy the drawing buffer
       if (cachedarea != null) {
         redraw(cachedarea, null, new GLAutoDrawableDrawAdapter(drawable))
       }
     }
-
+    
     def init(drawable: GLAutoDrawable) {
-      timesResized += 1
+      resizestamp += 1
+      initShadowMap(drawable)
     }
-
+    
     def displayChanged(drawable: GLAutoDrawable, mode: Boolean, device: Boolean) {
     }
-
+    
     def reshape(drawable: GLAutoDrawable, x: Int, y: Int, width: Int, height: Int) {
-      timesResized += 1
+      resizestamp += 1
     }
   })
   
@@ -87,6 +88,82 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   
   val palette = new DefaultGLPalette
   
+  /* shadows */
+  
+  val SHADOW_TEX_SIZE = 1024
+  var pbuffer: GLPbuffer = null
+  
+  private def initShadowMap(drawable: GLAutoDrawable) {
+    if (pbuffer != null) {
+      pbuffer.destroy()
+      pbuffer = null
+    }
+    pbuffer = GLDrawableFactory.getFactory.createGLPbuffer(caps, null, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, drawable.getContext)
+  }
+  
+  private def drawScene(area: AreaView, engine: Engine.State, a: DrawAdapter, gl: GL) {
+    import gl._
+    import GL._
+    
+    def drawCube(x: Int, y: Int) {
+      val slot = area.terrain(x, y)
+      val hgt = slot.height
+      if (hgt == 0) return
+      
+      glBegin(GL_QUADS)
+      
+      glVertex3f(x - 0.5f, y - 0.5f, hgt)
+      glVertex3f(x - 0.5f, y + 0.5f, hgt)
+      glVertex3f(x + 0.5f, y + 0.5f, hgt)
+      glVertex3f(x + 0.5f, y - 0.5f, hgt)
+      
+      // glVertex3f(x - 0.5f, y - 0.5f, hgt)
+      // glVertex3f(x - 0.5f, y + 0.5f, hgt)
+      // glVertex3f(x + 0.5f, y + 0.5f, hgt)
+      // glVertex3f(x + 0.5f, y - 0.5f, hgt)
+      
+      glEnd()
+    }
+    
+    var x = 0
+    var y = 0
+    while (y < area.terrain.dimensions._2) {
+      while (x < area.terrain.dimensions._1) {
+        drawCube(x, y)
+        x += 1
+      }
+      y += 1
+      x = 0
+    }
+  }
+  
+  override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
+    super.redraw(area, engine, a)
+    val gl = a.asInstanceOf[GLAutoDrawableDrawAdapter].gl
+    val glu = new GLU
+    import gl._
+    import GL._
+    
+    glClear(GL_DEPTH_BUFFER_BIT)
+    glEnable(GL_DEPTH_TEST)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    //glOrtho(0.0f, areadisplay.getWidth, areadisplay.getHeight, 0.0f, 0.0f, 1.0f)
+    val wdt = areadisplay.getWidth / 60
+    val hgt = -areadisplay.getHeight / 60
+    glOrtho(-wdt, wdt, -hgt, hgt, -30, 100.0)
+    
+    // val widthHeightRatio = areadisplay.getWidth.toFloat / areadisplay.getHeight
+    //gluOrtho2D(-(float)w/h, (float)w/h, -1.0, 1.0);
+    // glu.gluPerspective(45, widthHeightRatio, 1, 1000)
+    glu.gluLookAt(40.f, 40.f, 30.f, 0, 0, 0, 0, 0, 1)
+    
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+    
+    drawScene(area, engine, a, gl)
+  }
+  
   class GLAutoDrawableDrawAdapter(drawable: GLAutoDrawable) extends DrawAdapter {
     val gl = drawable.getGL
     val glut = new GLUT
@@ -98,25 +175,31 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glOrtho(0, drawable.getWidth, drawable.getHeight, 0, 0, 1)
     glMatrixMode(GL_MODELVIEW)
     glDisable(GL_DEPTH_TEST)
-    gl.glEnable(GL.GL_BLEND)
-    gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     
     def drawLine(x1: Int, y1: Int, x2: Int, y2: Int) {
+      // TODO fix
       glBegin(GL_LINES)
       glVertex3f(x1, y1, 0)
       glVertex3f(x2, y2, 0)
       glEnd()
     }
+    
     def setColor(r: Int, g: Int, b: Int) {
       glColor3ub(r.toByte, g.toByte, b.toByte)
     }
+    
     def drawString(s: String, x: Int, y: Int) {
+      // TODO fix
       glRasterPos2i(x, y);
       glut.glutBitmapString(GLUT.BITMAP_HELVETICA_10, s)
     }
+    
     def setFontSize(sz: Float) {
       // TODO
     }
+    
     def drawPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
       glBegin(GL_LINES)
       var i = 0
@@ -128,6 +211,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
       }
       glEnd()
     }
+    
     def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int) {
       glBegin(GL_POLYGON)
       var i = 0
@@ -137,19 +221,21 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
       }
       glEnd()
     }
+    
     def drawImage(image: Img, dx1: Int, dy1: Int, dx2: Int, dy2: Int, sx1: Int, sy1: Int, sx2: Int, sy2: Int) {
       val w = image.width
       val h = image.height
       
-      image.cache(timesResized, drawable.getGL)
+      image.cache(resizestamp, gl)
       
       val left = 100
       val top = 100
       
-      glEnable(GL.GL_TEXTURE_2D)
+      glEnable(GL_TEXTURE_2D)
       
-      glBindTexture(GL.GL_TEXTURE_2D, image.texno)
-      glBegin(GL.GL_POLYGON)
+      glBindTexture(GL_TEXTURE_2D, image.texno)
+      
+      glBegin(GL_POLYGON)
       
       val tx1 = 1.0 * sx1 / image.width
       val ty1 = 1.0 * sy1 / image.height
@@ -164,14 +250,17 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
       glVertex2d(dx2, dy2)
       glTexCoord2d(tx1, ty2)
       glVertex2d(dx1, dy2)
+      
       glEnd()
+      
+      glDisable(GL_TEXTURE_2D)
     }
+    
     def fillRect(x1: Int, y1: Int, w: Int, h: Int) {
       // TODO
     }
+    
   }
-
-
   
 }
 
