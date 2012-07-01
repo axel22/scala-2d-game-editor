@@ -26,6 +26,10 @@ class AreaView extends Struct with MutableEvidence {
   
   def sidelength = terrain.dimensions._1 max terrain.dimensions._2
   
+  def width = terrain.dimensions._1
+  
+  def height = terrain.dimensions._2
+  
   def contains(x: Int, y: Int) = {
     val d = terrain.dimensions
     x >= 0 && y >= 0 && x < d._1 && y < d._2

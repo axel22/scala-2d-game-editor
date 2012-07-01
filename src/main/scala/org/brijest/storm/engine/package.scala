@@ -30,6 +30,7 @@ package object engine {
     val time = System.currentTimeMillis - t1
     time
   }
-
+  
+  def interval(l1: Int, l2: Int)(x: Int) = math.max(l1, math.min(l2, x))
   
 }

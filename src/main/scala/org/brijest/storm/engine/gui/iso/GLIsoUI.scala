@@ -67,9 +67,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   
   /* implementations */
   
-  def width: Int = frame.size.width
+  def width: Int = areadisplay.getWidth
   
-  def height: Int = frame.size.height
+  def height: Int = areadisplay.getHeight
   
   def refresh(area: AreaView, state: Engine.State) = this.synchronized {
     cachedarea = area
@@ -101,42 +101,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     pbuffer = GLDrawableFactory.getFactory.createGLPbuffer(caps, null, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, drawable.getContext)
   }
   
-  private def drawScene(area: AreaView, engine: Engine.State, a: DrawAdapter, gl: GL) {
-    import gl._
-    import GL._
-    
-    def drawCube(x: Int, y: Int) {
-      val slot = area.terrain(x, y)
-      val hgt = slot.height
-      if (hgt == 0) return
-      
-      glBegin(GL_QUADS)
-      
-      glVertex3f(x - 0.5f, y - 0.5f, hgt)
-      glVertex3f(x - 0.5f, y + 0.5f, hgt)
-      glVertex3f(x + 0.5f, y + 0.5f, hgt)
-      glVertex3f(x + 0.5f, y - 0.5f, hgt)
-      
-      // glVertex3f(x - 0.5f, y - 0.5f, hgt)
-      // glVertex3f(x - 0.5f, y + 0.5f, hgt)
-      // glVertex3f(x + 0.5f, y + 0.5f, hgt)
-      // glVertex3f(x + 0.5f, y - 0.5f, hgt)
-      
-      glEnd()
-    }
-    
-    var x = 0
-    var y = 0
-    while (y < area.terrain.dimensions._2) {
-      while (x < area.terrain.dimensions._1) {
-        drawCube(x, y)
-        x += 1
-      }
-      y += 1
-      x = 0
-    }
-  }
-  
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     super.redraw(area, engine, a)
     val gl = a.asInstanceOf[GLAutoDrawableDrawAdapter].gl
@@ -144,27 +108,75 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     import gl._
     import GL._
     
+    val (u0, v0) = pos
+    val pw = width
+    val ph = height + area.maxheight() * levelheight + palette.maxSpriteHeight
+    val (xtl, ytl) = planar2iso(u0, v0, area.sidelength)
+    val (xtr, ytr) = planar2iso(u0 + pw, v0, area.sidelength)
+    val (xbr, ybr) = planar2iso(u0 + pw, v0 + ph, area.sidelength)
+    val (xbl, ybl) = planar2iso(u0, v0 + ph, area.sidelength)
+    val xmid = (xtl + xbr) / 2
+    val ymid = (ytr + ybl) / 2
+    val xfrom = interval(0, area.width)(xtl.toInt)
+    val xuntil = interval(0, area.width)(xbr.toInt)
+    val yfrom = interval(0, area.height)(ytr.toInt)
+    val yuntil = interval(0, area.height)(ybl.toInt)
+    
+    def drawScene() {
+      def drawCube(x: Int, y: Int) {
+        val slot = area.terrain(x, y)
+        val hgt = slot.height
+        //if (hgt == 0) return
+        
+        glBegin(GL_QUADS)
+        
+        glVertex3d(x - 0.5f, y - 0.5f, hgt * 0.55)
+        glVertex3d(x - 0.5f, y + 0.5f, hgt * 0.55)
+        glVertex3d(x + 0.5f, y + 0.5f, hgt * 0.55)
+        glVertex3d(x + 0.5f, y - 0.5f, hgt * 0.55)
+        
+        // glVertex3f(x - 0.5f, y - 0.5f, hgt)
+        // glVertex3f(x - 0.5f, y + 0.5f, hgt)
+        // glVertex3f(x + 0.5f, y + 0.5f, hgt)
+        // glVertex3f(x + 0.5f, y - 0.5f, hgt)
+        
+        glEnd()
+      }
+      
+      var x = xfrom
+      var y = yfrom
+      while (y < yuntil) {
+        while (x < xuntil) {
+          drawCube(x, y)
+          x += 1
+        }
+        y += 1
+        x = 0
+      }
+    }
+    
     glClear(GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    //glOrtho(0.0f, areadisplay.getWidth, areadisplay.getHeight, 0.0f, 0.0f, 1.0f)
-    val wdt = areadisplay.getWidth / 60
-    val hgt = -areadisplay.getHeight / 60
-    glOrtho(-wdt, wdt, -hgt, hgt, -30, 100.0)
     
-    // val widthHeightRatio = areadisplay.getWidth.toFloat / areadisplay.getHeight
-    //gluOrtho2D(-(float)w/h, (float)w/h, -1.0, 1.0);
-    // glu.gluPerspective(45, widthHeightRatio, 1, 1000)
-    glu.gluLookAt(40.f, 40.f, 30.f, 0, 0, 0, 0, 0, 1)
+    val wdt = width / (tileWidth * math.sqrt(2))
+    val hgt = height / (tileHeight * math.sqrt(2) * 2)
+    glOrtho(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
+    
+    val xlook = xmid - 14.35
+    val ylook = ymid - 13.35
+    val xyside = 100.f
+    val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
+    glu.gluLookAt(xlook + xyside, ylook + xyside, zcenter, xlook, ylook, 0, 0, 0, 1)
     
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     
-    drawScene(area, engine, a, gl)
+    drawScene()
   }
   
-  class GLAutoDrawableDrawAdapter(drawable: GLAutoDrawable) extends DrawAdapter {
+  class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {
     val gl = drawable.getGL
     val glut = new GLUT
     import gl._
