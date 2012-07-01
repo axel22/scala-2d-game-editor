@@ -205,13 +205,14 @@ trait PaletteCanvas extends Canvas {
 
 
 trait GLPaletteCanvas extends PaletteCanvas {
-
-  case class Img(texno: Int)(val width: Int, val height: Int, val data: ByteBuffer) {
+  case class Img()(val width: Int, val height: Int, val data: ByteBuffer) {
     private var stamp = -1L
+    var texno = -1
     
     def cache(newstamp: Long, gl: GL) = if (stamp != newstamp) {
       // TODO free resources
-      gl.glBindTexture(GL.GL_TEXTURE_2D, texno)
+      gl.glGenTextures(1, texptr, 0)
+      gl.glBindTexture(GL.GL_TEXTURE_2D, texptr(0))
       gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1)
       gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP)
       gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP)
@@ -220,10 +221,11 @@ trait GLPaletteCanvas extends PaletteCanvas {
       gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE)
       gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, data)
       stamp = newstamp
+      texno = texptr(0)
     }
   }
   
-  var textureCount = 0
+  val texptr = new Array[Int](1)
   
   final class DefaultGLPalette extends DefaultPalette {
     
@@ -261,9 +263,7 @@ trait GLPaletteCanvas extends PaletteCanvas {
       data.position(0)
       data.mark()
       
-      textureCount += 1
-      
-      Img(textureCount)(w, h, data)
+      Img()(w, h, data)
     }
     
     def width(img: Img) = img.width

@@ -90,19 +90,37 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = 1024
+  val SHADOW_TEX_SIZE = 512
   var pbuffer: GLPbuffer = null
+  val shadowtexno = new Array[Int](1)
+  val lightprojmatrix = new Array[Float](16)
+  val lightviewmatrix = new Array[Float](16)
+  val camprojmatrix = new Array[Float](16)
+  val camviewmatrix = new Array[Float](16)
+  val shadowtexmatrix = new Array[Float](16)
+  val biasmatrix = Array[Float](
+    0.5f, 0.f, 0.f, 0.f,
+    0.f, 0.5f, 0.f, 0.f,
+    0.f, 0.f, 0.5f, 0.f,
+    0.5f, 0.5f, 0.5f, 1.f
+  )
   
   private def initShadowMap(drawable: GLAutoDrawable) {
-    if (pbuffer != null) {
-      pbuffer.destroy()
-      pbuffer = null
-    }
-    pbuffer = GLDrawableFactory.getFactory.createGLPbuffer(caps, null, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, drawable.getContext)
+    val gl = drawable.getGL()
+    import gl._
+    import GL._
+    
+    glGenTextures(1, shadowtexno, 0)
+    glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
+                 GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, null)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
-    super.redraw(area, engine, a)
     val gl = a.asInstanceOf[GLAutoDrawableDrawAdapter].gl
     val glu = new GLU
     import gl._
@@ -121,24 +139,46 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     val xuntil = interval(0, area.width)(xbr.toInt)
     val yfrom = interval(0, area.height)(ytr.toInt)
     val yuntil = interval(0, area.height)(ybl.toInt)
+    val xlook = xmid - 14.35
+    val ylook = ymid - 13.35
     
     def drawScene() {
       def drawCube(x: Int, y: Int) {
         val slot = area.terrain(x, y)
-        val hgt = slot.height
-        //if (hgt == 0) return
+        val hgt = slot.height * 0.55f
         
         glBegin(GL_QUADS)
         
-        glVertex3d(x - 0.5f, y - 0.5f, hgt * 0.55)
-        glVertex3d(x - 0.5f, y + 0.5f, hgt * 0.55)
-        glVertex3d(x + 0.5f, y + 0.5f, hgt * 0.55)
-        glVertex3d(x + 0.5f, y - 0.5f, hgt * 0.55)
+        /* top */
         
-        // glVertex3f(x - 0.5f, y - 0.5f, hgt)
-        // glVertex3f(x - 0.5f, y + 0.5f, hgt)
-        // glVertex3f(x + 0.5f, y + 0.5f, hgt)
-        // glVertex3f(x + 0.5f, y - 0.5f, hgt)
+        glVertex3d(x - 0.5f, y - 0.5f, hgt)
+        glVertex3d(x - 0.5f, y + 0.5f, hgt)
+        glVertex3d(x + 0.5f, y + 0.5f, hgt)
+        glVertex3d(x + 0.5f, y - 0.5f, hgt)
+        
+        /* sides */
+        
+        if (hgt > 0) {
+          glVertex3f(x - 0.5f, y + 0.5f, hgt)
+          glVertex3f(x - 0.5f, y + 0.5f, 0)
+          glVertex3f(x - 0.5f, y - 0.5f, 0)
+          glVertex3f(x - 0.5f, y - 0.5f, hgt)
+          
+          glVertex3f(x - 0.5f, y - 0.5f, hgt)
+          glVertex3f(x - 0.5f, y - 0.5f, 0)
+          glVertex3f(x + 0.5f, y - 0.5f, 0)
+          glVertex3f(x + 0.5f, y - 0.5f, hgt)
+          
+          glVertex3f(x + 0.5f, y - 0.5f, hgt)
+          glVertex3f(x + 0.5f, y - 0.5f, 0)
+          glVertex3f(x + 0.5f, y + 0.5f, 0)
+          glVertex3f(x + 0.5f, y + 0.5f, hgt)
+          
+          glVertex3f(x + 0.5f, y + 0.5f, hgt)
+          glVertex3f(x + 0.5f, y + 0.5f, 0)
+          glVertex3f(x - 0.5f, y + 0.5f, 0)
+          glVertex3f(x - 0.5f, y + 0.5f, hgt)
+        }
         
         glEnd()
       }
@@ -155,25 +195,154 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
       }
     }
     
-    glClear(GL_DEPTH_BUFFER_BIT)
+    glPushMatrix()
+    
+    /* calc matrices */
+    
+    val lightpos = (-100.f, 100.f, 100.f);
+    
+    def initLightMatrices() {
+      glLoadIdentity()
+      val wdt = width / 45
+      val hgt = height / 45
+      glOrtho(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
+      glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
+      
+      glLoadIdentity()
+      glu.gluLookAt(
+        xlook + lightpos._1, ylook + lightpos._2, lightpos._3,
+        xlook, ylook, 0.0f,
+        0.f, 0.f, 1.0f)
+      glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
+    }
+    
+    def initCamMatrices() {
+      glLoadIdentity()
+      val wdt = width / (tileWidth * math.sqrt(2))
+      val hgt = height / (tileHeight * math.sqrt(2) * 2)
+      glOrtho(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
+      glGetFloatv(GL_MODELVIEW_MATRIX, camprojmatrix, 0)
+      
+      glLoadIdentity()
+      val xyside = 100.f
+      val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
+      glu.gluLookAt(
+        xlook + xyside, ylook + xyside, zcenter,
+        xlook, ylook, 0,
+        0.f, 0.f, 1.f)
+      glGetFloatv(GL_MODELVIEW_MATRIX, camviewmatrix, 0)
+    }
+    
+    initLightMatrices()
+    initCamMatrices()
+    
+    def lightView() {
+      glMatrixMode(GL_PROJECTION)
+      glLoadMatrixf(lightprojmatrix, 0)
+      
+      glMatrixMode(GL_MODELVIEW)
+      glLoadMatrixf(lightviewmatrix, 0)
+    }
+    
+    def orthoView() {
+      glMatrixMode(GL_PROJECTION)
+      glLoadMatrixf(camprojmatrix, 0)
+      
+      glMatrixMode(GL_MODELVIEW)
+      glLoadMatrixf(camviewmatrix, 0)
+    }
+    
+    /* draw scene from light point of view and copy to the texture buffer */
+    
+    glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+    lightView()
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    
-    val wdt = width / (tileWidth * math.sqrt(2))
-    val hgt = height / (tileHeight * math.sqrt(2) * 2)
-    glOrtho(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
-    
-    val xlook = xmid - 14.35
-    val ylook = ymid - 13.35
-    val xyside = 100.f
-    val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
-    glu.gluLookAt(xlook + xyside, ylook + xyside, zcenter, xlook, ylook, 0, 0, 0, 1)
-    
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
     
     drawScene()
+    
+    glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+    
+    /* 2d draw scene */
+    
+    glPopMatrix()
+    glViewport(0, 0, width, height)
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(0, width, height, 0, 0, 1)
+    glMatrixMode(GL_MODELVIEW)
+    glDisable(GL_DEPTH_TEST)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    
+    super.redraw(area, engine, a)
+    
+    /* draw scene with shadows from camera point of view */
+    
+    def calcTextureMatrix() {
+      glPushMatrix()
+      
+      glLoadIdentity()
+      glLoadMatrixf(biasmatrix, 0)
+      glMultMatrixf(lightprojmatrix, 0)
+      glMultMatrixf(lightviewmatrix, 0)
+      glGetFloatv(GL_MODELVIEW_MATRIX, shadowtexmatrix, 0)
+      
+      glPopMatrix()
+    }
+    
+    calcTextureMatrix()
+    
+    glPushMatrix()
+    orthoView()
+    
+    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+    glTexGenfv(GL_S, GL_EYE_PLANE, shadowtexmatrix, 0)
+    glEnable(GL_TEXTURE_GEN_S)
+    
+    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+    glTexGenfv(GL_T, GL_EYE_PLANE, shadowtexmatrix, 3)
+    glEnable(GL_TEXTURE_GEN_T)
+    
+    glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+    glTexGenfv(GL_R, GL_EYE_PLANE, shadowtexmatrix, 6)
+    glEnable(GL_TEXTURE_GEN_R)
+    
+    glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+    glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 9)
+    glEnable(GL_TEXTURE_GEN_Q)
+    
+    glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+    glEnable(GL_TEXTURE_2D)
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE)
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC_ARB, GL_LEQUAL)
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_INTENSITY)
+    
+    glAlphaFunc(GL_GEQUAL, 0.99f)
+    glEnable(GL_ALPHA_TEST)
+    
+    drawScene()
+    
+    glDisable(GL_TEXTURE_2D)
+    
+    glDisable(GL_TEXTURE_GEN_S)
+    glDisable(GL_TEXTURE_GEN_T)
+    glDisable(GL_TEXTURE_GEN_R)
+    glDisable(GL_TEXTURE_GEN_Q)
+    
+    glDisable(GL_LIGHTING)
+    glDisable(GL_ALPHA_TEST)
+    
+    /* reset */
+    
+    glPopMatrix()
   }
   
   class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {
