@@ -78,7 +78,7 @@ object Scripts {
     """#!/bin/sh
 BASEDIR=`dirname $0`
 JARS=%s
-java -server -classpath $JARS %s org.brijest.storm.Editor "$@"
+java -d32 -server -classpath $JARS %s org.brijest.storm.Editor "$@"
 """.format(
     jars.map("$BASEDIR/lib/" + _).mkString(":"),
     flags

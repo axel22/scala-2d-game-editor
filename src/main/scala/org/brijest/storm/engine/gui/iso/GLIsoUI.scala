@@ -104,6 +104,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     0.5f, 0.5f, 0.5f, 1.f
   )
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
+  var debugcount = 0l
   
   private def initShadowMap(drawable: GLAutoDrawable) {
     val gl = drawable.getGL()
@@ -119,7 +120,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE)
+      glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
                  GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, null)
   }
   
@@ -255,11 +258,45 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
       glLoadMatrixf(camviewmatrix, 0)
     }
     
+    def debugTexture() {
+      glPushMatrix()
+      glEnable(GL_TEXTURE_2D)
+      glEnable(GL_DEPTH_TEST)
+      glColor4f(1.0f,1.0f,1.0f,1.0f)
+      glEnable(GL_BLEND)
+      glBlendFunc(GL_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
+      
+      glMatrixMode(GL_PROJECTION)
+      glLoadIdentity()
+      glOrtho(0, width, height, 0, 0, 1)
+      glMatrixMode(GL_MODELVIEW)
+      glDisable(GL_DEPTH_TEST)
+      glEnable(GL_BLEND)
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
+      
+      glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+      
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
+      glTexCoord2f(0, 1); glVertex3f(0, width / 4, 0);
+      glTexCoord2f(1, 1); glVertex3f(width / 4, width / 4, 0);
+      glTexCoord2f(1, 0); glVertex3f(width / 4, 0, 0);
+      glEnd();
+      
+      glDisable(GL_DEPTH_TEST)
+      glDisable(GL_TEXTURE_2D)
+      glPopMatrix()
+    }
+    
     /* draw scene from light point of view and copy to the texture buffer */
     
     glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
     lightView()
     
+    glColor3f(1.f, 1.f, 1.f)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
     
@@ -273,7 +310,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glPopMatrix()
     glViewport(0, 0, width, height)
     
-    //glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+    glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glMatrixMode(GL_PROJECTION)
@@ -287,6 +324,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     super.redraw(area, engine, a)
     
     //glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+    
+    debugTexture()
     
     /* draw scene with shadows from camera point of view */
     
@@ -312,30 +351,33 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glEnable(GL_TEXTURE_GEN_S)
     
     glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-    glTexGenfv(GL_T, GL_EYE_PLANE, shadowtexmatrix, 3)
+    glTexGenfv(GL_T, GL_EYE_PLANE, shadowtexmatrix, 4)
     glEnable(GL_TEXTURE_GEN_T)
     
     glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-    glTexGenfv(GL_R, GL_EYE_PLANE, shadowtexmatrix, 6)
+    glTexGenfv(GL_R, GL_EYE_PLANE, shadowtexmatrix, 8)
     glEnable(GL_TEXTURE_GEN_R)
     
     glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-    glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 9)
+    glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 12)
     glEnable(GL_TEXTURE_GEN_Q)
     
     glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+    
     glEnable(GL_TEXTURE_2D)
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE)
-    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC_ARB, GL_LEQUAL)
-    
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_INTENSITY)
     
     glAlphaFunc(GL_GEQUAL, 0.99f)
-    //glEnable(GL_ALPHA_TEST)
+    glEnable(GL_ALPHA_TEST)
     
     drawScene()
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC_ARB, GL_NONE)
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_NONE)
     
     glDisable(GL_TEXTURE_2D)
     
@@ -344,12 +386,12 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glDisable(GL_TEXTURE_GEN_R)
     glDisable(GL_TEXTURE_GEN_Q)
     
-    glDisable(GL_LIGHTING)
-    //glDisable(GL_ALPHA_TEST)
+    glDisable(GL_ALPHA_TEST)
     
     /* reset */
     
     glPopMatrix()
+    debugcount += 1
   }
   
   class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {

@@ -63,7 +63,7 @@ package object storm {
     }
     
     object render extends PropMap {
-      this.outline(true)
+      this.outline(false)
       this.seethrough(false)
       this.indices(true)
       this.background(true)
