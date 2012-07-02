@@ -104,7 +104,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     0.5f, 0.5f, 0.5f, 1.f
   )
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
-  var debugcount = 0l
   
   private def initShadowMap(drawable: GLAutoDrawable) {
     val gl = drawable.getGL()
@@ -120,8 +119,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE)
-      glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
                  GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, null)
   }
@@ -156,14 +153,12 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
         glBegin(GL_QUADS)
         
         /* top */
-        
         glVertex3d(x - 0.5f, y - 0.5f, hgt)
         glVertex3d(x - 0.5f, y + 0.5f, hgt)
         glVertex3d(x + 0.5f, y + 0.5f, hgt)
         glVertex3d(x + 0.5f, y - 0.5f, hgt)
         
         /* sides */
-        
         if (hgt > 0) {
           glVertex3f(x - 0.5f, y + 0.5f, hgt)
           glVertex3f(x - 0.5f, y + 0.5f, 0)
@@ -281,8 +276,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
       
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
-      glTexCoord2f(0, 1); glVertex3f(0, width / 4, 0);
-      glTexCoord2f(1, 1); glVertex3f(width / 4, width / 4, 0);
+      glTexCoord2f(0, 1); glVertex3f(0, height / 4, 0);
+      glTexCoord2f(1, 1); glVertex3f(width / 4, height / 4, 0);
       glTexCoord2f(1, 0); glVertex3f(width / 4, 0, 0);
       glEnd();
       
@@ -310,7 +305,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glPopMatrix()
     glViewport(0, 0, width, height)
     
-    glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+    //glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glMatrixMode(GL_PROJECTION)
@@ -391,7 +386,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     /* reset */
     
     glPopMatrix()
-    debugcount += 1
   }
   
   class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {
