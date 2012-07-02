@@ -112,12 +112,15 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     glGenTextures(1, shadowtexno, 0)
     glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
-                 GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, null)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
+                 GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, null)
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
@@ -330,7 +333,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_INTENSITY)
     
     glAlphaFunc(GL_GEQUAL, 0.99f)
-    glEnable(GL_ALPHA_TEST)
+    //glEnable(GL_ALPHA_TEST)
     
     drawScene()
     
@@ -342,7 +345,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glDisable(GL_TEXTURE_GEN_Q)
     
     glDisable(GL_LIGHTING)
-    glDisable(GL_ALPHA_TEST)
+    //glDisable(GL_ALPHA_TEST)
     
     /* reset */
     
