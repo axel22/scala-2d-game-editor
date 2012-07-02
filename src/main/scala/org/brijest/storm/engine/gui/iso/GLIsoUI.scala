@@ -91,7 +91,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   /* shadows */
   
   val SHADOW_TEX_SIZE = 512
-  var pbuffer: GLPbuffer = null
   val shadowtexno = new Array[Int](1)
   val lightprojmatrix = new Array[Float](16)
   val lightviewmatrix = new Array[Float](16)
@@ -104,6 +103,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     0.f, 0.f, 0.5f, 0.f,
     0.5f, 0.5f, 0.5f, 1.f
   )
+  lazy val debugscreen = new Array[Byte](width * height * 4)
   
   private def initShadowMap(drawable: GLAutoDrawable) {
     val gl = drawable.getGL()
@@ -199,7 +199,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     /* calc matrices */
     
-    val lightpos = (-100.f, 100.f, 100.f);
+    val lightpos = (-100.f, 100.f, 65.f);
     
     def initLightMatrices() {
       glLoadIdentity()
@@ -270,7 +270,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glPopMatrix()
     glViewport(0, 0, width, height)
     
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     glOrtho(0, width, height, 0, 0, 1)
@@ -279,7 +279,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     
-    super.redraw(area, engine, a)
+    glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+    //super.redraw(area, engine, a)
+    glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
     
     /* draw scene with shadows from camera point of view */
     
@@ -328,7 +330,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glAlphaFunc(GL_GEQUAL, 0.99f)
     glEnable(GL_ALPHA_TEST)
     
-    drawScene()
+    //drawScene()
     
     glDisable(GL_TEXTURE_2D)
     
