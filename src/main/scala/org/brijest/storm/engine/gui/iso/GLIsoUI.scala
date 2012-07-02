@@ -103,7 +103,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     0.f, 0.f, 0.5f, 0.f,
     0.5f, 0.5f, 0.5f, 1.f
   )
-  lazy val debugscreen = new Array[Byte](width * height * 4)
+  lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
   
   private def initShadowMap(drawable: GLAutoDrawable) {
     val gl = drawable.getGL()
@@ -199,13 +199,13 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     /* calc matrices */
     
-    val lightpos = (-100.f, 100.f, 65.f);
+    val lightpos = (-10.f, 10.f, 6.5f);
     
     def initLightMatrices() {
       glLoadIdentity()
       val wdt = width / 45
       val hgt = height / 45
-      glOrtho(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
+      glOrtho(wdt, -wdt, -hgt, hgt, -45.0, 45.0)
       glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
       
       glLoadIdentity()
@@ -270,7 +270,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glPopMatrix()
     glViewport(0, 0, width, height)
     
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    //glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     glOrtho(0, width, height, 0, 0, 1)
@@ -279,9 +281,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     
-    glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
-    //super.redraw(area, engine, a)
-    glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+    super.redraw(area, engine, a)
+    
+    //glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
     
     /* draw scene with shadows from camera point of view */
     
@@ -330,7 +332,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glAlphaFunc(GL_GEQUAL, 0.99f)
     glEnable(GL_ALPHA_TEST)
     
-    //drawScene()
+    drawScene()
     
     glDisable(GL_TEXTURE_2D)
     
