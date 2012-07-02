@@ -121,6 +121,17 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
                  GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, null)
+    
+    glEnable(GL_NORMALIZE)
+    
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
+    glEnable(GL_COLOR_MATERIAL)
+    glMaterialfv(GL_FRONT, GL_SPECULAR, Array[Float](1.f, 1.f, 1.f, 1.f), 0)
+    glMaterialf(GL_FRONT, GL_SHININESS, 16.f)
+    
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+    
+    
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
