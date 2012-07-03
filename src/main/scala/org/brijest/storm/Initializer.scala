@@ -27,9 +27,9 @@ object Initializer extends Logging {
   private def unpackNativeLibs() {
     val os = sys.props("os.name")
     val natstr = os match {
-      case "Linux" => "linux-i586"
-      case "Mac OS X" => "macosx-universal"
-      case os if os.startsWith("Windows") => "windows-i586"
+      case "Linux" => "linux"
+      case "Mac OS X" => "macosx"
+      case os if os.startsWith("Windows") => "windows"
       case os => sys.error("Unknown OS: " + os)
     }
     val natext = os match {
