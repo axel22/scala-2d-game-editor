@@ -331,7 +331,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     //glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
     
-    debugTexture()
+    //debugTexture()
     
     /* draw scene with shadows from camera point of view */
     
@@ -384,7 +384,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC_ARB, GL_LEQUAL)
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_LUMINANCE)
     
-    glAlphaFunc(GL_GEQUAL, 0.999f)
+    glAlphaFunc(GL_GEQUAL, 0.99f)
     glEnable(GL_ALPHA_TEST)
     
     drawScene()
