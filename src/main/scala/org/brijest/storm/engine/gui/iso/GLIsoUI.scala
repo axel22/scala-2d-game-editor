@@ -171,20 +171,20 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
         
         /* sides */
         if (hgt > 0) {
-          glVertex3f(x - 0.5f, y + 0.5f, hgt)
+          glVertex3f(x - 0.5f, y - 0.5f, hgt)
+          glVertex3f(x - 0.5f, y - 0.5f, 0)
           glVertex3f(x - 0.5f, y + 0.5f, 0)
-          glVertex3f(x - 0.5f, y - 0.5f, 0)
-          glVertex3f(x - 0.5f, y - 0.5f, hgt)
+          glVertex3f(x - 0.5f, y + 0.5f, hgt)
           
           glVertex3f(x - 0.5f, y - 0.5f, hgt)
           glVertex3f(x - 0.5f, y - 0.5f, 0)
           glVertex3f(x + 0.5f, y - 0.5f, 0)
           glVertex3f(x + 0.5f, y - 0.5f, hgt)
           
-          glVertex3f(x + 0.5f, y - 0.5f, hgt)
-          glVertex3f(x + 0.5f, y - 0.5f, 0)
-          glVertex3f(x + 0.5f, y + 0.5f, 0)
           glVertex3f(x + 0.5f, y + 0.5f, hgt)
+          glVertex3f(x + 0.5f, y + 0.5f, 0)
+          glVertex3f(x + 0.5f, y - 0.5f, 0)
+          glVertex3f(x + 0.5f, y - 0.5f, hgt)
           
           glVertex3f(x - 0.5f, y + 0.5f, hgt)
           glVertex3f(x - 0.5f, y + 0.5f, 0)
@@ -211,7 +211,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     /* calc matrices */
     
-    val lightpos = (-5.f, 10.f, 7.5f);
+    val lightpos = (-4.f, 10.f, 7.f);
     
     def initLightMatrices() {
       glLoadIdentity()
@@ -299,9 +299,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     /* draw scene from light point of view and copy to the texture buffer */
     
-    glDisable(GL_CULL_FACE)
-    glCullFace(GL_BACK)
-    
     glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
     lightView()
     
@@ -329,7 +326,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glDisable(GL_DEPTH_TEST)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glDisable(GL_CULL_FACE)
     
     super.redraw(area, engine, a)
     
@@ -340,16 +336,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     /* draw scene with shadows from camera point of view */
     
     def calcTextureMatrix() {
-      // glPushMatrix()
-      
-      // glLoadIdentity()
-      // glLoadMatrixf(biasmatrix, 0)
-      // glMultMatrixf(lightprojmatrix, 0)
-      // glMultMatrixf(lightviewmatrix, 0)
-      // glGetFloatv(GL_MODELVIEW_MATRIX, shadowtexmatrix, 0)
-      
-      // glPopMatrix()
-      
       import Jama._
       
       val bi = new Matrix(4, 4)
@@ -390,12 +376,15 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     glEnable(GL_TEXTURE_2D)
     glEnable(GL_CULL_FACE)
+    glCullFace(GL_BACK)
+    glEnable(GL_DEPTH_TEST)
+    glClear(GL_DEPTH_BUFFER_BIT)
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC_ARB, GL_LEQUAL)
-    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_INTENSITY)
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_LUMINANCE)
     
-    glAlphaFunc(GL_GEQUAL, 0.9f)
+    glAlphaFunc(GL_GEQUAL, 0.999f)
     glEnable(GL_ALPHA_TEST)
     
     drawScene()
