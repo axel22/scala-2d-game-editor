@@ -29,9 +29,9 @@ libraryDependencies += "commons-io" % "commons-io" % "2.3"
 
 resolvers += MavenRepository("jogamp", "http://jogamp.org/deployment/maven")
 
-// libraryDependencies += "org.jogamp.jogl" % "jogl-all" % "2.0-rc9"
+libraryDependencies += "org.jogamp.jogl" % "jogl-all" % "2.0-rc9"
 
-// libraryDependencies += "org.jogamp.gluegen" % "gluegen-rt" % "2.0-rc9"
+libraryDependencies += "org.jogamp.gluegen" % "gluegen-rt" % "2.0-rc9"
 
 libraryDependencies ++= {
   val os = sys.props("os.name") match {
@@ -40,39 +40,20 @@ libraryDependencies ++= {
     case os if os.startsWith("Windows") => "windows"
     case os => sys.error("Cannot obtain lib for OS: " + os)
   }
-  val arch = if (os == "macosx") "universal" else sys.props("os.name") match {
+  val arch = if (os == "macosx") "universal" else sys.props("os.arch") match {
     case "amd64" => "amd64"
-    case "i586" => "i586"
+    case "i386" => "i586"
+    case "x86" => "i586"
     case arch => sys.error("Cannot obtain lib for arch: " + arch)
   }
-  val art = "/natives-" + os + "-" + arch
-  Seq(
-    "org.jogamp.jogl" % "jogl-all" % "2.0-rc10",
-    "org.jogamp.gluegen" % "gluegen-rt" % "2.0-rc10"
-  )
+  val vers = "2.0-rc9"
+  val suff = "-natives-" + os + "-" + arch
+  val jogampurl = "http://jogamp.org/deployment/maven/org/jogamp/"
+  val joglurl = jogampurl + "jogl/jogl-all/" + vers + "/" + "jogl-all-" + vers + suff + ".jar"
+  val jogl = "org.jogamp.jogl" % ("jogl-all" + suff) % vers from joglurl
+  val glueurl = jogampurl + "gluegen/gluegen-rt/" + vers + "/" + "gluegen-rt-" + vers + suff + ".jar"
+  val glue = "org.jogamp.gluegen" % ("gluegen-rt" + suff) % vers from glueurl
+  Seq(jogl, glue)
 }
 
-// old jogl version
-
-// libraryDependencies += "net.java.dev.jogl" % "jogl" % "1.1.1-rc6"
-
-// libraryDependencies += {
-//   sys.props("os.name") match {
-//     case "Linux" => "net.java.dev.jogl" % "jogl-linux-i586" % "1.1.1-rc6"
-//     case "Mac OS X" => "net.java.dev.jogl" % "jogl-macosx-universal" % "1.1.1-rc6"
-//     case os if os.startsWith("Windows") => "net.java.dev.jogl" % "jogl-windows-i586" % "1.1.1-rc6"
-//     case os => sys.error("Cannot build for OS: " + os)
-//   }
-// }
-
-// libraryDependencies += "net.java.dev.gluegen" % "gluegen-rt" % "1.0b05"
-
-// libraryDependencies += {
-//   sys.props("os.name") match {
-//     case "Linux" => "net.java.dev.gluegen" % "gluegen-rt-linux-i586" % "1.0b05"
-//     case "Mac OS X" => "net.java.dev.gluegen" % "gluegen-rt-macosx-universal" % "1.0b05"
-//     case os if os.startsWith("Windows") => "net.java.dev.gluegen" % "gluegen-rt-windows-i586" % "1.0b05"
-//     case os => sys.error("Cannot build for OS: " + os)
-//   }
-// }
 

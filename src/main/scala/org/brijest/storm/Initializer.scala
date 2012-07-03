@@ -62,6 +62,9 @@ object Initializer extends Logging {
     
     // unpack gluegen-rt and jogl native libs
     unpackNativeLibs()
+    
+    // init opengl
+    javax.media.opengl.GLProfile.initSingleton(true)
   }
   
   def apply(config: Config): Client = {

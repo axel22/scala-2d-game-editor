@@ -19,8 +19,15 @@ import java.lang.ref.SoftReference
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.media.opengl._
+import javax.media.opengl.awt.GLCanvas
 import javax.media.opengl.glu.GLU
-import com.sun.opengl.util.GLUT
+import GL._
+import GL2._
+import GL2ES1._
+import GL2ES2._
+import fixedfunc.GLLightingFunc._
+import fixedfunc.GLMatrixFunc._
+//import com.sun.opengl.util.gl2.GLUT
 import org.brijest.storm.engine.model._
 
 
@@ -30,7 +37,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   class AreaDisplay extends GLCanvas(caps)
   
   var resizestamp = 0L
-  val caps = new GLCapabilities()
+  val glp = GLProfile.getDefault()
+  val caps = new GLCapabilities(glp)
   var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
   val areadisplay = new AreaDisplay
   val frame = new Frame {
@@ -41,7 +49,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   
   areadisplay.addGLEventListener(new GLEventListener {
     def display(drawable: GLAutoDrawable) {
-      val gl = drawable.getGL()
+      val gl = drawable.getGL().getGL2()
       
       if (cachedarea != null) {
         redraw(cachedarea, null, new GLAutoDrawableDrawAdapter(drawable))
@@ -53,7 +61,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
       initShadowMap(drawable)
     }
     
-    def displayChanged(drawable: GLAutoDrawable, mode: Boolean, device: Boolean) {
+    def dispose(drawable: GLAutoDrawable) {
     }
     
     def reshape(drawable: GLAutoDrawable, x: Int, y: Int, width: Int, height: Int) {
@@ -106,9 +114,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
   
   private def initShadowMap(drawable: GLAutoDrawable) {
-    val gl = drawable.getGL()
+    val gl = drawable.getGL().getGL2()
     import gl._
-    import GL._
     
     glGenTextures(1, shadowtexno, 0)
     glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
@@ -138,7 +145,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     val gl = a.asInstanceOf[GLAutoDrawableDrawAdapter].gl
     val glu = new GLU
     import gl._
-    import GL._
     
     val (u0, v0) = pos
     val pw = width
@@ -380,9 +386,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glEnable(GL_DEPTH_TEST)
     glClear(GL_DEPTH_BUFFER_BIT)
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC_ARB, GL_LEQUAL)
-    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_LUMINANCE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
     
     glAlphaFunc(GL_GEQUAL, 0.99f)
     glEnable(GL_ALPHA_TEST)
@@ -391,9 +397,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     glMatrixMode(GL_MODELVIEW)
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC_ARB, GL_NONE)
-    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE_ARB, GL_NONE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NONE)
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_NONE)
     
     glDisable(GL_TEXTURE_2D)
     
@@ -410,8 +416,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   }
   
   class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {
-    val gl = drawable.getGL
-    val glut = new GLUT
+    val gl = drawable.getGL().getGL2()
+    //val glut = new GLUT
     import gl._
     import GL._
     
@@ -439,7 +445,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     def drawString(s: String, x: Int, y: Int) {
       // TODO fix
       glRasterPos2i(x, y);
-      glut.glutBitmapString(GLUT.BITMAP_HELVETICA_10, s)
+      //glut.glutBitmapString(GLUT.BITMAP_HELVETICA_10, s)
     }
     
     def setFontSize(sz: Float) {
