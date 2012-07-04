@@ -98,7 +98,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = 512
+  val SHADOW_TEX_SIZE = 1024
   val shadowtexno = new Array[Int](1)
   val lightprojmatrix = new Array[Float](16)
   val lightviewmatrix = new Array[Float](16)
@@ -127,7 +127,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
-                 GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, null)
+                 GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, null)
     
     glEnable(GL_NORMALIZE)
     
@@ -217,13 +217,13 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     /* calc matrices */
     
-    val lightpos = (-4.f, 10.f, 7.f);
+    val lightpos = (-40.f, 100.f, 70.f);
     
     def initLightMatrices() {
       glLoadIdentity()
       val wdt = width / 45
       val hgt = height / 45
-      glOrtho(wdt, -wdt, -hgt, hgt, -45.0, 45.0)
+      glOrtho(wdt, -wdt, -hgt, hgt, -500.0, 500.0)
       glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
       
       glLoadIdentity()
@@ -380,6 +380,10 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
     
+    glMatrixMode(GL_TEXTURE)
+    glLoadIdentity()
+    glScalef(1.f, 1.f, 0.9999f)
+    
     glEnable(GL_TEXTURE_2D)
     glEnable(GL_CULL_FACE)
     glCullFace(GL_BACK)
@@ -389,11 +393,15 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
     
     glAlphaFunc(GL_GEQUAL, 0.99f)
     glEnable(GL_ALPHA_TEST)
     
     drawScene()
+    
+    glMatrixMode(GL_TEXTURE)
+    glLoadIdentity()
     
     glMatrixMode(GL_MODELVIEW)
     
