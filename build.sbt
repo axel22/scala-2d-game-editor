@@ -50,9 +50,9 @@ libraryDependencies ++= {
   val suff = "-natives-" + os + "-" + arch
   val jogampurl = "http://jogamp.org/deployment/maven/org/jogamp/"
   val joglurl = jogampurl + "jogl/jogl-all/" + vers + "/" + "jogl-all-" + vers + suff + ".jar"
-  val jogl = "org.jogamp.jogl" % ("jogl-all" + suff) % vers from joglurl
+  val jogl = "org.jogamp.jogl" % ("jogl-all" + suff) % (vers) from joglurl
   val glueurl = jogampurl + "gluegen/gluegen-rt/" + vers + "/" + "gluegen-rt-" + vers + suff + ".jar"
-  val glue = "org.jogamp.gluegen" % ("gluegen-rt" + suff) % vers from glueurl
+  val glue = "org.jogamp.gluegen" % ("gluegen-rt" + suff) % (vers) from glueurl
   Seq(jogl, glue)
 }
 

@@ -38,12 +38,21 @@ object Initializer extends Logging {
       case os if os.startsWith("Windows") => "dll"
       case os => sys.error("Unknown OS: " + os)
     }
+    def rename(jarfile: File) = {
+      val name = jarfile.getName
+      if (name.contains("jogl-all-native") || name.contains("gluegen-rt-native")) {
+        val newname = name.replaceAll("(.*)(natives-.*)-(\\d.\\d-rc\\d)\\.jar", "$1$3-$2.jar")
+        val nfile = new File("lib/" + newname)
+        if (jarfile.renameTo(nfile)) nfile else jarfile
+      } else jarfile
+    }
     
     val candidates = for {
       jarfile <- new File("lib/").listFiles
       if jarfile.getName.endsWith(".jar") && jarfile.getName.contains(natstr)
     } {
-      val archive = new java.util.zip.ZipFile(jarfile)
+      val njarfile = rename(jarfile)
+      val archive = new java.util.zip.ZipFile(njarfile)
       val entries = archive.entries
       while (entries.hasMoreElements) {
         val entry = entries.nextElement()

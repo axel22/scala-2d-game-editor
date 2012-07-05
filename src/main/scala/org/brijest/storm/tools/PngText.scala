@@ -61,8 +61,8 @@ object PngText {
     
     // Create & populate metadata
     val metadata = new PNGMetadata()
-    metadata.tEXt_keyword.add(config.key)
-    metadata.tEXt_text.add(config.value)
+    metadata.tEXt_keyword.asInstanceOf[java.util.ArrayList[String]].add(config.key)
+    metadata.tEXt_text.asInstanceOf[java.util.ArrayList[String]].add(config.value)
     
     // Render the PNG to memory
     val pngwriter = new PNGImageWriter(new PNGImageWriterSpi())
