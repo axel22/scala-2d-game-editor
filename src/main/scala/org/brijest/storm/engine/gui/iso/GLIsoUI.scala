@@ -261,6 +261,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     
     /* calc matrices */
     
+    val xyside = 100.f
+    val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
     val lightpos = (-40.f, 100.f, 70.f);
     
     def initLightMatrices() {
@@ -273,8 +275,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glLoadIdentity()
       glu.gluLookAt(
         xlook + lightpos._1, ylook + lightpos._2, lightpos._3,
-        xlook, ylook, 0.0f,
-        0.f, 0.f, 1.0f)
+        xlook, ylook, 0.f,
+        0.f, 0.f, 1.f)
       glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
     }
     
@@ -286,11 +288,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glGetFloatv(GL_MODELVIEW_MATRIX, camprojmatrix, 0)
       
       glLoadIdentity()
-      val xyside = 100.f
-      val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
       glu.gluLookAt(
         xlook + xyside, ylook + xyside, zcenter,
-        xlook, ylook, 0,
+        xlook, ylook, 0.f,
         0.f, 0.f, 1.f)
       glGetFloatv(GL_MODELVIEW_MATRIX, camviewmatrix, 0)
     }
@@ -385,6 +385,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     
     /* draw scene with shadows from camera point of view */
     
+    glPushMatrix()
+    
     def calcTextureMatrix() {
       import Jama._
       
@@ -401,12 +403,11 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       for (y <- 0 until 4; x <- 0 until 4) shadowtexmatrix(y * 4 + x) = st.get(y, x).toFloat
     }
     
-    calcTextureMatrix()
-    
-    glPushMatrix()
-    orthoView()
-    
     def initfixed() {
+      orthoView()
+      
+      calcTextureMatrix()
+      
       glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
       glTexGenfv(GL_S, GL_EYE_PLANE, shadowtexmatrix, 0)
       glEnable(GL_TEXTURE_GEN_S)
@@ -444,10 +445,109 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     }
     
     def initglsl() {
+      import Jama._
+      
+      def tojama(a: Array[Float]) = {
+        val m = new Matrix(4, 4)
+        for (x <- 0 until 4; y <- 0 until 4) m.set(y, x, a(y * 4 + x))
+        m
+      }
+      
+      def toraw(m: Matrix, a: Array[Float]) = {
+        for (y <- 0 until 4; x <- 0 until 4) a(y * 4 + x) = m.get(y, x).toFloat
+        a
+      }
+      
+      def combine(a: Array[Float], b: Array[Float], res: Array[Float] = new Array[Float](16)) = {
+        val ma = tojama(a)
+        val mb = tojama(b)
+        val mr = ma.times(mb)
+        toraw(mr, res)
+      }
+      
+      def inverse(a: Array[Float], res: Array[Float] = new Array[Float](16)) = toraw(tojama(a).inverse, res)
+      
+      def transpose(a: Array[Float], res: Array[Float] = new Array[Float](16)) = toraw(tojama(a).transpose, res)
+      
+      def combine4(ma: Array[Float], mb: Array[Float], res: Array[Float] = new Array[Float](16)) = {
+        for (i <- 0 until 4) {
+          res(i*4) = ma(i*4) * mb(0) + ma(i*4+1) * mb(4) + ma(i*4+2) * mb(8) + ma(i*4+3) * mb(12)
+          res(i*4+1) = ma(i*4) * mb(1) + ma(i*4+1) * mb(5) + ma(i*4+2) * mb(9) + ma(i*4+3) * mb(13)
+          res(i*4+2) = ma(i*4) * mb(2) + ma(i*4+1) * mb(6) + ma(i*4+2) * mb(10) + ma(i*4+3) * mb(14)
+          res(i*4+3) = ma(i*4) * mb(3) + ma(i*4+1) * mb(7) + ma(i*4+2) * mb(11) + ma(i*4+3) * mb(15)
+        }
+        
+        res
+      }
+      
+      def inverse4(m: Array[Float], inv: Array[Float] = new Array[Float](16)) = {
+        inv(0) = m(0);
+        inv(1) = m(4);
+        inv(2) = m(8);
+        inv(4) = m(1);
+        inv(5) = m(5);
+        inv(6) = m(9);
+        inv(8) = m(2);
+        inv(9) = m(6);
+        inv(10) = m(10);
+        
+        inv(12) = inv(0) * -m(12) + inv(4) * -m(13) + inv(8) * -m(14);
+        inv(13) = inv(1) * -m(12) + inv(5) * -m(13) + inv(9) * -m(14);
+        inv(14) = inv(2) * -m(12) + inv(6) * -m(13) + inv(10) * -m(14);
+
+        inv(3) = 0.0f;
+        inv(7) = 0.0f;
+        inv(11) = 0.0f;
+        inv(15) = 1.0f;
+        
+        inv
+      }
+      
+      def sendUniform1i(varname: String, v: Int) {
+        val loc = glGetUniformLocation(shaderProgram, varname)
+        if (loc == -1) {
+          logger.warn("could not send uniform: " + varname)
+        }
+        glUniform1i(loc, v)
+      }
+      
+      def sendUniform3f(varname: String, x: Float, y: Float, z: Float) {
+        val loc = glGetUniformLocation(shaderProgram, varname)
+        if (loc == -1) {
+          logger.warn("could not send uniform: " + varname)
+        }
+        glUniform3f(loc, x, y, z)
+      }
+      
+      // val invmatrix = inverse4(camviewmatrix)
+      // val tmpmatrix = combine4(lightviewmatrix, lightprojmatrix)
+      // combine4(invmatrix, tmpmatrix, shadowtexmatrix)
+      
+      val invmatrix = inverse(camviewmatrix)
+      val tmpmatrix = combine(lightprojmatrix, lightviewmatrix, shadowtexmatrix)
+      //combine(tmpmatrix, invmatrix, shadowtexmatrix)
+      
+      glMatrixMode(GL_TEXTURE)
+      glLoadMatrixf(shadowtexmatrix, 0)
+      
+      glEnable(GL_CULL_FACE)
+      glCullFace(GL_BACK)
+      glEnable(GL_DEPTH_TEST)
+      glClear(GL_DEPTH_BUFFER_BIT)
+      
+      orthoView()
+      
       glUseProgram(shaderProgram)
+      
+      sendUniform1i("texunit", 0)
+      //sendUniform3f("lpos", lightpos._1, lightpos._2, lightpos._3)
+      
+      glEnable(GL_TEXTURE_2D)
+      glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
     }
     
-    initfixed()
+    //initfixed()
+    initglsl()
     
     drawScene()
     
