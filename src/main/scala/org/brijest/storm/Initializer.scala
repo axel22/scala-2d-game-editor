@@ -14,6 +14,7 @@ import java.io.File
 import org.apache.commons.io.FileUtils
 import org.brijest.bufferz._
 import org.brijest.bufferz.shells._
+import collection._
 import engine._
 import engine.model.{World, Player}
 
@@ -47,6 +48,7 @@ object Initializer extends Logging {
       } else jarfile
     }
     
+    val natives = mutable.ArrayBuffer[String]()
     val candidates = for {
       jarfile <- new File("lib/").listFiles
       if jarfile.getName.endsWith(".jar") && jarfile.getName.contains(natstr)
@@ -58,10 +60,11 @@ object Initializer extends Logging {
         val entry = entries.nextElement()
         if (entry.getName.contains(natext)) {
           FileUtils.copyInputStreamToFile(archive.getInputStream(entry), new File("lib/" + entry.getName))
-          logger.info("unpacked native lib: " + entry.getName)
+          natives += entry.getName
         }
       }
     }
+    logger.info("unpacked native libs: " + natives.mkString(", "))
   }
   
   def default() {
@@ -69,8 +72,7 @@ object Initializer extends Logging {
     app.sys.props("java.library.path") = "lib/" + java.io.File.pathSeparator + app.sys.props("java.library.path")
     logger.info("java.library.path = " + app.sys.props("java.library.path"))
     
-    // unpack gluegen-rt and jogl native libs
-    unpackNativeLibs()
+    // unpack gluegen-rt and jogl native libs - not necessary any more
     
     // init opengl
     javax.media.opengl.GLProfile.initSingleton(true)
