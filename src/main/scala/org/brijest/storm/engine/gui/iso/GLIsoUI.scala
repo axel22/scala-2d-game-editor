@@ -14,6 +14,7 @@ package gui.iso
 
 import collection._
 import swing._
+import org.apache.commons.io.IOUtils
 import java.awt.image._
 import java.lang.ref.SoftReference
 import java.awt.event.WindowAdapter
@@ -27,7 +28,6 @@ import GL2ES1._
 import GL2ES2._
 import fixedfunc.GLLightingFunc._
 import fixedfunc.GLMatrixFunc._
-//import com.sun.opengl.util.gl2.GLUT
 import org.brijest.storm.engine.model._
 
 
@@ -58,7 +58,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     def init(drawable: GLAutoDrawable) {
       resizestamp += 1
-      initShadowMap(drawable)
+      initialize(drawable)
     }
     
     def dispose(drawable: GLAutoDrawable) {
@@ -111,9 +111,10 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     0.f, 0.f, 0.5f, 0.f,
     0.5f, 0.5f, 0.5f, 1.f
   )
+  var shaderProgram: Int = -1
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
   
-  private def initShadowMap(drawable: GLAutoDrawable) {
+  private def initialize(drawable: GLAutoDrawable) {
     val gl = drawable.getGL().getGL2()
     import gl._
     
@@ -138,7 +139,29 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
     
+    /* shaders */
     
+    val vs = glCreateShader(GL_VERTEX_SHADER)
+    val fs = glCreateShader(GL_FRAGMENT_SHADER)
+    val vsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/blur.vert")
+    val fsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/blur.frag")
+    import JavaConverters._
+    val vsrc = IOUtils.readLines(vsprogis).asScala.mkString("\n")
+    val fsrc = IOUtils.readLines(fsprogis).asScala.mkString("\n")
+    IOUtils.closeQuietly(vsprogis)
+    IOUtils.closeQuietly(fsprogis)
+    
+    glShaderSource(vs, 1, Array(vsrc), null)
+    glCompileShader(vs)
+    
+    glShaderSource(fs, 1, Array(fsrc), null)
+    glCompileShader(fs)
+    
+    shaderProgram = glCreateProgram()
+    glAttachShader(shaderProgram, vs)
+    glAttachShader(shaderProgram, fs)
+    glLinkProgram(shaderProgram)
+    glValidateProgram(shaderProgram)
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
@@ -417,6 +440,10 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glDisable(GL_TEXTURE_GEN_Q)
     
     glDisable(GL_ALPHA_TEST)
+    
+    glUseProgram(shaderProgram)
+    
+    glUseProgram(0)
     
     /* reset */
     
