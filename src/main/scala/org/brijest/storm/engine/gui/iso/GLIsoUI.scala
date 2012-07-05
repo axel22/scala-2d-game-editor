@@ -32,7 +32,7 @@ import org.brijest.storm.engine.model._
 
 
 
-class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
+class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging {
   
   class AreaDisplay extends GLCanvas(caps)
   
@@ -111,6 +111,12 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     0.f, 0.f, 0.5f, 0.f,
     0.5f, 0.5f, 0.5f, 1.f
   )
+  val identmatrix = Array[Float](
+    1.f, 0.f, 0.f, 0.f,
+    0.f, 1.f, 0.f, 0.f,
+    0.f, 0.f, 1.f, 0.f,
+    0.f, 0.f, 0.f, 1.f
+  )
   var shaderProgram: Int = -1
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
   
@@ -151,11 +157,26 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     IOUtils.closeQuietly(vsprogis)
     IOUtils.closeQuietly(fsprogis)
     
+    def errorLog(shader: Int) {
+      val compstatus = new Array[Int](1)
+      glGetShaderiv(shader, GL_COMPILE_STATUS, compstatus, 0)
+      if (compstatus(0) == GL_FALSE) {
+        val len = Array(0)
+        val maxlen = 1000
+        val buff = new Array[Byte](maxlen)
+        glGetShaderInfoLog(shader, maxlen, len, 0, buff, 0)
+        val comperrors = buff.map(_.toChar).mkString
+        logger.warn("error compiling shader\n" + comperrors)
+      } else logger.info("compiled shader successfully")
+    }
+    
     glShaderSource(vs, 1, Array(vsrc), null)
     glCompileShader(vs)
+    errorLog(vs)
     
     glShaderSource(fs, 1, Array(fsrc), null)
     glCompileShader(fs)
+    errorLog(fs)
     
     shaderProgram = glCreateProgram()
     glAttachShader(shaderProgram, vs)
@@ -205,10 +226,10 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
           glVertex3f(x - 0.5f, y + 0.5f, 0)
           glVertex3f(x - 0.5f, y + 0.5f, hgt)
           
-          glVertex3f(x - 0.5f, y - 0.5f, hgt)
-          glVertex3f(x - 0.5f, y - 0.5f, 0)
-          glVertex3f(x + 0.5f, y - 0.5f, 0)
           glVertex3f(x + 0.5f, y - 0.5f, hgt)
+          glVertex3f(x + 0.5f, y - 0.5f, 0)
+          glVertex3f(x - 0.5f, y - 0.5f, 0)
+          glVertex3f(x - 0.5f, y - 0.5f, hgt)
           
           glVertex3f(x + 0.5f, y + 0.5f, hgt)
           glVertex3f(x + 0.5f, y + 0.5f, 0)
@@ -385,43 +406,52 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     glPushMatrix()
     orthoView()
     
-    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-    glTexGenfv(GL_S, GL_EYE_PLANE, shadowtexmatrix, 0)
-    glEnable(GL_TEXTURE_GEN_S)
+    def initfixed() {
+      glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+      glTexGenfv(GL_S, GL_EYE_PLANE, shadowtexmatrix, 0)
+      glEnable(GL_TEXTURE_GEN_S)
+
+      glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+      glTexGenfv(GL_T, GL_EYE_PLANE, shadowtexmatrix, 4)
+      glEnable(GL_TEXTURE_GEN_T)
+
+      glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+      glTexGenfv(GL_R, GL_EYE_PLANE, shadowtexmatrix, 8)
+      glEnable(GL_TEXTURE_GEN_R)
+
+      glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+      glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 12)
+      glEnable(GL_TEXTURE_GEN_Q)
+      
+      glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
+      glScalef(1.f, 1.f, 0.9999f)
+      
+      glEnable(GL_TEXTURE_2D)
+      glEnable(GL_CULL_FACE)
+      glCullFace(GL_BACK)
+      glEnable(GL_DEPTH_TEST)
+      glClear(GL_DEPTH_BUFFER_BIT)
+      
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
+      glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
+      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+      
+      glAlphaFunc(GL_GEQUAL, 0.99f)
+      glEnable(GL_ALPHA_TEST)
+    }
     
-    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-    glTexGenfv(GL_T, GL_EYE_PLANE, shadowtexmatrix, 4)
-    glEnable(GL_TEXTURE_GEN_T)
+    def initglsl() {
+      glUseProgram(shaderProgram)
+    }
     
-    glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-    glTexGenfv(GL_R, GL_EYE_PLANE, shadowtexmatrix, 8)
-    glEnable(GL_TEXTURE_GEN_R)
-    
-    glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-    glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 12)
-    glEnable(GL_TEXTURE_GEN_Q)
-    
-    glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
-    
-    glMatrixMode(GL_TEXTURE)
-    glLoadIdentity()
-    glScalef(1.f, 1.f, 0.9999f)
-    
-    glEnable(GL_TEXTURE_2D)
-    glEnable(GL_CULL_FACE)
-    glCullFace(GL_BACK)
-    glEnable(GL_DEPTH_TEST)
-    glClear(GL_DEPTH_BUFFER_BIT)
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
-    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
-    
-    glAlphaFunc(GL_GEQUAL, 0.99f)
-    glEnable(GL_ALPHA_TEST)
+    initfixed()
     
     drawScene()
+    
+    glUseProgram(0)
     
     glMatrixMode(GL_TEXTURE)
     glLoadIdentity()
@@ -441,10 +471,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
     
     glDisable(GL_ALPHA_TEST)
     
-    glUseProgram(shaderProgram)
-    
-    glUseProgram(0)
-    
     /* reset */
     
     glPopMatrix()
@@ -452,7 +478,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas {
   
   class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {
     val gl = drawable.getGL().getGL2()
-    //val glut = new GLUT
     import gl._
     import GL._
     
