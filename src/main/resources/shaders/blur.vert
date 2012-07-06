@@ -1,6 +1,7 @@
 
 
 uniform sampler2D shadowtex;
+uniform vec3 campos;
 
 varying float polydirection;
 

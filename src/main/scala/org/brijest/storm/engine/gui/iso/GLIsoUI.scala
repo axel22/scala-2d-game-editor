@@ -488,6 +488,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
       
       sendUniform1i("shadowtex", 0)
+      //sendUniform3f("campos", campos._1, campos._2, campos._3)
       
       glEnable(GL_DEPTH_TEST)
       glClear(GL_DEPTH_BUFFER_BIT)

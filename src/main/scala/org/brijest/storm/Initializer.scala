@@ -73,6 +73,7 @@ object Initializer extends Logging {
     logger.info("java.library.path = " + app.sys.props("java.library.path"))
     
     // unpack gluegen-rt and jogl native libs - not necessary any more
+    unpackNativeLibs()
     
     // init opengl
     javax.media.opengl.GLProfile.initSingleton(true)
