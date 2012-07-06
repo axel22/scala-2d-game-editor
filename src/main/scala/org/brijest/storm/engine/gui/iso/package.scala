@@ -28,6 +28,15 @@ package object iso {
   object Sprites {
     def maxheight = 320
   }
+  
+  def ceilpow2(n: Int) = {
+    var pow2 = 1
+    while (n > pow2) {
+      pow2 = pow2 << 1
+    }
+    pow2
+  }
+  
 }
 
 

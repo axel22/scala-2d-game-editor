@@ -235,14 +235,6 @@ trait GLPaletteCanvas extends PaletteCanvas {
     
     def newSprite(imgs: Seq[Img]) = new Sprite(imgs)
     
-    def ceilpow2(n: Int) = {
-      var pow2 = 1
-      while (n > pow2) {
-	pow2 = pow2 << 1
-      }
-      pow2
-    }
-    
     def toImg(img: BufferedImage) = {
       val w = ceilpow2(img.getWidth(null))
       val h = ceilpow2(img.getWidth(null))

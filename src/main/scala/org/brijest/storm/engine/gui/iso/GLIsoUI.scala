@@ -149,8 +149,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     
     val vs = glCreateShader(GL_VERTEX_SHADER)
     val fs = glCreateShader(GL_FRAGMENT_SHADER)
-    val vsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/blur.vert")
-    val fsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/blur.frag")
+    val vsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/shadow.vert")
+    val fsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/shadow.frag")
     import JavaConverters._
     val vsrc = IOUtils.readLines(vsprogis).asScala.mkString("\n")
     val fsrc = IOUtils.readLines(fsprogis).asScala.mkString("\n")
@@ -466,16 +466,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glMatrixMode(GL_TEXTURE)
       glLoadMatrixf(lightprojmatrix, 0)
       glMultMatrixf(lightviewmatrix, 0)
-      // println(camviewmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
-      // println("---------")
-      // println(camprojmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
-      // println("---------")
-      // println(lightviewmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
-      // println("---------")
-      // println(lightprojmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
-      // println("---------")
-      // println("==============")
-      // println("==============")
       
       glMatrixMode(GL_MODELVIEW)
       
