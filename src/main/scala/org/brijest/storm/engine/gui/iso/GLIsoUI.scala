@@ -257,73 +257,248 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       }
     }
     
-    glPushMatrix()
-    
     /* calc matrices */
     
-    val xyside = 100.f
-    val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
-    val lightpos = (-40.f, 100.f, 70.f);
-    //val lightpos = (xyside, xyside, zcenter);
-    val campos = (xyside, xyside, zcenter.toFloat);
+    val mainlightpos = (-40.f, 100.f, 70.f);
     
-    def initLightMatrices() {
-      glLoadIdentity()
-      val wdt = width / 45
-      val hgt = height / 45
-      glOrtho(wdt, -wdt, -hgt, hgt, -500.0, 500.0)
-      glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
+    def renderLightLayer(lightpos: (Float, Float, Float)) {
+      val xyside = 100.f
+      val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
+      val campos = (xyside, xyside, zcenter.toFloat);
       
-      glLoadIdentity()
-      glu.gluLookAt(
-        xlook + lightpos._1, ylook + lightpos._2, lightpos._3,
-        xlook, ylook, 0.f,
-        0.f, 0.f, 1.f)
-      glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
-    }
-    
-    def initCamMatrices() {
-      glLoadIdentity()
-      val wdt = width / (tileWidth * math.sqrt(2))
-      val hgt = height / (tileHeight * math.sqrt(2) * 2)
-      glOrtho(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
-      glGetFloatv(GL_MODELVIEW_MATRIX, camprojmatrix, 0)
+      def initLightMatrices() {
+        glLoadIdentity()
+        val wdt = width / 45
+        val hgt = height / 45
+        glOrtho(wdt, -wdt, -hgt, hgt, -500.0, 500.0)
+        glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
+        
+        glLoadIdentity()
+        glu.gluLookAt(
+          xlook + lightpos._1, ylook + lightpos._2, lightpos._3,
+          xlook, ylook, 0.f,
+          0.f, 0.f, 1.f)
+        glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
+      }
       
-      glLoadIdentity()
-      glu.gluLookAt(
-        xlook + campos._1, ylook + campos._2, campos._3,
-        xlook, ylook, 0.f,
-        0.f, 0.f, 1.f)
-      glGetFloatv(GL_MODELVIEW_MATRIX, camviewmatrix, 0)
-    }
-    
-    initLightMatrices()
-    initCamMatrices()
-    
-    def lightView() {
-      glMatrixMode(GL_PROJECTION)
-      glLoadMatrixf(lightprojmatrix, 0)
+      def initCamMatrices() {
+        glLoadIdentity()
+        val wdt = width / (tileWidth * math.sqrt(2))
+        val hgt = height / (tileHeight * math.sqrt(2) * 2)
+        glOrtho(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
+        glGetFloatv(GL_MODELVIEW_MATRIX, camprojmatrix, 0)
+        
+        glLoadIdentity()
+        glu.gluLookAt(
+          xlook + campos._1, ylook + campos._2, campos._3,
+          xlook, ylook, 0.f,
+          0.f, 0.f, 1.f)
+        glGetFloatv(GL_MODELVIEW_MATRIX, camviewmatrix, 0)
+      }
       
-      glMatrixMode(GL_MODELVIEW)
-      glLoadMatrixf(lightviewmatrix, 0)
-    }
-    
-    def orthoView() {
-      glMatrixMode(GL_PROJECTION)
-      glLoadMatrixf(camprojmatrix, 0)
+      initLightMatrices()
+      initCamMatrices()
       
-      glMatrixMode(GL_MODELVIEW)
-      glLoadMatrixf(camviewmatrix, 0)
-    }
-    
-    def debugTexture() {
-      glPushMatrix()
-      glEnable(GL_TEXTURE_2D)
+      def lightView() {
+        glMatrixMode(GL_PROJECTION)
+        glLoadMatrixf(lightprojmatrix, 0)
+        
+        glMatrixMode(GL_MODELVIEW)
+        glLoadMatrixf(lightviewmatrix, 0)
+      }
+      
+      def orthoView() {
+        glMatrixMode(GL_PROJECTION)
+        glLoadMatrixf(camprojmatrix, 0)
+        
+        glMatrixMode(GL_MODELVIEW)
+        glLoadMatrixf(camviewmatrix, 0)
+      }
+      
+      def debugTexture() {
+        glPushMatrix()
+        glEnable(GL_TEXTURE_2D)
+        glEnable(GL_DEPTH_TEST)
+        glColor4f(1.0f,1.0f,1.0f,1.0f)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
+        
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0, width, height, 0, 0, 1)
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_DEPTH_TEST)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        
+        glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+        
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
+        glTexCoord2f(0, 1); glVertex3f(0, height / 4, 0);
+        glTexCoord2f(1, 1); glVertex3f(width / 4, height / 4, 0);
+        glTexCoord2f(1, 0); glVertex3f(width / 4, 0, 0);
+        glEnd();
+        
+        glDisable(GL_DEPTH_TEST)
+        glDisable(GL_TEXTURE_2D)
+        glPopMatrix()
+      }
+      
+      /* draw scene from light point of view and copy to the texture buffer */
+      
+      glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+      lightView()
+      
+      glColor3f(1.f, 1.f, 1.f)
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       glEnable(GL_DEPTH_TEST)
-      glColor4f(1.0f,1.0f,1.0f,1.0f)
-      glEnable(GL_BLEND)
-      glBlendFunc(GL_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
       
+      drawScene()
+      
+      glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+      glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+      
+      def debugReadScreen() {
+        glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+      }
+      
+      def debugScreen() {
+        glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+      }
+      
+      /* render scene with shadows from camera point of view */
+      
+      glViewport(0, 0, width, height)
+      
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+      
+      def initfixed() {
+        orthoView()
+        
+        import Jama._
+        
+        val bi = new Matrix(4, 4)
+        val lp = new Matrix(4, 4)
+        val lv = new Matrix(4, 4)
+        val cv = new Matrix(4, 4)
+        for (y <- 0 until 4; x <- 0 until 4) bi.set(x, y, biasmatrix(y * 4 + x))
+        for (y <- 0 until 4; x <- 0 until 4) lp.set(x, y, lightprojmatrix(y * 4 + x))
+        for (y <- 0 until 4; x <- 0 until 4) lv.set(x, y, lightviewmatrix(y * 4 + x))
+        for (y <- 0 until 4; x <- 0 until 4) cv.set(x, y, camviewmatrix(y * 4 + x))
+        
+        val st = bi.times(lp).times(lv)
+        for (y <- 0 until 4; x <- 0 until 4) shadowtexmatrix(y * 4 + x) = st.get(y, x).toFloat
+        
+        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+        glTexGenfv(GL_S, GL_EYE_PLANE, shadowtexmatrix, 0)
+        glEnable(GL_TEXTURE_GEN_S)
+
+        glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+        glTexGenfv(GL_T, GL_EYE_PLANE, shadowtexmatrix, 4)
+        glEnable(GL_TEXTURE_GEN_T)
+
+        glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+        glTexGenfv(GL_R, GL_EYE_PLANE, shadowtexmatrix, 8)
+        glEnable(GL_TEXTURE_GEN_R)
+
+        glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
+        glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 12)
+        glEnable(GL_TEXTURE_GEN_Q)
+        
+        glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glScalef(1.f, 1.f, 0.9999f)
+        
+        glEnable(GL_TEXTURE_2D)
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
+        glEnable(GL_DEPTH_TEST)
+        glClear(GL_DEPTH_BUFFER_BIT)
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
+        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+        
+        glAlphaFunc(GL_GEQUAL, 0.99f)
+        glEnable(GL_ALPHA_TEST)
+      }
+      
+      def initglsl() {
+        def sendUniform1i(varname: String, v: Int) {
+          val loc = glGetUniformLocation(shaderProgram, varname)
+          if (loc == -1) {
+            logger.warn("could not send uniform: " + varname)
+          }
+          glUniform1i(loc, v)
+        }
+        
+        def sendUniform3f(varname: String, x: Float, y: Float, z: Float) {
+          val loc = glGetUniformLocation(shaderProgram, varname)
+          if (loc == -1) {
+            logger.warn("could not send uniform: " + varname)
+          }
+          glUniform3f(loc, x, y, z)
+        }
+        
+        glMatrixMode(GL_TEXTURE)
+        glLoadMatrixf(lightprojmatrix, 0)
+        glMultMatrixf(lightviewmatrix, 0)
+        
+        glMatrixMode(GL_MODELVIEW)
+        
+        orthoView()
+        
+        glUseProgram(shaderProgram)
+        
+        glActiveTexture(GL_TEXTURE0)
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+        
+        sendUniform1i("shadowtex", 0)
+        
+        glEnable(GL_DEPTH_TEST)
+        glClear(GL_DEPTH_BUFFER_BIT)
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
+      }
+      
+      initglsl()
+      
+      drawScene()
+      
+      glUseProgram(0)
+      
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
+      
+      glMatrixMode(GL_MODELVIEW)
+      
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE)
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NONE)
+      glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_NONE)
+      
+      glDisable(GL_TEXTURE_2D)
+      
+      glDisable(GL_TEXTURE_GEN_S)
+      glDisable(GL_TEXTURE_GEN_T)
+      glDisable(GL_TEXTURE_GEN_R)
+      glDisable(GL_TEXTURE_GEN_Q)
+      
+      glDisable(GL_ALPHA_TEST)
+    }
+    
+    renderLightLayer(mainlightpos)
+    
+    /* 2d render scene */
+    
+    def renderScene() {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       glMatrixMode(GL_PROJECTION)
       glLoadIdentity()
       glOrtho(0, width, height, 0, 0, 1)
@@ -332,188 +507,12 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       
-      glMatrixMode(GL_TEXTURE)
-      glLoadIdentity()
-      
-      glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
-      
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
-      glTexCoord2f(0, 1); glVertex3f(0, height / 4, 0);
-      glTexCoord2f(1, 1); glVertex3f(width / 4, height / 4, 0);
-      glTexCoord2f(1, 0); glVertex3f(width / 4, 0, 0);
-      glEnd();
-      
-      glDisable(GL_DEPTH_TEST)
-      glDisable(GL_TEXTURE_2D)
-      glPopMatrix()
-    }
-    
-    /* draw scene from light point of view and copy to the texture buffer */
-    
-    glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
-    lightView()
-    
-    glColor3f(1.f, 1.f, 1.f)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glEnable(GL_DEPTH_TEST)
-    
-    drawScene()
-    
-    glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
-    
-    /* 2d draw scene */
-    
-    glPopMatrix()
-    glViewport(0, 0, width, height)
-    
-    //glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    glOrtho(0, width, height, 0, 0, 1)
-    glMatrixMode(GL_MODELVIEW)
-    glDisable(GL_DEPTH_TEST)
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    
-    super.redraw(area, engine, a)
-    
-    //glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
-    
-    //debugTexture()
-    
-    /* draw scene with shadows from camera point of view */
-    
-    glPushMatrix()
-    
-    def calcTextureMatrix() {
-      import Jama._
-      
-      val bi = new Matrix(4, 4)
-      val lp = new Matrix(4, 4)
-      val lv = new Matrix(4, 4)
-      val cv = new Matrix(4, 4)
-      for (y <- 0 until 4; x <- 0 until 4) bi.set(x, y, biasmatrix(y * 4 + x))
-      for (y <- 0 until 4; x <- 0 until 4) lp.set(x, y, lightprojmatrix(y * 4 + x))
-      for (y <- 0 until 4; x <- 0 until 4) lv.set(x, y, lightviewmatrix(y * 4 + x))
-      for (y <- 0 until 4; x <- 0 until 4) cv.set(x, y, camviewmatrix(y * 4 + x))
-      
-      val st = bi.times(lp).times(lv)
-      for (y <- 0 until 4; x <- 0 until 4) shadowtexmatrix(y * 4 + x) = st.get(y, x).toFloat
-    }
-    
-    def initfixed() {
-      orthoView()
-      
-      calcTextureMatrix()
-      
-      glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-      glTexGenfv(GL_S, GL_EYE_PLANE, shadowtexmatrix, 0)
-      glEnable(GL_TEXTURE_GEN_S)
-
-      glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-      glTexGenfv(GL_T, GL_EYE_PLANE, shadowtexmatrix, 4)
-      glEnable(GL_TEXTURE_GEN_T)
-
-      glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-      glTexGenfv(GL_R, GL_EYE_PLANE, shadowtexmatrix, 8)
-      glEnable(GL_TEXTURE_GEN_R)
-
-      glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-      glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 12)
-      glEnable(GL_TEXTURE_GEN_Q)
-      
-      glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
-      glMatrixMode(GL_TEXTURE)
-      glLoadIdentity()
-      glScalef(1.f, 1.f, 0.9999f)
-      
-      glEnable(GL_TEXTURE_2D)
-      glEnable(GL_CULL_FACE)
-      glCullFace(GL_BACK)
-      glEnable(GL_DEPTH_TEST)
-      glClear(GL_DEPTH_BUFFER_BIT)
-      
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
-      glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
-      
-      glAlphaFunc(GL_GEQUAL, 0.99f)
-      glEnable(GL_ALPHA_TEST)
-    }
-    
-    def initglsl() {
-      def sendUniform1i(varname: String, v: Int) {
-        val loc = glGetUniformLocation(shaderProgram, varname)
-        if (loc == -1) {
-          logger.warn("could not send uniform: " + varname)
-        }
-        glUniform1i(loc, v)
-      }
-      
-      def sendUniform3f(varname: String, x: Float, y: Float, z: Float) {
-        val loc = glGetUniformLocation(shaderProgram, varname)
-        if (loc == -1) {
-          logger.warn("could not send uniform: " + varname)
-        }
-        glUniform3f(loc, x, y, z)
-      }
-      
-      glMatrixMode(GL_TEXTURE)
-      glLoadMatrixf(lightprojmatrix, 0)
-      glMultMatrixf(lightviewmatrix, 0)
-      
-      glMatrixMode(GL_MODELVIEW)
-      
-      orthoView()
-      
-      glUseProgram(shaderProgram)
-      
-      glActiveTexture(GL_TEXTURE0)
-      glEnable(GL_TEXTURE_2D)
-      glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
-      
-      sendUniform1i("shadowtex", 0)
-      //sendUniform3f("campos", campos._1, campos._2, campos._3)
+      super.redraw(area, engine, a)
       
       glEnable(GL_DEPTH_TEST)
-      glClear(GL_DEPTH_BUFFER_BIT)
-      glEnable(GL_CULL_FACE)
-      glCullFace(GL_BACK)
     }
     
-    //initfixed()
-    initglsl()
-    
-    drawScene()
-    
-    glUseProgram(0)
-    
-    glMatrixMode(GL_TEXTURE)
-    glLoadIdentity()
-    
-    glMatrixMode(GL_MODELVIEW)
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NONE)
-    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_NONE)
-    
-    glDisable(GL_TEXTURE_2D)
-    
-    glDisable(GL_TEXTURE_GEN_S)
-    glDisable(GL_TEXTURE_GEN_T)
-    glDisable(GL_TEXTURE_GEN_R)
-    glDisable(GL_TEXTURE_GEN_Q)
-    
-    glDisable(GL_ALPHA_TEST)
-    
-    /* reset */
-    
-    glPopMatrix()
+    renderScene()
   }
   
   class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {
