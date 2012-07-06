@@ -166,7 +166,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
         val buff = new Array[Byte](maxlen)
         glGetShaderInfoLog(shader, maxlen, len, 0, buff, 0)
         val comperrors = buff.map(_.toChar).mkString
-        logger.warn("error compiling shader\n" + comperrors)
+        logger.warn("error compiling %s shader\n%s".format(name, comperrors))
       } else logger.info("compiled %s shader successfully".format(name))
     }
     
@@ -265,6 +265,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
     val lightpos = (-40.f, 100.f, 70.f);
     //val lightpos = (xyside, xyside, zcenter);
+    val campos = (xyside, xyside, zcenter.toFloat);
     
     def initLightMatrices() {
       glLoadIdentity()
@@ -290,7 +291,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       
       glLoadIdentity()
       glu.gluLookAt(
-        xlook + xyside, ylook + xyside, zcenter,
+        xlook + campos._1, ylook + campos._2, campos._3,
         xlook, ylook, 0.f,
         0.f, 0.f, 1.f)
       glGetFloatv(GL_MODELVIEW_MATRIX, camviewmatrix, 0)
@@ -465,23 +466,18 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glMatrixMode(GL_TEXTURE)
       glLoadMatrixf(lightprojmatrix, 0)
       glMultMatrixf(lightviewmatrix, 0)
-      println(camviewmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
-      println("---------")
-      println(camprojmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
-      println("---------")
-      println(lightviewmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
-      println("---------")
-      println(lightprojmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
-      println("---------")
-      println("==============")
-      println("==============")
+      // println(camviewmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
+      // println("---------")
+      // println(camprojmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
+      // println("---------")
+      // println(lightviewmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
+      // println("---------")
+      // println(lightprojmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
+      // println("---------")
+      // println("==============")
+      // println("==============")
       
       glMatrixMode(GL_MODELVIEW)
-      
-      glEnable(GL_CULL_FACE)
-      glCullFace(GL_BACK)
-      glEnable(GL_DEPTH_TEST)
-      glClear(GL_DEPTH_BUFFER_BIT)
       
       orthoView()
       
@@ -492,7 +488,11 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
       
       sendUniform1i("shadowtex", 0)
-      //sendUniform3f("lpos", lightpos._1, lightpos._2, lightpos._3)
+      
+      glEnable(GL_DEPTH_TEST)
+      glClear(GL_DEPTH_BUFFER_BIT)
+      glEnable(GL_CULL_FACE)
+      glCullFace(GL_BACK)
     }
     
     //initfixed()

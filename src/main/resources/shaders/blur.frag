@@ -1,20 +1,23 @@
 
 
-uniform vec3 lpos;
 uniform sampler2D shadowtex;
 
-varying vec4 projShadow;
-varying vec3 normal;
-varying vec3 lightvec;
+varying float polydirection;
+
+const float maxd = 0.0002;
+const float mind = 0.00001;
 
 
 void main() {
   // project shadow
   vec4 texcoord = (gl_TexCoord[0] / gl_TexCoord[0].w) * 0.5 + 0.5;
   float distance = texture2D(shadowtex, texcoord.xy).z;
-  float shade = distance < texcoord.z ? 1.0 : 0.0;
+  float shadowed = 1.0;
+  float diff = texcoord.z - distance;
+  if (diff > maxd) shadowed = 0.0;
+  if (diff < maxd && diff > mind) shadowed = 1.0 - (diff - mind) / (maxd - mind);
   
   // set final color
-  gl_FragColor = vec4(0.2, 0.3, 0.5, 1.0) * shade;
+  gl_FragColor = vec4(vec3(0.6, 0.6, 0.6) * shadowed, 0.7);
 }
 
