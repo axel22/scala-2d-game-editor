@@ -10,9 +10,9 @@ varying vec3 lightvec;
 
 void main() {
   // project shadow
-  vec4 texcoord = ((gl_TexCoord[0] / gl_TexCoord[0].w) + 1.0) * 0.5;
-  vec4 tex = texture2D(shadowtex, texcoord.xy);
-  float shade = tex.z;
+  vec4 texcoord = (gl_TexCoord[0] / gl_TexCoord[0].w) * 0.5 + 0.5;
+  float distance = texture2D(shadowtex, texcoord.xy).z;
+  float shade = distance < texcoord.z ? 1.0 : 0.0;
   
   // set final color
   gl_FragColor = vec4(0.2, 0.3, 0.5, 1.0) * shade;

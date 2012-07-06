@@ -40,7 +40,8 @@ void main() {
 	 vec4(0.000,   0.866,   0.500,  81.551),
 	 vec4(0.000,   0.000,   0.000,   1.000)
 	 );
-  mat4 texmat = lightproj * lightview * invcamview;
+  mat4 texmat = lightproj * lightview;
   
-  gl_TexCoord[0] = texmat * gl_Vertex;
+  //gl_TexCoord[0] = texmat * gl_Vertex;
+  gl_TexCoord[0] = gl_TextureMatrix[0] * gl_Vertex;
 }

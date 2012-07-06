@@ -263,8 +263,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     
     val xyside = 100.f
     val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
-    //val lightpos = (-40.f, 100.f, 70.f);
-    val lightpos = (xyside, xyside, zcenter);
+    val lightpos = (-40.f, 100.f, 70.f);
+    //val lightpos = (xyside, xyside, zcenter);
     
     def initLightMatrices() {
       glLoadIdentity()
@@ -463,7 +463,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       }
       
       glMatrixMode(GL_TEXTURE)
-      glLoadIdentity()
+      glLoadMatrixf(lightprojmatrix, 0)
+      glMultMatrixf(lightviewmatrix, 0)
       println(camviewmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
       println("---------")
       println(camprojmatrix.map(x => "%+05f".format(x)).grouped(4).map(_.mkString(", ")).mkString("\n"))
@@ -475,6 +476,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       println("==============")
       println("==============")
       
+      glMatrixMode(GL_MODELVIEW)
+      
       glEnable(GL_CULL_FACE)
       glCullFace(GL_BACK)
       glEnable(GL_DEPTH_TEST)
@@ -484,11 +487,12 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       
       glUseProgram(shaderProgram)
       
-      sendUniform1i("shadowtex", 0)
-      //sendUniform3f("lpos", lightpos._1, lightpos._2, lightpos._3)
-      
+      glActiveTexture(GL_TEXTURE0)
       glEnable(GL_TEXTURE_2D)
       glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+      
+      sendUniform1i("shadowtex", 0)
+      //sendUniform3f("lpos", lightpos._1, lightpos._2, lightpos._3)
     }
     
     //initfixed()
