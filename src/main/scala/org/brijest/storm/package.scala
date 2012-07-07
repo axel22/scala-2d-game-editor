@@ -82,6 +82,8 @@ package object storm {
           fieldSysPath.set( null, null );
         }
       }
+      
+      val os = props("os.name")
     }
   }
   

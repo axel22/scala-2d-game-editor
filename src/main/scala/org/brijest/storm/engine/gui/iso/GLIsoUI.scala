@@ -98,7 +98,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = 1024
+  val SHADOW_TEX_SIZE = if (app.sys.os == "Linux") 256 else 1024
   var shadowtexno: Int = -1
   val LITE_TEX_SIZE = 1024
   var litetexno: Int = -1
