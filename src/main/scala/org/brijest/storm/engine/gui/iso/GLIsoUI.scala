@@ -99,7 +99,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   /* shadows */
   
   val SHADOW_TEX_SIZE = 1024
-  val shadowtexno = new Array[Int](1)
+  var shadowtexno: Int = -1
+  val LITE_TEX_SIZE = 1024
+  var litetexno: Int = -1
   val lightprojmatrix = new Array[Float](16)
   val lightviewmatrix = new Array[Float](16)
   val camprojmatrix = new Array[Float](16)
@@ -118,14 +120,17 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     0.f, 0.f, 0.f, 1.f
   )
   var shaderProgram: Int = -1
+  var liteProgram: Int = -1
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
   
   private def initialize(drawable: GLAutoDrawable) {
     val gl = drawable.getGL().getGL2()
+    val texindex = new Array[Int](1)
     import gl._
     
-    glGenTextures(1, shadowtexno, 0)
-    glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+    glGenTextures(1, texindex, 0)
+    shadowtexno = texindex(0)
+    glBindTexture(GL_TEXTURE_2D, shadowtexno)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
@@ -135,6 +140,19 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
                  GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, null)
+    
+    glGenTextures(1, texindex, 0)
+    litetexno = texindex(0)
+    glBindTexture(GL_TEXTURE_2D, litetexno)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, LITE_TEX_SIZE, LITE_TEX_SIZE, 0,
+                 GL_RGB, GL_UNSIGNED_INT, null)
     
     glEnable(GL_NORMALIZE)
     
@@ -147,42 +165,50 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     
     /* shaders */
     
-    val vs = glCreateShader(GL_VERTEX_SHADER)
-    val fs = glCreateShader(GL_FRAGMENT_SHADER)
-    val vsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/shadow.vert")
-    val fsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/shadow.frag")
-    import JavaConverters._
-    val vsrc = IOUtils.readLines(vsprogis).asScala.mkString("\n")
-    val fsrc = IOUtils.readLines(fsprogis).asScala.mkString("\n")
-    IOUtils.closeQuietly(vsprogis)
-    IOUtils.closeQuietly(fsprogis)
-    
-    def errorLog(name: String, shader: Int) {
-      val compstatus = new Array[Int](1)
-      glGetShaderiv(shader, GL_COMPILE_STATUS, compstatus, 0)
-      if (compstatus(0) == GL_FALSE) {
-        val len = Array(0)
-        val maxlen = 1000
-        val buff = new Array[Byte](maxlen)
-        glGetShaderInfoLog(shader, maxlen, len, 0, buff, 0)
-        val comperrors = buff.map(_.toChar).mkString
-        logger.warn("error compiling %s shader\n%s".format(name, comperrors))
-      } else logger.info("compiled %s shader successfully".format(name))
+    def createShaderProgram(name: String): Int = {
+      var program = -1
+      val vs = glCreateShader(GL_VERTEX_SHADER)
+      val fs = glCreateShader(GL_FRAGMENT_SHADER)
+      val vsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/%s.vert".format(name))
+      val fsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/%s.frag".format(name))
+      import JavaConverters._
+      val vsrc = IOUtils.readLines(vsprogis).asScala.mkString("\n")
+      val fsrc = IOUtils.readLines(fsprogis).asScala.mkString("\n")
+      IOUtils.closeQuietly(vsprogis)
+      IOUtils.closeQuietly(fsprogis)
+      
+      def errorLog(shname: String, shader: Int) {
+        val compstatus = new Array[Int](1)
+        glGetShaderiv(shader, GL_COMPILE_STATUS, compstatus, 0)
+        if (compstatus(0) == GL_FALSE) {
+          val len = Array(0)
+          val maxlen = 1000
+          val buff = new Array[Byte](maxlen)
+          glGetShaderInfoLog(shader, maxlen, len, 0, buff, 0)
+          val comperrors = buff.map(_.toChar).mkString
+          logger.warn("error compiling %s shader in %s\n%s".format(shname, name, comperrors))
+        } else logger.info("compiled %s shader in %s successfully".format(shname, name))
+      }
+      
+      glShaderSource(vs, 1, Array(vsrc), null)
+      glCompileShader(vs)
+      errorLog("vertex", vs)
+      
+      glShaderSource(fs, 1, Array(fsrc), null)
+      glCompileShader(fs)
+      errorLog("fragment", fs)
+      
+      program = glCreateProgram()
+      glAttachShader(program, vs)
+      glAttachShader(program, fs)
+      glLinkProgram(program)
+      glValidateProgram(program)
+      
+      program
     }
     
-    glShaderSource(vs, 1, Array(vsrc), null)
-    glCompileShader(vs)
-    errorLog("vertex", vs)
-    
-    glShaderSource(fs, 1, Array(fsrc), null)
-    glCompileShader(fs)
-    errorLog("fragment", fs)
-    
-    shaderProgram = glCreateProgram()
-    glAttachShader(shaderProgram, vs)
-    glAttachShader(shaderProgram, fs)
-    glLinkProgram(shaderProgram)
-    glValidateProgram(shaderProgram)
+    shaderProgram = createShaderProgram("shadow")
+    liteProgram = createShaderProgram("blurlight")
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
@@ -257,6 +283,55 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       }
     }
     
+    def sendUniform1i(program: Int, varname: String, v: Int) {
+      val loc = glGetUniformLocation(program, varname)
+      if (loc == -1) {
+        logger.warn("could not send uniform: " + varname)
+      }
+      glUniform1i(loc, v)
+    }
+    
+    def sendUniform3f(program: Int, varname: String, x: Float, y: Float, z: Float) {
+      val loc = glGetUniformLocation(program, varname)
+      if (loc == -1) {
+        logger.warn("could not send uniform: " + varname)
+      }
+      glUniform3f(loc, x, y, z)
+    }
+    
+    def debugTexture(texno: Int) {
+      glPushMatrix()
+      glEnable(GL_TEXTURE_2D)
+      glEnable(GL_DEPTH_TEST)
+      glColor4f(1.0f,1.0f,1.0f,1.0f)
+      glEnable(GL_BLEND)
+      glBlendFunc(GL_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
+      
+      glMatrixMode(GL_PROJECTION)
+      glLoadIdentity()
+      glOrtho(0, width, height, 0, 0, 1)
+      glMatrixMode(GL_MODELVIEW)
+      glDisable(GL_DEPTH_TEST)
+      glEnable(GL_BLEND)
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
+      
+      glBindTexture(GL_TEXTURE_2D, texno)
+      
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 1); glVertex2d(0, 0);
+      glTexCoord2f(1, 1); glVertex2d(width / 4, 0);
+      glTexCoord2f(1, 0); glVertex2d(width / 4, height / 4);
+      glTexCoord2f(0, 0); glVertex2d(0, height / 4);
+      glEnd();
+      
+      glDisable(GL_DEPTH_TEST)
+      glDisable(GL_TEXTURE_2D)
+      glPopMatrix()
+    }
+    
     /* calc matrices */
     
     val mainlightpos = (-40.f, 100.f, 70.f);
@@ -315,39 +390,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
         glLoadMatrixf(camviewmatrix, 0)
       }
       
-      def debugTexture() {
-        glPushMatrix()
-        glEnable(GL_TEXTURE_2D)
-        glEnable(GL_DEPTH_TEST)
-        glColor4f(1.0f,1.0f,1.0f,1.0f)
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
-        
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(0, width, height, 0, 0, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_DEPTH_TEST)
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        
-        glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
-        
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
-        glTexCoord2f(0, 1); glVertex3f(0, height / 4, 0);
-        glTexCoord2f(1, 1); glVertex3f(width / 4, height / 4, 0);
-        glTexCoord2f(1, 0); glVertex3f(width / 4, 0, 0);
-        glEnd();
-        
-        glDisable(GL_DEPTH_TEST)
-        glDisable(GL_TEXTURE_2D)
-        glPopMatrix()
-      }
-      
       /* draw scene from light point of view and copy to the texture buffer */
       
       glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
@@ -359,7 +401,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       
       drawScene()
       
-      glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+      glBindTexture(GL_TEXTURE_2D, shadowtexno)
       glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
       
       def debugReadScreen() {
@@ -409,7 +451,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
         glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 12)
         glEnable(GL_TEXTURE_GEN_Q)
         
-        glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+        glBindTexture(GL_TEXTURE_2D, shadowtexno)
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
         glScalef(1.f, 1.f, 0.9999f)
@@ -430,22 +472,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       }
       
       def initglsl() {
-        def sendUniform1i(varname: String, v: Int) {
-          val loc = glGetUniformLocation(shaderProgram, varname)
-          if (loc == -1) {
-            logger.warn("could not send uniform: " + varname)
-          }
-          glUniform1i(loc, v)
-        }
-        
-        def sendUniform3f(varname: String, x: Float, y: Float, z: Float) {
-          val loc = glGetUniformLocation(shaderProgram, varname)
-          if (loc == -1) {
-            logger.warn("could not send uniform: " + varname)
-          }
-          glUniform3f(loc, x, y, z)
-        }
-        
         glMatrixMode(GL_TEXTURE)
         glLoadMatrixf(lightprojmatrix, 0)
         glMultMatrixf(lightviewmatrix, 0)
@@ -458,9 +484,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
         
         glActiveTexture(GL_TEXTURE0)
         glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, shadowtexno(0))
+        glBindTexture(GL_TEXTURE_2D, shadowtexno)
         
-        sendUniform1i("shadowtex", 0)
+        sendUniform1i(shaderProgram, "shadowtex", 0)
         
         glEnable(GL_DEPTH_TEST)
         glClear(GL_DEPTH_BUFFER_BIT)
@@ -469,6 +495,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       }
       
       initglsl()
+      
+      glViewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
       
       drawScene()
       
@@ -495,6 +523,10 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     
     renderLightLayer(mainlightpos)
     
+    glBindTexture(GL_TEXTURE_2D, litetexno)
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
+    glViewport(0, 0, width, height)
+    
     /* 2d render scene */
     
     def renderScene() {
@@ -514,7 +546,40 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glEnable(GL_DEPTH_TEST)
     }
     
+    def blurLightLayer() {
+      glEnable(GL_TEXTURE_2D)
+      glEnable(GL_DEPTH_TEST)
+      
+      glMatrixMode(GL_PROJECTION)
+      glLoadIdentity()
+      glOrtho(0, width, height, 0, 0, 1)
+      glMatrixMode(GL_MODELVIEW)
+      glDisable(GL_DEPTH_TEST)
+      
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
+      
+      glBindTexture(GL_TEXTURE_2D, litetexno)
+      
+      glUseProgram(liteProgram)
+      
+      //sendUniform1i(liteProgram, "litetex", 0)
+      
+      glBegin(GL_QUADS)
+      glTexCoord2f(0, 1); glVertex2d(0, 0)
+      glTexCoord2f(1, 1); glVertex2d(width, 0)
+      glTexCoord2f(1, 0); glVertex2d(width, height)
+      glTexCoord2f(0, 0); glVertex2d(0, height)
+      glEnd()
+      
+      glUseProgram(0)
+      
+      glDisable(GL_DEPTH_TEST)
+      glDisable(GL_TEXTURE_2D)
+    }
+    
     renderScene()
+    blurLightLayer()
   }
   
   class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {
@@ -545,7 +610,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     
     def drawString(s: String, x: Int, y: Int) {
       // TODO fix
-      glRasterPos2i(x, y);
+      glRasterPos2i(x, y)
       //glut.glutBitmapString(GLUT.BITMAP_HELVETICA_10, s)
     }
     

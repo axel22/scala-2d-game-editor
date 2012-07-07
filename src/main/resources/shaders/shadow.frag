@@ -62,7 +62,7 @@ void main() {
   float shadowed = directShadow(diff);
   
   // set final color
-  gl_FragColor = vec4(vec3(0.6, 0.6, 0.6) * shadowed, 1.0);
+  gl_FragColor = vec4(vec3(0.4, 0.4, 0.4) * shadowed, 1.0);
 }
 
 
