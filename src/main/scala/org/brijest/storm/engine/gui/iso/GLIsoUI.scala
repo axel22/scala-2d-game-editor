@@ -98,7 +98,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = if (app.sys.os == "Linux") 256 else 1024
+  val SHADOW_TEX_SIZE = 1024
   var shadowtexno: Int = -1
   val LITE_TEX_SIZE = 1024
   var litetexno: Int = -1
@@ -119,7 +119,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     0.f, 0.f, 1.f, 0.f,
     0.f, 0.f, 0.f, 1.f
   )
-  var shaderProgram: Int = -1
+  var orthoshadowProgram: Int = -1
   var liteProgram: Int = -1
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
   
@@ -207,7 +207,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       program
     }
     
-    shaderProgram = createShaderProgram("shadow")
+    orthoshadowProgram = createShaderProgram("orthoshadow")
     liteProgram = createShaderProgram("blurlight")
   }
   
@@ -231,6 +231,13 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     val yuntil = interval(0, area.height)(ybl.toInt)
     val xlook = xmid - 14.35
     val ylook = ymid - 13.35
+    
+    trait Light {
+      def shader: Int
+    }
+    case class OrthoLight(pos: (Float, Float, Float)) extends Light {
+      def shader = orthoshadowProgram
+    }
     
     def drawScene() {
       def drawCube(x: Int, y: Int) {
@@ -336,24 +343,26 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     
     val mainlightpos = (-40.f, 100.f, 70.f);
     
-    def renderLightLayer(lightpos: (Float, Float, Float)) {
+    def renderLightLayer(light: Light) {
       val xyside = 100.f
       val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
       val campos = (xyside, xyside, zcenter.toFloat);
+      val shaderProgram = light.shader
       
-      def initLightMatrices() {
-        glLoadIdentity()
-        val wdt = width / 45
-        val hgt = height / 45
-        glOrtho(wdt, -wdt, -hgt, hgt, -500.0, 500.0)
-        glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
-        
-        glLoadIdentity()
-        glu.gluLookAt(
-          xlook + lightpos._1, ylook + lightpos._2, lightpos._3,
-          xlook, ylook, 0.f,
-          0.f, 0.f, 1.f)
-        glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
+      def initLightMatrices() = light match {
+        case OrthoLight(lightpos) =>
+          glLoadIdentity()
+          val wdt = width / 45
+          val hgt = height / 45
+          glOrtho(wdt, -wdt, -hgt, hgt, -500.0, 500.0)
+          glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
+          
+          glLoadIdentity()
+          glu.gluLookAt(
+            xlook + lightpos._1, ylook + lightpos._2, lightpos._3,
+            xlook, ylook, 0.f,
+            0.f, 0.f, 1.f)
+          glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
       }
       
       def initCamMatrices() {
@@ -521,7 +530,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glDisable(GL_ALPHA_TEST)
     }
     
-    renderLightLayer(mainlightpos)
+    renderLightLayer(OrthoLight(mainlightpos))
     
     glBindTexture(GL_TEXTURE_2D, litetexno)
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
