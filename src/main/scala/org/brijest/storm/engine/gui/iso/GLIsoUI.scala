@@ -43,6 +43,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   val areadisplay = new AreaDisplay
   val frame = new Frame {
     title = name
+    location = new Point(50, 50)
     peer.add(areadisplay)
     areadisplay.requestFocus()
   }
@@ -98,10 +99,13 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = 1024
+  val SHADOW_TEX_SIZE = 2048
   var shadowtexno: Int = -1
+  var shadowfbo: Int = -1
+  var shadowdrb: Int = -1
   val LITE_TEX_SIZE = 1024
   var litetexno: Int = -1
+  var litefbo: Int = -1
   val lightprojmatrix = new Array[Float](16)
   val lightviewmatrix = new Array[Float](16)
   val camprojmatrix = new Array[Float](16)
@@ -125,11 +129,11 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   
   private def initialize(drawable: GLAutoDrawable) {
     val gl = drawable.getGL().getGL2()
-    val texindex = new Array[Int](1)
+    val index = new Array[Int](1)
     import gl._
     
-    glGenTextures(1, texindex, 0)
-    shadowtexno = texindex(0)
+    glGenTextures(1, index, 0)
+    shadowtexno = index(0)
     glBindTexture(GL_TEXTURE_2D, shadowtexno)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -141,8 +145,14 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
                  GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, null)
     
-    glGenTextures(1, texindex, 0)
-    litetexno = texindex(0)
+    glGenFramebuffers(1, index, 0)
+    shadowfbo = index(0)
+    
+    glGenRenderbuffers(1, index, 0)
+    shadowdrb = index(0)
+    
+    glGenTextures(1, index, 0)
+    litetexno = index(0)
     glBindTexture(GL_TEXTURE_2D, litetexno)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
@@ -153,6 +163,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, LITE_TEX_SIZE, LITE_TEX_SIZE, 0,
                  GL_RGB, GL_UNSIGNED_INT, null)
+    
+    glGenFramebuffers(1, index, 0)
+    litefbo = index(0)
     
     glEnable(GL_NORMALIZE)
     
@@ -225,9 +238,9 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     val (xbl, ybl) = planar2iso(u0, v0 + ph, area.sidelength)
     val xmid = (xtl + xbr) / 2
     val ymid = (ytr + ybl) / 2
-    val xfrom = interval(0, area.width)(xtl.toInt)
+    val xfrom = interval(0, area.width)(xtl.toInt - 4)
     val xuntil = interval(0, area.width)(xbr.toInt)
-    val yfrom = interval(0, area.height)(ytr.toInt)
+    val yfrom = interval(0, area.height)(ytr.toInt - 1)
     val yuntil = interval(0, area.height)(ybl.toInt)
     val xlook = xmid - 14.35
     val ylook = ymid - 13.35
@@ -349,20 +362,22 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       val campos = (xyside, xyside, zcenter.toFloat);
       val shaderProgram = light.shader
       
-      def initLightMatrices() = light match {
-        case OrthoLight(lightpos) =>
-          glLoadIdentity()
-          val wdt = width / 45
-          val hgt = height / 45
-          glOrtho(wdt, -wdt, -hgt, hgt, -500.0, 500.0)
-          glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
-          
-          glLoadIdentity()
-          glu.gluLookAt(
-            xlook + lightpos._1, ylook + lightpos._2, lightpos._3,
-            xlook, ylook, 0.f,
-            0.f, 0.f, 1.f)
-          glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
+      def initLightMatrices() {
+        light match {
+          case OrthoLight(lightpos) =>
+            glLoadIdentity()
+            val wdt = width / 8
+            val hgt = height / 8
+            glOrtho(wdt, -wdt, -hgt, hgt, -600.0, 600.0)
+            glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
+            
+            glLoadIdentity()
+            glu.gluLookAt(
+              xlook + 80.f + lightpos._1, ylook - 50.f + lightpos._2, lightpos._3,
+              xlook + 80.f, ylook - 50.f, 0.f,
+              0.f, 0.f, 1.f)
+            glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
+        }
       }
       
       def initCamMatrices() {
@@ -408,10 +423,21 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       glEnable(GL_DEPTH_TEST)
       
+      // glBindFramebuffer(GL_FRAMEBUFFER, shadowfbo)
+      // glBindRenderbuffer(GL_RENDERBUFFER, shadowdrb)
+      // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, LITE_TEX_SIZE, LITE_TEX_SIZE)
+      // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, shadowdrb)
+      // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowtexno, 0)
+      
       drawScene()
+      
+      // glBindFramebuffer(GL_FRAMEBUFFER, 0)
+      // glBindRenderbuffer(GL_RENDERBUFFER, 0)
       
       glBindTexture(GL_TEXTURE_2D, shadowtexno)
       glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+      // debugTexture(shadowtexno)
+      // return
       
       def debugReadScreen() {
         glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
@@ -507,7 +533,12 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       
       glViewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
       
+      glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
+      
       drawScene()
+      
+      glBindFramebuffer(GL_FRAMEBUFFER, 0)
       
       glUseProgram(0)
       
@@ -530,10 +561,17 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glDisable(GL_ALPHA_TEST)
     }
     
+    /* first clear texture */
+    glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glBindFramebuffer(GL_FRAMEBUFFER, 0)
+    
     renderLightLayer(OrthoLight(mainlightpos))
     
-    glBindTexture(GL_TEXTURE_2D, litetexno)
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
+    //glBindTexture(GL_TEXTURE_2D, litetexno)
+    //glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
+    
     glViewport(0, 0, width, height)
     
     /* 2d render scene */

@@ -411,8 +411,8 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
     val (xtr, ytr) = planar2iso(u0 + pw, v0, area.sidelength)
     val (xbr, ybr) = planar2iso(u0 + pw, v0 + ph, area.sidelength)
     val (xbl, ybl) = planar2iso(u0, v0 + ph, area.sidelength)
-    val x0 = xtl.toInt - 1
-    val y0 = ytr.toInt
+    val x0 = xtl.toInt - 4
+    val y0 = ytr.toInt - 1
     val w = (xbr - x0).toInt
     val h = (ybl - y0).toInt
     

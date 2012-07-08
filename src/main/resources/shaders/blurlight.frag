@@ -9,25 +9,29 @@ const float blursize = 1.0 / 1024.0;
 vec4 blurred(vec4 texcenter) {
   vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
   
-  color += texture2D(litetex, vec2(texcenter.x - 4.0 * blursize, texcenter.y)) * 0.05;
-  color += texture2D(litetex, vec2(texcenter.x - 3.0 * blursize, texcenter.y)) * 0.09;
-  color += texture2D(litetex, vec2(texcenter.x - 2.0 * blursize, texcenter.y)) * 0.12;
-  color += texture2D(litetex, vec2(texcenter.x - 1.0 * blursize, texcenter.y)) * 0.15;
+  color += texture2D(litetex, vec2(texcenter.x - 9.0 * blursize, texcenter.y)) * 0.03;
+  color += texture2D(litetex, vec2(texcenter.x - 8.0 * blursize, texcenter.y)) * 0.05;
+  color += texture2D(litetex, vec2(texcenter.x - 6.0 * blursize, texcenter.y)) * 0.08;
+  color += texture2D(litetex, vec2(texcenter.x - 4.0 * blursize, texcenter.y)) * 0.11;
+  color += texture2D(litetex, vec2(texcenter.x - 2.0 * blursize, texcenter.y)) * 0.14;
   color += texture2D(litetex, vec2(texcenter.x + 0.0 * blursize, texcenter.y)) * 0.16;
-  color += texture2D(litetex, vec2(texcenter.x + 1.0 * blursize, texcenter.y)) * 0.15;
-  color += texture2D(litetex, vec2(texcenter.x + 2.0 * blursize, texcenter.y)) * 0.12;
-  color += texture2D(litetex, vec2(texcenter.x + 3.0 * blursize, texcenter.y)) * 0.09;
-  color += texture2D(litetex, vec2(texcenter.x + 4.0 * blursize, texcenter.y)) * 0.05;
+  color += texture2D(litetex, vec2(texcenter.x + 2.0 * blursize, texcenter.y)) * 0.14;
+  color += texture2D(litetex, vec2(texcenter.x + 4.0 * blursize, texcenter.y)) * 0.11;
+  color += texture2D(litetex, vec2(texcenter.x + 6.0 * blursize, texcenter.y)) * 0.08;
+  color += texture2D(litetex, vec2(texcenter.x + 8.0 * blursize, texcenter.y)) * 0.05;
+  color += texture2D(litetex, vec2(texcenter.x + 9.0 * blursize, texcenter.y)) * 0.03;
   
-  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 4.0 * blursize)) * 0.05;
-  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 3.0 * blursize)) * 0.09;
-  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 2.0 * blursize)) * 0.12;
-  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 1.0 * blursize)) * 0.15;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 9.0 * blursize)) * 0.03;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 8.0 * blursize)) * 0.05;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 6.0 * blursize)) * 0.08;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 4.0 * blursize)) * 0.11;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 2.0 * blursize)) * 0.14;
   color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 0.0 * blursize)) * 0.16;
-  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 1.0 * blursize)) * 0.15;
-  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 2.0 * blursize)) * 0.12;
-  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 3.0 * blursize)) * 0.09;
-  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 4.0 * blursize)) * 0.05;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 2.0 * blursize)) * 0.14;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 4.0 * blursize)) * 0.11;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 6.0 * blursize)) * 0.08;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 8.0 * blursize)) * 0.05;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 9.0 * blursize)) * 0.03;
   
   return color / 2.0;
 }
