@@ -563,7 +563,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       
       glUseProgram(liteProgram)
       
-      //sendUniform1i(liteProgram, "litetex", 0)
+      sendUniform1i(liteProgram, "litetex", 0)
       
       glBegin(GL_QUADS)
       glTexCoord2f(0, 1); glVertex2d(0, 0)
