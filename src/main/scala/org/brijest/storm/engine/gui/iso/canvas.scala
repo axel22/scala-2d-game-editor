@@ -185,13 +185,13 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   }
   
   trait TerrainDrawer {
-    def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int)
+    def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int)
   }
   
   class TerrainSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
     import a._
     
-    def drawTerrain(curr: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+    def drawTerrain(curr: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
       def random(x: Int, y: Int) = math.abs(x + y * 0x9e3775cd)
       
       // obtain sprite for slot
@@ -237,7 +237,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   class TerrainOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
     import a._
     
-    def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+    def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
       rect(
         up - slotwidth / 2, up, up + slotwidth / 2, up,
         vp, vp - slotheight / 2, vp, vp + slotheight / 2
@@ -274,11 +274,11 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   }
   
   trait CharacterDrawer {
-    def drawCharacter(c: Character, x: Int, y: Int, info: Info)
+    def drawCharacter(c: Character, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int)
   }
   
   class CharacterSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with CharacterDrawer {
-    def drawCharacter(c: Character, x: Int, y: Int, info: Info) {
+    def drawCharacter(c: Character, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int) {
       // get sprite for character
       
       // draw sprite
@@ -310,7 +310,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   }
   
   class CharacterOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends OutlineDrawer(a, area, u0, v0) with CharacterDrawer {
-    def drawCharacter(c: Character, x: Int, y: Int, info: Info) {
+    def drawCharacter(c: Character, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int) {
       var maxheight = 0
       c.foreachPos {
         (x, y) =>
@@ -323,11 +323,11 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   }
   
   trait EffectDrawer {
-    def drawEffect(e: Effect, x: Int, y: Int, info: Info)
+    def drawEffect(e: Effect, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int)
   }
   
   class EffectOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends OutlineDrawer(a, area, u0, v0) with EffectDrawer {
-    def drawEffect(e: Effect, x: Int, y: Int, info: Info) {
+    def drawEffect(e: Effect, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int) {
       var maxheight = 0
       e.foreachPos {
         (x, y) =>
@@ -339,7 +339,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   }
   
   class EffectSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with EffectDrawer {
-    def drawEffect(e: Effect, x: Int, y: Int, info: Info) {
+    def drawEffect(e: Effect, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int) {
     }
   }
   
@@ -388,23 +388,30 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   
   def background(area: AreaView) = stars
   
-  def redrawBackground(area: AreaView, a: DrawAdapter) = if (drawing.background) {
-    val w = 800
-    val h = 600
-    val x0 = pos._1 / 16 % w
-    val y0 = pos._2 / 16 % h
-    for (x <- -1 to (width / w + 1); y <- -1 to (height / h + 1))
-      a.drawImage(background(area), x * w - x0, y * h - y0, x * w + w - x0, y * h + h - y0, 0, 0, w, h)
-  } else {
-    a.setColor(0, 0, 0)
-    a.fillRect(0, 0, width, height)
+  def redrawBackground(area: AreaView, a: DrawAdapter, ustart: Int, vstart: Int, vpuoffs: Int, vpvoffs: Int) {
+    if (drawing.background) {
+      val w = 800
+      val h = 600
+      val x0 = (pos._1 / 16  + vpuoffs) % w
+      val y0 = (pos._2 / 16  + height - vpvoffs) % h
+      for (x <- -1 to (width / w + 1); y <- -1 to (height / h + 1))
+        a.drawImage(background(area), x * w - x0, y * h - y0, x * w + w - x0, y * h + h - y0, 0, 0, w, h)
+    } else {
+      a.setColor(0, 0, 0)
+      a.fillRect(0, 0, width, height)
+    }
   }
   
   def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
-    redrawBackground(area, a)
+    redrawRect(area, engine, a, pos._1, pos._2, width, height, 0, 0)
+  }
+  
+  protected def redrawRect(area: AreaView, engine: Engine.State, a: DrawAdapter, ustart: Int, vstart: Int, width: Int, height: Int, vpuoffs: Int, vpvoffs: Int) {
+    redrawBackground(area, a, ustart, vstart, vpuoffs, vpvoffs)
     
     // determine region
-    val (u0, v0) = pos
+    val u0 = ustart
+    val v0 = vstart
     val pw = width
     val ph = height + area.maxheight() * levelheight + palette.maxSpriteHeight
     val (xtl, ytl) = planar2iso(u0, v0, area.sidelength)
@@ -534,13 +541,13 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
         val slot = area.terrain(xp, yp)
         val u = iso2planar_u(xp, yp, slot.height, area.sidelength) - u0
         val v = iso2planar_v(xp, yp, slot.height, area.sidelength) - v0
-        drawTerrain(slot, xp, yp, u, v)
+        drawTerrain(slot, xp, yp, u, v, vpuoffs, vpvoffs)
       }
       
       // draw character
       area.characters(x, y) match {
         case NoCharacter => // do nothing
-        case c => if (!hidden(c)) drawCharacter(c, x, y, info)
+        case c => if (!hidden(c)) drawCharacter(c, x, y, info, vpuoffs, vpvoffs)
       }
     }
     def reverseDraw(x: Int, y: Int) {
@@ -549,7 +556,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
           if (info.isTop) {
             info.drawn = true
             info.deps.foreach((xp, yp) => reverseDraw(xp, yp))
-            if (info.isEffect) drawEffect(info.effect, x, y, info) else drawTop(x, y, info)
+            if (info.isEffect) drawEffect(info.effect, x, y, info, vpuoffs, vpvoffs) else drawTop(x, y, info)
           } else {
             info.drawn = true
             reverseDraw(info.top.x, info.top.y)

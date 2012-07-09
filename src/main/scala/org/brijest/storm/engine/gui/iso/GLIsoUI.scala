@@ -39,7 +39,6 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   var resizestamp = 0L
   val glp = GLProfile.getDefault()
   val caps = new GLCapabilities(glp)
-  var buffer = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR)
   val areadisplay = new AreaDisplay
   val frame = new Frame {
     title = name
@@ -70,7 +69,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     }
   })
   
-  frame.size = new Dimension(640, 480)
+  frame.size = new Dimension(800, 600)
   frame.peer.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
   frame.open()
   
@@ -224,12 +223,32 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     liteProgram = createShaderProgram("blurlight")
   }
   
+  var count = 0
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
+    a.asInstanceOf[GLAutoDrawableDrawAdapter].gl.glClear(GL_COLOR_BUFFER_BIT)
+    
+    val wrect = 640
+    val hrect = 480
+    
+    var u = 0
+    var v = 0
+    while (v < height) {
+      while (u < width) {
+        redrawRect(area, engine, a, pos._1 + u, pos._2 + v, wrect, hrect, u, height - hrect - v)
+        u += hrect
+      }
+      u = 0
+      v += hrect
+    }
+  }
+  
+  protected override def redrawRect(area: AreaView, engine: Engine.State, a: DrawAdapter, ustart: Int, vstart: Int, width: Int, height: Int, vpuoffs: Int, vpvoffs: Int) {
     val gl = a.asInstanceOf[GLAutoDrawableDrawAdapter].gl
     val glu = new GLU
     import gl._
     
-    val (u0, v0) = pos
+    val u0 = ustart
+    val v0 = vstart
     val pw = width
     val ph = height + area.maxheight() * levelheight + palette.maxSpriteHeight
     val (xtl, ytl) = planar2iso(u0, v0, area.sidelength)
@@ -419,25 +438,22 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
       lightView()
       
-      glColor3f(1.f, 1.f, 1.f)
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+      glColor4f(1.f, 1.f, 1.f, 0.f)
       glEnable(GL_DEPTH_TEST)
       
-      // glBindFramebuffer(GL_FRAMEBUFFER, shadowfbo)
-      // glBindRenderbuffer(GL_RENDERBUFFER, shadowdrb)
-      // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, LITE_TEX_SIZE, LITE_TEX_SIZE)
-      // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, shadowdrb)
-      // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowtexno, 0)
+      //glBindFramebuffer(GL_FRAMEBUFFER, shadowfbo)
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowtexno, 0)
+      
+      glClear(GL_DEPTH_BUFFER_BIT)
       
       drawScene()
       
-      // glBindFramebuffer(GL_FRAMEBUFFER, 0)
-      // glBindRenderbuffer(GL_RENDERBUFFER, 0)
+      glBindFramebuffer(GL_FRAMEBUFFER, 0)
       
       glBindTexture(GL_TEXTURE_2D, shadowtexno)
       glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
-      // debugTexture(shadowtexno)
-      // return
+      //debugTexture(shadowtexno)
+      //return
       
       def debugReadScreen() {
         glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
@@ -451,7 +467,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       
       glViewport(0, 0, width, height)
       
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+      //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       
       def initfixed() {
         orthoView()
@@ -572,12 +588,12 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     //glBindTexture(GL_TEXTURE_2D, litetexno)
     //glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
     
-    glViewport(0, 0, width, height)
+    glViewport(vpuoffs, vpvoffs, width, height)
     
     /* 2d render scene */
     
     def renderScene() {
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+      //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       glMatrixMode(GL_PROJECTION)
       glLoadIdentity()
       glOrtho(0, width, height, 0, 0, 1)
@@ -588,23 +604,22 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       
-      super.redraw(area, engine, a)
+      super.redrawRect(area, engine, a, ustart, vstart, width, height, vpuoffs, vpvoffs)
       
       glEnable(GL_DEPTH_TEST)
     }
     
     def blurLightLayer() {
+      glDisable(GL_DEPTH_TEST)
       glEnable(GL_TEXTURE_2D)
-      glEnable(GL_DEPTH_TEST)
+      
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
       
       glMatrixMode(GL_PROJECTION)
       glLoadIdentity()
       glOrtho(0, width, height, 0, 0, 1)
       glMatrixMode(GL_MODELVIEW)
-      glDisable(GL_DEPTH_TEST)
-      
-      glMatrixMode(GL_TEXTURE)
-      glLoadIdentity()
       
       glBindTexture(GL_TEXTURE_2D, litetexno)
       
@@ -621,7 +636,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       
       glUseProgram(0)
       
-      glDisable(GL_DEPTH_TEST)
+      glEnable(GL_DEPTH_TEST)
       glDisable(GL_TEXTURE_2D)
     }
     
