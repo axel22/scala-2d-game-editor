@@ -224,9 +224,17 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
+    val t = timed {
+      redrawInternal(area, engine, a)
+    }
+    
+    println("redrawn in " + t + " ms")
+  }
+
+  private def redrawInternal(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     a.asInstanceOf[GLAutoDrawableDrawAdapter].gl.glClear(GL_COLOR_BUFFER_BIT)
     
-    val (wrect, hrect) = if (drawing.shadows) (1024, 1024) else (width, height)
+    val (wrect, hrect) = if (drawing.shadows) (1050, 1050) else (width, height)
     
     var u = 0
     var v = 0
@@ -386,8 +394,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
         light match {
           case OrthoLight(lightpos, _) =>
             glLoadIdentity()
-            val wdt = width / 10
-            val hgt = height / 10
+            val wdt = if (width < 1050) width / 8 else width / 11
+            val hgt = if (height < 1050) height / 8 else height / 11
             glOrtho(wdt, -wdt, -hgt, hgt, -600.0, 600.0)
             glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
             
@@ -580,12 +588,15 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     }
     
     /* first clear texture */
-    glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glBindFramebuffer(GL_FRAMEBUFFER, 0)
     
-    renderLightLayer(OrthoLight(mainlightpos, (0.3f, 0.3f, 0.3f)))
+    if (drawing.shadows) {
+      glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+      glBindFramebuffer(GL_FRAMEBUFFER, 0)
+      
+      renderLightLayer(OrthoLight(mainlightpos, (0.3f, 0.3f, 0.3f)))
+    }
     
     //glBindTexture(GL_TEXTURE_2D, litetexno)
     //glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
@@ -643,7 +654,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     }
     
     renderScene()
-    blurLightLayer()
+    if (drawing.shadows) blurLightLayer()
   }
   
   class GLAutoDrawableDrawAdapter(val drawable: GLAutoDrawable) extends DrawAdapter {
