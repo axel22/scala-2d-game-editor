@@ -223,18 +223,17 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     liteProgram = createShaderProgram("blurlight")
   }
   
-  var count = 0
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     a.asInstanceOf[GLAutoDrawableDrawAdapter].gl.glClear(GL_COLOR_BUFFER_BIT)
     
-    val (wrect, hrect) = if (drawing.shadows) (800, 800) else (width, height)
+    val (wrect, hrect) = if (drawing.shadows) (1024, 1024) else (width, height)
     
     var u = 0
     var v = 0
     while (v < height) {
       while (u < width) {
         redrawRect(area, engine, a, pos._1 + u, pos._2 + v, wrect, hrect, u, height - hrect - v)
-        u += hrect
+        u += wrect
       }
       u = 0
       v += hrect
@@ -387,8 +386,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
         light match {
           case OrthoLight(lightpos, _) =>
             glLoadIdentity()
-            val wdt = width / 8
-            val hgt = height / 8
+            val wdt = width / 10
+            val hgt = height / 10
             glOrtho(wdt, -wdt, -hgt, hgt, -600.0, 600.0)
             glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
             

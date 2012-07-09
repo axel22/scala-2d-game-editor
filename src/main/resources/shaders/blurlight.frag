@@ -40,7 +40,9 @@ vec4 blurred(vec4 texcenter) {
 void main() {
   vec4 texcoord = gl_TexCoord[0] / gl_TexCoord[0].w * 0.5 + 0.5;
   vec4 color = blurred(texcoord);
-  float intensity = (1.0 - (color.x + color.y + color.z) / 3.0);
+  float intensity = (color.x + color.y + color.z) / 3.0;
+  float alpha = 1.0 - intensity * 2.0;
+  if (alpha < 0.6) alpha = 0.6;
   
-  gl_FragColor = vec4(color.xyz, 0.4 * intensity);
+  gl_FragColor = vec4(color.xyz, 0.5 * alpha);
 }
