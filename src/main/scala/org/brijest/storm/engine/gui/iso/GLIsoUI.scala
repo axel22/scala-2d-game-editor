@@ -264,10 +264,13 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     val xlook = xmid - 14.35
     val ylook = ymid - 13.35
     
+    type Vec3 = (Float, Float, Float)
+    
     trait Light {
       def shader: Int
+      def color: Vec3
     }
-    case class OrthoLight(pos: (Float, Float, Float)) extends Light {
+    case class OrthoLight(pos: Vec3, color: Vec3) extends Light {
       def shader = orthoshadowProgram
     }
     
@@ -383,7 +386,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       
       def initLightMatrices() {
         light match {
-          case OrthoLight(lightpos) =>
+          case OrthoLight(lightpos, _) =>
             glLoadIdentity()
             val wdt = width / 8
             val hgt = height / 8
@@ -538,6 +541,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
         glBindTexture(GL_TEXTURE_2D, shadowtexno)
         
         sendUniform1i(shaderProgram, "shadowtex", 0)
+        sendUniform3f(shaderProgram, "light_color", light.color._1, light.color._2, light.color._3)
         
         glEnable(GL_DEPTH_TEST)
         glClear(GL_DEPTH_BUFFER_BIT)
@@ -583,7 +587,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glBindFramebuffer(GL_FRAMEBUFFER, 0)
     
-    renderLightLayer(OrthoLight(mainlightpos))
+    renderLightLayer(OrthoLight(mainlightpos, (0.3f, 0.3f, 0.3f)))
     
     //glBindTexture(GL_TEXTURE_2D, litetexno)
     //glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)

@@ -1,6 +1,7 @@
 
 
 uniform sampler2D shadowtex;
+uniform vec3 light_color;
 
 varying float polydirection;
 
@@ -62,7 +63,7 @@ void main() {
   float shadowed = directShadow(diff);
   
   // set final color
-  gl_FragColor = vec4(vec3(0.4, 0.4, 0.4) * shadowed, 1.0);
+  gl_FragColor = vec4(light_color * shadowed, 1.0);
 }
 
 
