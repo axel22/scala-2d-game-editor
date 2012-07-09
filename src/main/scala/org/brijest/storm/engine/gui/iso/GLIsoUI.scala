@@ -69,7 +69,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
     }
   })
   
-  frame.size = new Dimension(800, 600)
+  frame.size = new Dimension(1000, 1000)
   frame.peer.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
   frame.open()
   
@@ -227,8 +227,8 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     a.asInstanceOf[GLAutoDrawableDrawAdapter].gl.glClear(GL_COLOR_BUFFER_BIT)
     
-    val wrect = 640
-    val hrect = 480
+    val wrect = 800
+    val hrect = 800
     
     var u = 0
     var v = 0
