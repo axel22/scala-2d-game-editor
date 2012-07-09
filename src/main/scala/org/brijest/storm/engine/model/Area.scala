@@ -122,12 +122,12 @@ object Area {
     area.resize(w, h);
     area.terrain.default = (x, y) => Some(new DungeonFloor);
     for (x <- 0 until w) {
-      area.terrain(x, 0) = Slot(classOf[DungeonFloor], 4)
-      area.terrain(x, h - 1) = Slot(classOf[DungeonFloor], 4)
+      area.terrain(x, 0) = Slot(classOf[HardRock], 4)
+      area.terrain(x, h - 1) = Slot(classOf[HardRock], 4)
     }
     for (y <- 1 until (h - 1)) {
-      area.terrain(0, y) = Slot(classOf[DungeonFloor], 4)
-      area.terrain(w - 1, y) = Slot(classOf[DungeonFloor], 4)
+      area.terrain(0, y) = Slot(classOf[HardRock], 4)
+      area.terrain(w - 1, y) = Slot(classOf[HardRock], 4)
     }
     
     area
