@@ -227,8 +227,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     a.asInstanceOf[GLAutoDrawableDrawAdapter].gl.glClear(GL_COLOR_BUFFER_BIT)
     
-    val wrect = 800
-    val hrect = 800
+    val (wrect, hrect) = if (drawing.shadows) (800, 800) else (width, height)
     
     var u = 0
     var v = 0
@@ -454,7 +453,7 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
       glBindFramebuffer(GL_FRAMEBUFFER, 0)
       
       glBindTexture(GL_TEXTURE_2D, shadowtexno)
-      glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+      if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
       //debugTexture(shadowtexno)
       //return
       

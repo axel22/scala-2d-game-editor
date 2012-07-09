@@ -358,6 +358,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
     var seethrough: Boolean = app.render.seethrough
     var indices: Boolean = app.render.indices
     var background: Boolean = app.render.background
+    var shadows: Boolean = app.render.shadows
   }
   
   def pos: (Int, Int)

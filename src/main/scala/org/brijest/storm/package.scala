@@ -67,6 +67,7 @@ package object storm {
       this.seethrough(false)
       this.indices(true)
       this.background(true)
+      this.shadows(sys.os != "Linux")
     }
     
     object sys {
