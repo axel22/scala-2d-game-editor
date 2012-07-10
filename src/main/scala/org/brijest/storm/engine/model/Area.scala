@@ -120,7 +120,7 @@ object Area {
     implicit val area = new Area
     
     area.resize(w, h);
-    area.terrain.default = (x, y) => Some(new DungeonFloor);
+    area.terrain.default = (x, y) => Some(Slot(classOf[DungeonFloor], 0));
     for (x <- 0 until w) {
       area.terrain(x, 0) = Slot(classOf[DungeonFloor], 4)
       area.terrain(x, h - 1) = Slot(classOf[DungeonFloor], 4)
