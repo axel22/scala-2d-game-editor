@@ -33,6 +33,7 @@ import org.brijest.storm.engine.model._
 
 
 class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging {
+self =>
   
   class AreaDisplay extends GLCanvas(caps)
   
@@ -234,17 +235,19 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
   private def redrawInternal(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     a.asInstanceOf[GLAutoDrawableDrawAdapter].gl.glClear(GL_COLOR_BUFFER_BIT)
     
-    val (wrect, hrect) = if (drawing.shadows) (1050, 1050) else (width, height)
+    val (wrect, hrect) = if (drawing.shadows) (1680, 1050) else (width, height)
     
     var u = 0
     var v = 0
     while (v < height) {
+      val hgt = if (height - v < hrect) height - v else hrect
       while (u < width) {
-        redrawRect(area, engine, a, pos._1 + u, pos._2 + v, wrect, hrect, u, height - hrect - v)
-        u += wrect
+        val wdt = if (width - u < wrect) width - u else wrect
+        redrawRect(area, engine, a, pos._1 + u, pos._2 + v, wdt, hgt, u, height - hgt - v)
+        u += wdt
       }
       u = 0
-      v += hrect
+      v += hgt
     }
   }
   
@@ -394,15 +397,15 @@ class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging 
         light match {
           case OrthoLight(lightpos, _) =>
             glLoadIdentity()
-            val wdt = if (width < 1050) width / 8 else width / 11
-            val hgt = if (height < 1050) height / 8 else height / 11
+            val wdt = 1050 / 14
+            val hgt = 1050 / 14
             glOrtho(wdt, -wdt, -hgt, hgt, -600.0, 600.0)
             glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
             
             glLoadIdentity()
             glu.gluLookAt(
-              xlook + 80.f + lightpos._1, ylook - 50.f + lightpos._2, lightpos._3,
-              xlook + 80.f, ylook - 50.f, 0.f,
+              xlook + 60.f + lightpos._1, ylook - 50.f + lightpos._2, lightpos._3,
+              xlook + 60.f, ylook - 50.f, 0.f,
               0.f, 0.f, 1.f)
             glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
         }
