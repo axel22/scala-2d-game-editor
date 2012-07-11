@@ -38,7 +38,7 @@ object Editor {
 }
 
 
-class EditorConfigParser(config: Config) extends DefaultParser(app.command) {
+class EditorConfigParser(config: Config) extends DefaultParser(app.editorcommand) {
   help("h", "help", "Show this help message")
   opt("width", "The width for the area, if it's newly created", { v: String => config.area.width = v.toInt })
   opt("height", "The height for the area, if it's newly created", { v: String => config.area.height = v.toInt })

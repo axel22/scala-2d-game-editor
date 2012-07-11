@@ -52,6 +52,7 @@ package object storm {
     val name = "Storm Enroute"
     val editorname = "Storm Enroute Area Editor"
     val command = "storm-enroute"
+    val editorcommand = "editor"
     
     trait PropMap extends Dynamic {
       private val propmap = mutable.Map[String, Any]()

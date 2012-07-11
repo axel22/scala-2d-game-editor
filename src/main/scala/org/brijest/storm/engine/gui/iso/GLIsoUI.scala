@@ -70,7 +70,7 @@ self =>
     }
   })
   
-  frame.size = new Dimension(1000, 1000)
+  frame.size = new Dimension(1680, 1050)
   frame.peer.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
   frame.open()
   
@@ -229,7 +229,7 @@ self =>
       redrawInternal(area, engine, a)
     }
     
-    println("redrawn in " + t + " ms")
+    //logger.info("redrawn in " + t + " ms")
   }
 
   private def redrawInternal(area: AreaView, engine: Engine.State, a: DrawAdapter) {
@@ -448,7 +448,12 @@ self =>
       /* draw scene from light point of view and copy to the texture buffer */
       
       glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+      glEnable(GL_CULL_FACE)
+      glCullFace(GL_FRONT)
+      
       lightView()
+      
+      glDisable(GL_CULL_FACE)
       
       glColor4f(1.f, 1.f, 1.f, 0.f)
       glEnable(GL_DEPTH_TEST)
@@ -561,6 +566,8 @@ self =>
       initglsl()
       
       glViewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
+      glEnable(GL_CULL_FACE)
+      glCullFace(GL_BACK)
       
       glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
@@ -568,6 +575,8 @@ self =>
       drawScene()
       
       glBindFramebuffer(GL_FRAMEBUFFER, 0)
+      
+      glDisable(GL_CULL_FACE)
       
       glUseProgram(0)
       
