@@ -43,7 +43,7 @@ self =>
   val areadisplay = new AreaDisplay
   val frame = new Frame {
     title = name
-    location = new Point(50, 50)
+    location = new Point(0, 0)
     peer.add(areadisplay)
     areadisplay.requestFocus()
   }
@@ -270,8 +270,8 @@ self =>
     val xuntil = interval(0, area.width)(xbr.toInt)
     val yfrom = interval(0, area.height)(ytr.toInt - 1)
     val yuntil = interval(0, area.height)(ybl.toInt)
-    val xlook = xmid - 14.35
-    val ylook = ymid - 13.35
+    val xlook = xmid - 14.45
+    val ylook = ymid - 13.45
     
     type Vec3 = (Float, Float, Float)
     

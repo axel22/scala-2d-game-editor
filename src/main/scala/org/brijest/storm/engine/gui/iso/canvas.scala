@@ -241,26 +241,34 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
     val nbsorted = new Array[Int](3)
     val nbsprites = new Array[AnyRef](8)
     
-    def loadNeighbours(x: Int, y: Int) {
+    def loadNeighboursAndCheckEdge(x: Int, y: Int, layer: Int) = {
+      var samelayer = true
       neighbours(0) = area.safeTerrain(x + 0, y + 1)
+      if (neighbours(0).layer != layer) samelayer = false
       neighbours(1) = area.safeTerrain(x + 1, y + 1)
+      if (neighbours(1).layer != layer) samelayer = false
       neighbours(2) = area.safeTerrain(x + 1, y + 0)
+      if (neighbours(2).layer != layer) samelayer = false
       neighbours(3) = area.safeTerrain(x + 1, y - 1)
+      if (neighbours(3).layer != layer) samelayer = false
       neighbours(4) = area.safeTerrain(x + 0, y - 1)
+      if (neighbours(4).layer != layer) samelayer = false
       neighbours(5) = area.safeTerrain(x - 1, y - 1)
+      if (neighbours(5).layer != layer) samelayer = false
       neighbours(6) = area.safeTerrain(x - 1, y + 0)
+      if (neighbours(6).layer != layer) samelayer = false
       neighbours(7) = area.safeTerrain(x - 1, y + 1)
+      if (neighbours(7).layer != layer) samelayer = false
       var i = 0
       while (i < 8) {
         nbsprites(i) = null
         i += 1
       }
+      samelayer
     }
     
     def drawTerrain(curr: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
       def random(x: Int, y: Int) = math.abs(Integer.reverseBytes(((x << 8) + y + x + (y << 4)) * 0x9e3775cd) * 0x9e3775cd)
-      
-      loadNeighbours(xp, yp)
       
       // obtain sprite for slot
       val tile = palette.sprite(curr)
@@ -270,7 +278,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
       def drawWall(nbheight: Int, nx: Int, ny: Int, walloffset: Int) {
         if (nbheight < curr.height) {
           val lu = iso2planar_u(nx, ny, nbheight, area.sidelength) - u0 + tileWidth / 2
-          var lv = iso2planar_v(nx, ny, nbheight, area.sidelength) - v0 + tileHeight / 2
+          var lv = iso2planar_v(nx, ny, nbheight, area.sidelength) - v0 + tileHeight / 2 + 3
           val limit = lv - levelheight * (curr.height - nbheight)
           var i = 0
           while (lv > limit) {
@@ -303,21 +311,15 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
       // we detect all the different terrain layers next to curr
       // and draw an edge for each layer
       def drawEdge(sideno: Int) {
-        val firstnb = sideno * 2
+        val firstnb = (sideno * 2) % 8
         val currlayer = curr.layer
         val nb = neighbours
-        
-        if (
-          nb(firstnb + 0).layer == currlayer &&
-          nb(firstnb + 1).layer == currlayer &&
-          nb(firstnb + 2).layer == currlayer
-        ) return
         
         val currheight = curr.height
         val sorted = nbsorted
         val nb0 = nb(firstnb + 0)
         val nb1 = nb(firstnb + 1)
-        val nb2 = nb(firstnb + 2)
+        val nb2 = nb((firstnb + 2) % 8)
         val nb0layer = nb0.layer
         val nb1layer = nb1.layer
         val nb2layer = nb2.layer
@@ -326,7 +328,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
         val nb2hgt = nb2.height
         val nb0idx = firstnb + 0
         val nb1idx = firstnb + 1
-        val nb2idx = firstnb + 2
+        val nb2idx = (firstnb + 2) % 8
         
         /* inline sort 3 values */ {
           if (nb0layer < nb1layer) {
@@ -380,23 +382,23 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
           val bits = sidebits | nb0bits | nb1bits | nb2bits
           
           /* locate edge on the spritesheet */
+          val number = edgelut(bits)
           val tilewdt = edgesheetWidth / 4
           val tilehgt = edgesheetHeight / 2
           val halftilewdt = tilewdt / 2
           val halftilehgt = tilehgt / 2
-          val number = edgelut(bits)
           val block = number / 2
           val blockx = block % 4
           val blocky = block / 4
-          val intilexoff = (1 - block % 2) * (number % 2) * halftilewdt
-          val intileyoff = (0 + block % 2) * (number % 2) * halftilehgt
+          val intilexoff = (1 - (block + blocky) % 2) * (number % 2) * halftilewdt
+          val intileyoff = (0 + (block + blocky) % 2) * (number % 2) * halftilehgt
           val xoff = blockx * tilewdt + intilexoff
           val yoff = blocky * tilehgt + intileyoff
-          val xlen = halftilewdt * (1 + (0 + block % 2))
-          val ylen = halftilehgt * (1 + (1 - block % 2))
+          val xlen = halftilewdt * (1 + (0 + (block + blocky) % 2))
+          val ylen = halftilehgt * (1 + (1 - (block + blocky) % 2))
           val s = getNbSprite(slotidx).asInstanceOf[palette.Sprite]
           val eu = up + intilexoff
-          val ev = vp + intileyoff
+          val ev = vp + intileyoff - (tilehgt - tileHeight)
           drawImage(s.image(0), eu, ev, eu + xlen, ev + ylen, xoff, yoff, xoff + xlen, yoff + ylen)
         }
         
@@ -416,9 +418,14 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
       
       def drawEdges() {
         drawEdge(0)
+        drawEdge(1)
+        drawEdge(2)
+        drawEdge(3)
       }
       
-      drawEdges()
+      if (!loadNeighboursAndCheckEdge(xp, yp, curr.layer)) {
+        drawEdges()
+      }
     }
   }
   
