@@ -18,12 +18,20 @@ import annotation.switch
 
 
 trait Slot extends Immutable {
+  val identifier = this.getClass.getName
+  protected val identhash = identifier.hashCode
+  
   def walkable: Boolean
   def seethrough: Boolean
   def height: Int
   def chr: Char
   def color: Int
-  def identifier = this.getClass.getName
+  /** Never use 2 different terrain types with the same layer in the same area. */
+  def layer: Int
+  
+  def wallsuffix = "-wall"
+  
+  def edgesuffix = "-edges"
   
   assert(height >= 0)
   
@@ -55,6 +63,16 @@ object Slot {
 }
 
 
+object NoSlot extends Slot {
+  def walkable = false
+  def seethrough = true
+  def height = 0
+  def chr = '_'
+  def color = 0x00000000
+  def layer = 0
+}
+
+
 case class HardRock(val height: Int) extends Slot {
   def this() = this(0)
   
@@ -62,6 +80,7 @@ case class HardRock(val height: Int) extends Slot {
   def seethrough = false
   def chr = '#'
   def color = 0x55555500
+  def layer = 600
 }
 
 
@@ -72,6 +91,7 @@ case class DungeonFloor(val height: Int) extends Slot {
   def seethrough = true
   def chr = '.'
   def color = 0x55555500
+  def layer = 500
 }
 
 

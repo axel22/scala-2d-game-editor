@@ -47,6 +47,8 @@ trait PaletteCanvas extends Canvas {
     
     def wall(t: Slot): Sprite
     
+    def edges(t: Slot): Sprite
+    
     def maxSpriteHeight: Int
     
     def newImageFromPngStream(stream: java.io.InputStream): Img
@@ -191,13 +193,15 @@ trait PaletteCanvas extends Canvas {
     
     def sprite(t: Slot) = findSprite(t.identifier)
     
-    def wall(t: Slot) = findSprite(t.identifier + "-wall")
+    def wall(t: Slot) = findSprite(t.identifier + t.wallsuffix)
+    
+    def edges(t: Slot) = findSprite(t.identifier + t.edgesuffix)
     
     def maxSpriteHeight = Sprites.maxheight
     
   }
 
-  def palette: Palette
+  val palette: Palette
   
   def imageFromPngStream(stream: java.io.InputStream) = palette.newImageFromPngStream(stream)
   

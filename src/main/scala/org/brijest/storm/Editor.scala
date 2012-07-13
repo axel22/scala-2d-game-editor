@@ -48,7 +48,7 @@ class EditorConfigParser(config: Config) extends DefaultParser(app.editorcommand
 
 class Editor(config: Config)
 extends GLIsoUI(app.editorname) {
-  val area = Area.emptyDungeonTest4(config.area.width, config.area.height)
+  val area = Area.tileTest(config.area.width, config.area.height)
   val refresher = new Thread {
     override def run() = while (true) {
       areadisplay.repaint()

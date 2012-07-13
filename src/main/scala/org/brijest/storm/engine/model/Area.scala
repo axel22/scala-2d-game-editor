@@ -17,7 +17,7 @@ import components._
 
 class AreaView extends Struct with MutableEvidence {
   private val entitycount = access[mutable] cell(0l)
-  private var rawterrain = access[mutable].quad[Slot](1, 1, Some(new HardRock), true)
+  private var rawterrain = access[mutable].quad[Slot](1, 1, Some(NoSlot), true)
   val id = access[mutable] cell(invalidAreaId)
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable(1, 1)
@@ -56,6 +56,8 @@ class AreaView extends Struct with MutableEvidence {
   }
   
   def terrain = rawterrain
+  
+  def safeTerrain(x: Int, y: Int) = if (contains(x, y)) terrain(x, y) else NoSlot
   
   def character(id: EntityId): Character = characters.ids(id)
   
@@ -113,6 +115,30 @@ object Area {
   def simpleTestArea: Area = {
     implicit val area = new Area
     area.insert(0, 0, Item.SimpleTestItem((0L, 0L)))
+    area
+  }
+  
+  def tileTest(w: Int, h: Int): Area = {
+    implicit val area = new Area
+    
+    area.resize(w, h);
+    area.terrain.default = (x, y) => Some(Slot[HardRock](0))
+    for (x <- 0 until w) {
+      area.terrain(x, 0) = Slot[HardRock](4)
+      area.terrain(x, h - 1) = Slot[HardRock](4)
+    }
+    for (y <- 1 until (h - 1)) {
+      area.terrain(0, y) = Slot[HardRock](4)
+      area.terrain(w - 1, y) = Slot[HardRock](4)
+    }
+    area.terrain(4, 4) = Slot[HardRock](2)
+    
+    // add different terrain
+    area.terrain(10, 11) = Slot[DungeonFloor](0)
+    area.terrain(11, 11) = Slot[DungeonFloor](0)
+    area.terrain(10, 12) = Slot[DungeonFloor](0)
+    area.terrain(11, 12) = Slot[DungeonFloor](0)
+    
     area
   }
   
