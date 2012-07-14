@@ -43,4 +43,6 @@ package components {
     implicit val evidence = new free {}
   }
   
+  sealed trait const extends Access
+  
 }

@@ -35,13 +35,25 @@ package object model {
   
   /* area */
   
+  type PlaneId = Int
+  
   type AreaId = Long
   
   def invalidAreaId = -1L
-
+  
+  object areaId {
+    def onPlane(plane: PlaneId, x: Int, y: Int) = {
+      assert(x >= 0 && x < 0x3fff)
+      assert(y >= 0 && y < 0x3fff)
+      assert(plane >= 0 && plane < 0x3fffffff)
+      (plane.toLong << 32) + (y << 16) + x
+    }
+    def floating(plane: PlaneId) = plane.toLong << 32 + 0x80000000 + 0x8000
+  }
+  
   /* entity */
   
-  type EntityId = (Long, Long)
+  type EntityId = (AreaId, Long)
   
   def invalidEntityId = (-1L, -1L)
   

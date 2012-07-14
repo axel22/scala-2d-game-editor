@@ -6,7 +6,8 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package model
 
 
@@ -16,9 +17,13 @@ package model
 
 trait World {
   def name: String
-  def initializeArea(id: AreaId): Area
-  def initialPosition(p: Player): AreaId
-  def initialPlace(p: Player, area: Area): PlayerCharacter
+  def position(p: Player): AreaId
+  def pc(p: Player): PlayerCharacter
+  def plane(id: PlaneId): Plane
+  def mainPlane: PlaneId
+  def area(id: AreaId): Area
+  def planeArea(id: PlaneId, x: Int, y: Int) = area(areaId.onPlane(id, x, y))
+  def floatingArea(id: PlaneId) = area(areaId.floating(id))
 }
 
 
@@ -26,9 +31,13 @@ object World {
   
   final class DefaultWorld extends World {
     def name = "D'Falta"
-    def initializeArea(id: AreaId) = Area.emptyDungeon(60, 30)
-    def initialPosition(p: Player) = 0L
-    def initialPlace(p: Player, area: Area): PlayerCharacter = {
+    def area(id: AreaId) = Area.emptyDungeon(60, 30)
+    def position(p: Player) = 0L
+    def pc(p: Player): PlayerCharacter = PlayerCharacter.simpleTestCharacter(p.id)
+    def plane(id: PlaneId): Plane = unsupported
+    def mainPlane: PlaneId = unsupported
+    
+    private def place(p: Player, area: Area): PlayerCharacter = {
       implicit val a = area
       
       // find a location to place him in

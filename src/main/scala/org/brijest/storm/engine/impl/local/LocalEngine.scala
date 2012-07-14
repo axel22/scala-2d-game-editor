@@ -32,9 +32,9 @@ engine =>
   /* simulation thread */
   
   class SimulationThread extends Thread("Local simulator") {
-    val area = w.initializeArea(w.initialPosition(player))
+    val area = w.area(w.position(player))
     val sim = new Simulator(area)
-    val pc = w.initialPlace(player, area)
+    val pc = w.pc(player)
     
     override def run() {
       sim.init()

@@ -21,8 +21,8 @@ class AreaView extends Struct with MutableEvidence {
   val id = access[mutable] cell(invalidAreaId)
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable(1, 1)
-  val neighbours = access[mutable].table[Pos, AreaId]
-  val maxheight = access[mutable] cell(20)
+  val maxheight = access[const] cell(20)
+  val exits = access[mutable].table[Pos, AreaId]
   
   def sidelength = terrain.dimensions._1 max terrain.dimensions._2
   

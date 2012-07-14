@@ -33,7 +33,7 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       drawing.indices = false
       drawing.outline = true
       
-      def palette = new DefaultSwingPalette
+      val palette = new DefaultSwingPalette
       def pos = (0, 0);
       def width = img.getWidth
       def height = img.getHeight
