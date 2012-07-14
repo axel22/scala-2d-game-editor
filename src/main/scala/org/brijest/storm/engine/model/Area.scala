@@ -145,6 +145,12 @@ object Area {
     area.terrain(15, 10) = Slot[DungeonFloor](0)
     area.terrain(15, 12) = Slot[DungeonFloor](0)
     
+    area.terrain(10, 5) = Slot[DungeonFloor](1)
+    area.terrain(11, 5) = Slot[DungeonFloor](8)
+    area.terrain(12, 5) = Slot[DungeonFloor](1)
+    area.terrain(11, 4) = Slot[DungeonFloor](1)
+    area.terrain(11, 6) = Slot[DungeonFloor](1)
+    
     area
   }
   

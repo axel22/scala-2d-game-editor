@@ -270,8 +270,8 @@ self =>
     val xuntil = interval(0, area.width)(xbr.toInt)
     val yfrom = interval(0, area.height)(ytr.toInt - 1)
     val yuntil = interval(0, area.height)(ybl.toInt)
-    val xlook = xmid - 14.45
-    val ylook = ymid - 13.45
+    val xlook = xmid - 14.50
+    val ylook = ymid - 13.50
     
     type Vec3 = (Float, Float, Float)
     
@@ -691,8 +691,8 @@ self =>
       glEnd()
     }
     
-    def setColor(r: Int, g: Int, b: Int) {
-      glColor3ub(r.toByte, g.toByte, b.toByte)
+    def setColor(r: Int, g: Int, b: Int, alpha: Int) {
+      glColor4ub(r.toByte, g.toByte, b.toByte, alpha.toByte)
     }
     
     def drawString(s: String, x: Int, y: Int) {

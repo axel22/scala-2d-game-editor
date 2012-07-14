@@ -22,7 +22,7 @@ trait Canvas {
   type Img
   
   trait DrawAdapter {
-    def setColor(r: Int, g: Int, b: Int)
+    def setColor(r: Int, g: Int, b: Int, alpha: Int)
     def setFontSize(sz: Float)
     def drawLine(x1: Int, y1: Int, x2: Int, y2: Int)
     def drawLine(x1: Double, y1: Double, x2: Double, y2: Double): Unit = drawLine(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
@@ -35,12 +35,12 @@ trait Canvas {
   
   /* constants */
   
-  def tileWidth = 48
-  def tileHeight = 24
-  def wallHeight = 64
-  def wallWidth = 48
-  def edgesheetWidth = 192
-  def edgesheetHeight = 60
+  final def tileWidth = 48
+  final def tileHeight = 24
+  final def wallHeight = 64
+  final def wallWidth = 48
+  final def edgesheetWidth = 192
+  final def edgesheetHeight = 60
   
   /* see docs/edges.jpg for explanation */
   val edgelut = new Array[Int](32)
@@ -223,9 +223,9 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
     }
     
     @inline final def drawRect(r: Int, g: Int, b: Int) {
-      a.setColor(0, 0, 0)
+      a.setColor(0, 0, 0, 255)
       if (!drawing.seethrough) a.fillPoly(xrect, yrect, 5)
-      a.setColor(r, g, b)
+      a.setColor(r, g, b, 255)
       a.drawPoly(xrect, yrect, 5)
     }
   }
@@ -383,23 +383,23 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
           
           /* locate edge on the spritesheet */
           val number = edgelut(bits)
-          val tilewdt = edgesheetWidth / 4
-          val tilehgt = edgesheetHeight / 2
-          val halftilewdt = tilewdt / 2
-          val halftilehgt = tilehgt / 2
+          val sectionwdt = edgesheetWidth / 4
+          val sectionhgt = edgesheetHeight / 2
+          val halftilewdt = tileWidth / 2
+          val halftilehgt = tileHeight / 2
           val block = number / 2
           val blockx = block % 4
           val blocky = block / 4
           val intilexoff = (1 - (block + blocky) % 2) * (number % 2) * halftilewdt
-          val intileyoff = (0 + (block + blocky) % 2) * (number % 2) * halftilehgt
-          val xoff = blockx * tilewdt + intilexoff
-          val yoff = blocky * tilehgt + intileyoff
+          val intileyoff = (0 + (block + blocky) % 2) * (number % 2) * halftilehgt + (sectionhgt - tileHeight)
+          val xoff = blockx * sectionwdt + intilexoff
+          val yoff = blocky * sectionhgt + intileyoff
           val xlen = halftilewdt * (1 + (0 + (block + blocky) % 2))
           val ylen = halftilehgt * (1 + (1 - (block + blocky) % 2))
           val s = getNbSprite(slotidx).asInstanceOf[palette.Sprite]
           val eu = up + intilexoff
-          val ev = vp + intileyoff - (tilehgt - tileHeight)
-          drawImage(s.image(0), eu, ev, eu + xlen, ev + ylen, xoff, yoff, xoff + xlen, yoff + ylen)
+          val ev = vp + intileyoff - (sectionhgt - tileHeight)
+          drawImage(s.image(0), eu - 1, ev + 2, eu + xlen + 1, ev + ylen + 4, xoff - 1, yoff - 1, xoff + xlen + 1, yoff + ylen + 1)
         }
         
         var i = 0
@@ -425,6 +425,16 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
       
       if (!loadNeighboursAndCheckEdge(xp, yp, curr.layer)) {
         drawEdges()
+      }
+      
+      // draw weak northern outline
+      if (neighbours(6).height < curr.height) {
+        a.setColor(0, 0, 0, 95)
+        a.drawLine(up, vp + 2 + slotheight / 2, up + slotwidth / 2, vp + 2)
+      }
+      if (neighbours(4).height < curr.height) {
+        a.setColor(0, 0, 0, 95)
+        a.drawLine(up + slotwidth / 2, vp + 2, up + slotwidth, vp + 2 + slotheight / 2)
       }
     }
   }
@@ -593,7 +603,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
       for (x <- -1 to (width / w + 1); y <- -1 to (height / h + 1))
         a.drawImage(background(area), x * w - x0, y * h - y0, x * w + w - x0, y * h + h - y0, 0, 0, w, h)
     } else {
-      a.setColor(0, 0, 0)
+      a.setColor(0, 0, 0, 255)
       a.fillRect(0, 0, width, height)
     }
   }

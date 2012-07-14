@@ -52,7 +52,7 @@ extends GLIsoUI(app.editorname) {
   val refresher = new Thread {
     override def run() = while (true) {
       areadisplay.repaint()
-      Thread.sleep(0)
+      Thread.sleep(20)
     }
   }
   
