@@ -23,14 +23,14 @@ class EngineTests extends WordSpec with ShouldMatchers {
   "LocalEngine" should {
     
     "be ended through a script" in {
-      val eng = new LocalEngine(new Config, Player.default(PlayerId(0L)), new World.DefaultWorld)
+      val eng = new LocalEngine(new Config, Player.default(PlayerId(0L)), new World.TestWorld)
       eng.start()
       eng.script("end()")
       eng.awaitTermination()
     }
     
     "be paused and resumed through a script" in {
-      val eng = new LocalEngine(new Config, Player.default(PlayerId(0L)), new World.DefaultWorld)
+      val eng = new LocalEngine(new Config, Player.default(PlayerId(0L)), new World.TestWorld)
       eng.start()
       eng.script("pause()")
       assert(eng.isPaused)
@@ -40,7 +40,7 @@ class EngineTests extends WordSpec with ShouldMatchers {
     }
     
     "be toggle the pause state through a script" in {
-      val eng = new LocalEngine(new Config, Player.default(PlayerId(0L)), new World.DefaultWorld)
+      val eng = new LocalEngine(new Config, Player.default(PlayerId(0L)), new World.TestWorld)
       eng.start()
       eng.script("togglePause()")
       assert(eng.isPaused)

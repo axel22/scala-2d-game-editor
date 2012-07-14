@@ -10,8 +10,6 @@ DONE
 
 TODO
 ----
-- fix the characters
-- refactoring characters -> agents
 - effects iso rendering
 - world - maps - area + connected areas
 - editor ui
@@ -20,8 +18,5 @@ TODO
   - area editor - editing terrain, adding agents
   - trigger system
   - maps editor
-- inventory
-- pick up items
-- equip items
-- melee attacks
-- movement to different areas
+- fix the apng loader not to create tmp files
+- fix the jogl texture loader to delete unused textures

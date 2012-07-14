@@ -112,7 +112,7 @@ object Initializer extends Logging {
   }
   
   private def createWorld(config: Config): World = config.world match {
-    case None => new World.DefaultWorld
+    case None => new World.TestWorld
     case Some(_) => exit("Arbitrary worlds not yet supported.")
   }
   

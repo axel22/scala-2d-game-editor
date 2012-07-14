@@ -12,6 +12,8 @@ package model
 
 
 
+import collection._
+import java.io._
 
 
 
@@ -29,8 +31,33 @@ trait World {
 
 object World {
   
-  final class DefaultWorld extends World {
-    def name = "D'Falta"
+  class Default(val name: String, val mainPlane: PlaneId) extends World with Serializable {
+    val areas = mutable.Map[AreaId, Area]()
+    val planes = mutable.Map[PlaneId, Plane]()
+    val players = mutable.Map[Player, (AreaId, PlayerCharacter)]()
+    
+    def position(p: Player) = players(p)._1
+    def pc(p: Player) = players(p)._2
+    def plane(id: PlaneId) = planes(id)
+    def area(id: AreaId): Area = id match {
+      case areaId.onPlane(id, x, y) => plane(id)(x, y)
+      case areaId.floating(id) => plane(id)(0, 0)
+    }
+  }
+  
+  object Default {
+    def serialize(w: Default, os: OutputStream) {
+      val oos = new ObjectOutputStream(os)
+      oos.writeObject(w)
+    }
+    def deserialize(is: InputStream): Default = {
+      val ois = new ObjectInputStream(is)
+      ois.readObject.asInstanceOf[Default]
+    }
+  }
+  
+  final class TestWorld extends World {
+    def name = "TestWorld"
     def area(id: AreaId) = Area.emptyDungeon(60, 30)
     def position(p: Player) = 0L
     def pc(p: Player): PlayerCharacter = PlayerCharacter.simpleTestCharacter(p.id)

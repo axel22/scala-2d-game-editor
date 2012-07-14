@@ -24,7 +24,7 @@ class Simulator(val area: Area) {
   private var actioncount: Long = 0L
   private var simtime = zeroTime
   private val eventqueue = access[free].heap[(Time, EntityId)]
-  private val simulating = access[free].set[EntityId]
+  private val simulating = access[free].pile[EntityId]
   
   def init() {
     actioncount = 0L

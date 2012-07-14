@@ -42,13 +42,28 @@ package object model {
   def invalidAreaId = -1L
   
   object areaId {
-    def onPlane(plane: PlaneId, x: Int, y: Int) = {
-      assert(x >= 0 && x < 0x3fff)
-      assert(y >= 0 && y < 0x3fff)
-      assert(plane >= 0 && plane < 0x3fffffff)
-      (plane.toLong << 32) + (y << 16) + x
+    object onPlane {
+      def apply(plane: PlaneId, x: Int, y: Int) = {
+        assert(x >= 0 && x < 0x3fff)
+        assert(y >= 0 && y < 0x3fff)
+        assert(plane >= 0 && plane < 0x3fffffff)
+        (plane.toLong << 32) + (y << 16) + x
+      }
+      def unapply(id: Long): Option[(PlaneId, Int, Int)] =
+        if ((0x80008000 & id) == 0) Some((planeId(id), (0x3fff & id).toInt, (0x3fff & (id >>> 16)).toInt))
+        else None
     }
-    def floating(plane: PlaneId) = plane.toLong << 32 + 0x80000000 + 0x8000
+    
+    object floating {
+      def apply(plane: PlaneId) = plane.toLong << 32 + 0x80008000
+      def unapply(id: Long): Option[PlaneId] =
+        if ((0x80008000 & id) != 0) Some(planeId(id))
+        else None
+    }
+  }
+  
+  object planeId {
+    def apply(id: AreaId) = ((id & 0x3fffffff) >>> 32).toInt
   }
   
   /* entity */

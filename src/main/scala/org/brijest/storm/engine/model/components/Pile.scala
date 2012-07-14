@@ -15,11 +15,11 @@ import collection._
 
 
 package immutable {
-  trait UniSet[T] extends Set[T]
+  trait Pile[T] extends Set[T]
 }
 
 
-class UniSet[T, Acc] extends immutable.UniSet[T] with Serializable {
+class Pile[T, Acc] extends immutable.Pile[T] with Serializable {
   val s = mutable.HashSet[T]()
   
   @inline final override def size = s.size

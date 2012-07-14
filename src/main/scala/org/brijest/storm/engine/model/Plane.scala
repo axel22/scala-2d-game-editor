@@ -15,4 +15,6 @@ import components._
 
 
 
-trait Plane
+trait Plane {
+  def apply(x: Int, y: Int): Area
+}
