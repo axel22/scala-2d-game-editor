@@ -26,15 +26,18 @@ trait World {
   def area(id: AreaId): Area
   def planeArea(id: PlaneId, x: Int, y: Int) = area(areaId.onPlane(id, x, y))
   def floatingArea(id: PlaneId) = area(areaId.floating(id))
+  def planes: Map[PlaneId, Plane]
+  def newPlaneId(): PlaneId
 }
 
 
 object World {
   
   class Default(val name: String, val mainPlane: PlaneId) extends World with Serializable {
+    private var count = 0
     val areas = mutable.Map[AreaId, Area]()
-    val planes = mutable.Map[PlaneId, Plane]()
     val players = mutable.Map[Player, (AreaId, PlayerCharacter)]()
+    val planes = mutable.Map[PlaneId, Plane]()
     
     def position(p: Player) = players(p)._1
     def pc(p: Player) = players(p)._2
@@ -42,6 +45,10 @@ object World {
     def area(id: AreaId): Area = id match {
       case areaId.onPlane(id, x, y) => plane(id)(x, y)
       case areaId.floating(id) => plane(id)(0, 0)
+    }
+    def newPlaneId() = {
+      count += 1
+      count
     }
   }
   
@@ -62,7 +69,9 @@ object World {
     def position(p: Player) = 0L
     def pc(p: Player): PlayerCharacter = PlayerCharacter.simpleTestCharacter(p.id)
     def plane(id: PlaneId): Plane = unsupported
+    def planes = unsupported
     def mainPlane: PlaneId = unsupported
+    def newPlaneId() = unsupported
     
     private def place(p: Player, area: Area): PlayerCharacter = {
       implicit val a = area

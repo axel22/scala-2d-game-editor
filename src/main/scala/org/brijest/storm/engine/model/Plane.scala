@@ -16,5 +16,8 @@ import components._
 
 
 trait Plane {
+  def name: String
+  def width: Int
+  def height: Int
   def apply(x: Int, y: Int): Area
 }

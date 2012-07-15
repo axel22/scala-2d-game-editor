@@ -48,26 +48,33 @@ class EditorConfigParser(config: Config) extends DefaultParser(app.editorcommand
 
 
 class Editor(config: Config) extends AnyRef with GLIsoUI {
-  val area = Area.tileTest(config.area.width, config.area.height)
-  val refresher = new Thread {
-    setDaemon(true)
-    override def run() = while (true) {
-      areadisplay.repaint()
-      Thread.sleep(20)
-    }
-  }
+  // val area = Area.tileTest(config.area.width, config.area.height)
+  // val refresher = new Thread {
+  //   setDaemon(true)
+  //   override def run() = while (true) {
+  //     areadisplay.repaint()
+  //     Thread.sleep(20)
+  //   }
+  // }
   
-  refresher.start()
-  engine = Some(org.brijest.storm.engine.IdleEngine)
-  refresh(area, engine.get)
+  // refresher.start()
+  // engine = Some(org.brijest.storm.engine.IdleEngine)
+  // refresh(area, engine.get)
+  
+  // CTabItem tbtmMap = new CTabItem(tabFolder, SWT.CLOSE);
+  // tbtmMap.setText("Map");
+  
+  // areaPanel = new AreaPanel(tabFolder, SWT.NONE);
+  // tbtmMap.setControl(areaPanel);
+  
+  //editorwindow.areaPanel.areaCanvasPane.add(areadisplay)
   
   val dispatchThread = new Thread() {
-    setDaemon(true)
     override def run() {
       val display = Display.getDefault()
       val editorwindow = new editor.EditorWindow(display)
-      editorwindow.areaCanvasPane.add(areadisplay)
       editorwindow.setVisible(true)
+      editorwindow.setImage(new graphics.Image(display, pngStream("lightning")))
       
       for (cls <- Terrain.registered) {
         val inst = cls.newInstance
@@ -78,12 +85,16 @@ class Editor(config: Config) extends AnyRef with GLIsoUI {
         tableItem.setText(2, inst.identifier);
       }
       
-      editorwindow.open()
-      editorwindow.layout()
-      while (!editorwindow.isDisposed()) {
-	if (!display.readAndDispatch()) {
-	  display.sleep()
-	}
+      try {
+        editorwindow.open()
+        editorwindow.layout()
+        while (!editorwindow.isDisposed()) {
+	  if (!display.readAndDispatch()) {
+	    display.sleep()
+	  }
+        }
+      } catch {
+        case e => logger.error("exception in event dispatch thread: " + e)
       }
     }
   }
