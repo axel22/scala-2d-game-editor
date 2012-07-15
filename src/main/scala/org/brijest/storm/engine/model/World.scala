@@ -21,11 +21,10 @@ trait World {
   def name: String
   def position(p: Player): AreaId
   def pc(p: Player): PlayerCharacter
-  def plane(id: PlaneId): Plane
+  def plane(id: PlaneId): Option[Plane]
   def mainPlane: PlaneId
-  def area(id: AreaId): Area
-  def planeArea(id: PlaneId, x: Int, y: Int) = area(areaId.onPlane(id, x, y))
-  def floatingArea(id: PlaneId) = area(areaId.floating(id))
+  def area(id: AreaId): Option[Area]
+  def area(id: PlaneId, x: Int, y: Int): Option[Area] = area(areaId(id, x, y))
   def planes: Map[PlaneId, Plane]
   def newPlaneId(): PlaneId
 }
@@ -33,19 +32,19 @@ trait World {
 
 object World {
   
-  class Default(val name: String, val mainPlane: PlaneId) extends World with Serializable {
+  class Default(val name: String) extends World with Serializable {
     private var count = 0
     val areas = mutable.Map[AreaId, Area]()
     val players = mutable.Map[Player, (AreaId, PlayerCharacter)]()
     val planes = mutable.Map[PlaneId, Plane]()
+    var mainPlane: PlaneId = 0
+    
+    planes(mainPlane) = new Plane("Main plane")
     
     def position(p: Player) = players(p)._1
     def pc(p: Player) = players(p)._2
-    def plane(id: PlaneId) = planes(id)
-    def area(id: AreaId): Area = id match {
-      case areaId.onPlane(id, x, y) => plane(id)(x, y)
-      case areaId.floating(id) => plane(id)(0, 0)
-    }
+    def plane(id: PlaneId) = planes.get(id)
+    def area(id: AreaId) = areas.get(id)
     def newPlaneId() = {
       count += 1
       count
@@ -65,10 +64,10 @@ object World {
   
   final class TestWorld extends World {
     def name = "TestWorld"
-    def area(id: AreaId) = Area.emptyDungeon(60, 30)
+    def area(id: AreaId) = Some(Area.emptyDungeon(60, 30))
     def position(p: Player) = 0L
     def pc(p: Player): PlayerCharacter = PlayerCharacter.simpleTestCharacter(p.id)
-    def plane(id: PlaneId): Plane = unsupported
+    def plane(id: PlaneId) = unsupported
     def planes = unsupported
     def mainPlane: PlaneId = unsupported
     def newPlaneId() = unsupported

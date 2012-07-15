@@ -34,7 +34,7 @@ class SwingIsoUI(val name: String) extends IsoUI with SwingPaletteCanvas {
                          java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
       
       this.synchronized {
-        g.drawImage(buffer, 0, 0, width, height, 0, 0, width, height, null, null)
+        g.drawImage(buffer, 0, 0, iwidth, iheight, 0, 0, iwidth, iheight, null, null)
       }
     }
   }
@@ -51,9 +51,9 @@ class SwingIsoUI(val name: String) extends IsoUI with SwingPaletteCanvas {
   
   /* implementations */
   
-  def width: Int = frame.size.width
+  def iwidth: Int = frame.size.width
   
-  def height: Int = frame.size.height
+  def iheight: Int = frame.size.height
   
   def refresh(area: AreaView, state: Engine.State) = this.synchronized {
     val sad = new SwingDrawAdapter

@@ -548,9 +548,9 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
     }
   }
   
-  def width: Int
+  def iwidth: Int
   
-  def height: Int
+  def iheight: Int
   
   def slotwidth = tileHeight * ratio
   
@@ -599,17 +599,17 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       val w = 800
       val h = 600
       val x0 = (pos._1 / 16  + vpuoffs) % w
-      val y0 = (pos._2 / 16  + height - vpvoffs) % h
-      for (x <- -1 to (width / w + 1); y <- -1 to (height / h + 1))
+      val y0 = (pos._2 / 16  + iheight - vpvoffs) % h
+      for (x <- -1 to (iwidth / w + 1); y <- -1 to (iheight / h + 1))
         a.drawImage(background(area), x * w - x0, y * h - y0, x * w + w - x0, y * h + h - y0, 0, 0, w, h)
     } else {
       a.setColor(0, 0, 0, 255)
-      a.fillRect(0, 0, width, height)
+      a.fillRect(0, 0, iwidth, iheight)
     }
   }
   
   def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
-    redrawRect(area, engine, a, pos._1, pos._2, width, height, 0, 0)
+    redrawRect(area, engine, a, pos._1, pos._2, iwidth, iheight, 0, 0)
   }
   
   protected def redrawRect(area: AreaView, engine: Engine.State, a: DrawAdapter, ustart: Int, vstart: Int, width: Int, height: Int, vpuoffs: Int, vpvoffs: Int) {

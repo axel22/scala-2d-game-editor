@@ -11,13 +11,12 @@ package model
 
 
 
-import components._
+import collection._
 
 
 
-trait Plane {
-  def name: String
-  def width: Int
-  def height: Int
-  def apply(x: Int, y: Int): Area
+case class Plane(name: String) {
+  val areas = immutable.Set[AreaId]()
+  
+  def details = "%d areas".format(areas.size)
 }

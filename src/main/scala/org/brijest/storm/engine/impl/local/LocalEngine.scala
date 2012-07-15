@@ -32,7 +32,7 @@ engine =>
   /* simulation thread */
   
   class SimulationThread extends Thread("Local simulator") {
-    val area = w.area(w.position(player))
+    val area = w.area(w.position(player)).get
     val sim = new Simulator(area)
     val pc = w.pc(player)
     

@@ -9,6 +9,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 
 public class PlaneAreaChooser extends Dialog {
 
@@ -54,20 +57,27 @@ public class PlaneAreaChooser extends Dialog {
 		Label lblXPosition = new Label(shlChooseArea, SWT.NONE);
 		lblXPosition.setText("X position:");
 		
-		Spinner spinner = new Spinner(shlChooseArea, SWT.BORDER);
-		GridData gd_spinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_spinner.widthHint = 36;
-		spinner.setLayoutData(gd_spinner);
+		final Spinner xspinner = new Spinner(shlChooseArea, SWT.BORDER);
+		GridData gd_xspinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_xspinner.widthHint = 36;
+		xspinner.setLayoutData(gd_xspinner);
 		
 		Label lblYPosition = new Label(shlChooseArea, SWT.NONE);
 		lblYPosition.setText("Y position:");
 		
-		Spinner spinner_1 = new Spinner(shlChooseArea, SWT.BORDER);
-		GridData gd_spinner_1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_spinner_1.widthHint = 36;
-		spinner_1.setLayoutData(gd_spinner_1);
+		final Spinner yspinner = new Spinner(shlChooseArea, SWT.BORDER);
+		GridData gd_yspinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_yspinner.widthHint = 36;
+		yspinner.setLayoutData(gd_yspinner);
 		
 		Button btnNewButton = new Button(shlChooseArea, SWT.NONE);
+		btnNewButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				result = new Point(xspinner.getSelection(), yspinner.getSelection());
+				shlChooseArea.dispose();
+			}
+		});
 		btnNewButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		btnNewButton.setText("OK");
 		

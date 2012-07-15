@@ -29,6 +29,8 @@ public class EditorWindow extends Shell {
 	public Combo mainPlaneCombo;
 	public Label totalPlanesLabel;
 	public AreaPanel areaPanel;
+	public MenuItem openAreaMenuItem;
+	public CTabFolder leftTabs;
 	
 	/**
 	 * Launch the application.
@@ -56,7 +58,7 @@ public class EditorWindow extends Shell {
 	 */
 	public EditorWindow(Display display) {
 		super(display, SWT.SHELL_TRIM); 
-		setMinimumSize(new Point(100, 750));
+		setMinimumSize(new Point(1000, 750));
 		setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		Menu menu = new Menu(this, SWT.BAR);
@@ -96,13 +98,13 @@ public class EditorWindow extends Shell {
 		
 		SashForm sashForm = new SashForm(this, SWT.NONE);
 		
-		CTabFolder tabFolder = new CTabFolder(sashForm, SWT.BORDER);
-		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		leftTabs = new CTabFolder(sashForm, SWT.BORDER);
+		leftTabs.setSelectionBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		
-		CTabItem tbtmWorld = new CTabItem(tabFolder, SWT.NONE);
+		CTabItem tbtmWorld = new CTabItem(leftTabs, SWT.NONE);
 		tbtmWorld.setText("World");
 		
-		SashForm sashForm_1 = new SashForm(tabFolder, SWT.NONE);
+		SashForm sashForm_1 = new SashForm(leftTabs, SWT.NONE);
 		sashForm_1.setOrientation(SWT.VERTICAL);
 		tbtmWorld.setControl(sashForm_1);
 		
@@ -125,8 +127,8 @@ public class EditorWindow extends Shell {
 		Menu menu_3 = new Menu(planeTable);
 		planeTable.setMenu(menu_3);
 		
-		MenuItem mntmOpenArea = new MenuItem(menu_3, SWT.NONE);
-		mntmOpenArea.setText("Open area...");
+		openAreaMenuItem = new MenuItem(menu_3, SWT.NONE);
+		openAreaMenuItem.setText("Open area...");
 		
 		Composite composite_2 = new Composite(sashForm_1, SWT.NONE);
 		composite_2.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -159,16 +161,16 @@ public class EditorWindow extends Shell {
 		totalPlanesLabel = new Label(grpWorldInfo, SWT.NONE);
 		totalPlanesLabel.setText("   ");
 		sashForm_1.setWeights(new int[] {3, 1});
-		tabFolder.setSelection(0);
+		leftTabs.setSelection(0);
 		
-		CTabFolder righttabs = new CTabFolder(sashForm, SWT.BORDER);
-		righttabs.setSelectionBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		CTabFolder rightTabs = new CTabFolder(sashForm, SWT.BORDER);
+		rightTabs.setSelectionBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		
-		CTabItem tbtmTerrain = new CTabItem(righttabs, SWT.NONE);
+		CTabItem tbtmTerrain = new CTabItem(rightTabs, SWT.NONE);
 		tbtmTerrain.setText("Terrain");
-		righttabs.setSelection(0);
+		rightTabs.setSelection(0);
 		
-		terrainTable = new Table(righttabs, SWT.BORDER | SWT.FULL_SELECTION);
+		terrainTable = new Table(rightTabs, SWT.BORDER | SWT.FULL_SELECTION);
 		terrainTable.setHeaderVisible(true);
 		tbtmTerrain.setControl(terrainTable);
 		
@@ -184,7 +186,7 @@ public class EditorWindow extends Shell {
 		tblclmnNewColumn.setWidth(100);
 		tblclmnNewColumn.setText("Full name");
 		
-		CTabItem tbtmAreaDetails = new CTabItem(righttabs, SWT.NONE);
+		CTabItem tbtmAreaDetails = new CTabItem(rightTabs, SWT.NONE);
 		tbtmAreaDetails.setText("Area Details");
 		sashForm.setWeights(new int[] {85, 15});
 		createContents();

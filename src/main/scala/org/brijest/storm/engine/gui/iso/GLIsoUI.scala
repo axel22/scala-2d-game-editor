@@ -32,23 +32,19 @@ import org.brijest.storm.engine.model._
 
 
 
-trait GLIsoUI extends IsoUI with GLPaletteCanvas with Logging {
+class GLIsoUI(val area: Area, val caps: GLCapabilities) extends GLCanvas(caps) with IsoUI with GLPaletteCanvas with Logging {
 self =>
   
-  class AreaDisplay extends GLCanvas(caps)
+  //class AreaDisplay extends GLCanvas(caps)
   
   var resizestamp = 0L
-  val glp = GLProfile.getDefault()
-  val caps = new GLCapabilities(glp)
-  val areadisplay = new AreaDisplay
+  val areadisplay = this //new AreaDisplay
   
   areadisplay.addGLEventListener(new GLEventListener {
     def display(drawable: GLAutoDrawable) {
       val gl = drawable.getGL().getGL2()
       
-      if (cachedarea != null) {
-        redraw(cachedarea, null, new GLAutoDrawableDrawAdapter(drawable))
-      }
+      redraw(area, null, new GLAutoDrawableDrawAdapter(drawable))
     }
     
     def init(drawable: GLAutoDrawable) {
@@ -66,13 +62,13 @@ self =>
   
   /* implementations */
   
-  def width: Int = areadisplay.getWidth
+  def iwidth: Int = areadisplay.getWidth
   
-  def height: Int = areadisplay.getHeight
+  def iheight: Int = areadisplay.getHeight
   
   def refresh(area: AreaView, state: Engine.State) = this.synchronized {
-    cachedarea = area
-    areadisplay.repaint()
+    // cachedarea = area
+    // areadisplay.repaint()
     
     // val glad = new GLAutoDrawableDrawAdapter(areadisplay)
     
@@ -83,7 +79,7 @@ self =>
     //println("Time to render: %d ms".format(t))
   }
   
-  var cachedarea: AreaView = null
+  //var cachedarea: AreaView = null
   
   val palette = new DefaultGLPalette
   
@@ -225,15 +221,15 @@ self =>
   private def redrawInternal(area: AreaView, engine: Engine.State, a: DrawAdapter) {
     a.asInstanceOf[GLAutoDrawableDrawAdapter].gl.glClear(GL_COLOR_BUFFER_BIT)
     
-    val (wrect, hrect) = if (drawing.shadows) (1680, 1050) else (width, height)
+    val (wrect, hrect) = if (drawing.shadows) (1680, 1050) else (iwidth, iheight)
     
     var u = 0
     var v = 0
-    while (v < height) {
-      val hgt = if (height - v < hrect) height - v else hrect
-      while (u < width) {
-        val wdt = if (width - u < wrect) width - u else wrect
-        redrawRect(area, engine, a, pos._1 + u, pos._2 + v, wdt, hgt, u, height - hgt - v)
+    while (v < iheight) {
+      val hgt = if (iheight - v < hrect) iheight - v else hrect
+      while (u < iwidth) {
+        val wdt = if (iwidth - u < wrect) iwidth - u else wrect
+        redrawRect(area, engine, a, pos._1 + u, pos._2 + v, wdt, hgt, u, iheight - hgt - v)
         u += wdt
       }
       u = 0

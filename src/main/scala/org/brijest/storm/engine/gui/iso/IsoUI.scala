@@ -21,9 +21,9 @@ trait IsoUI extends IsoCanvas with UI {
   var playerId: PlayerId = invalidPlayerId
   var engine: Option[Engine] = None
   
-  def width: Int
+  def iwidth: Int
   
-  def height: Int
+  def iheight: Int
   
   def update(actions: Seq[Action], area: AreaView, state: Engine.State) = refresh(area, state)
   
