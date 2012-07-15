@@ -89,7 +89,7 @@ trait Canvas {
 }
 
 
-abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas {
+trait IsoCanvas extends Canvas with PaletteCanvas {
   lazy val stars = imageFromPngStream(pngStream("stars"))
   val deppool: singlethread.FreeList[DepNode] = new singlethread.FreeList(new DepNode)({ _.reset() }) {
     override def allocate() = {
@@ -430,11 +430,11 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
       // draw weak northern outline
       if (neighbours(6).height < curr.height) {
         a.setColor(0, 0, 0, 95)
-        a.drawLine(up, vp + 2 + slotheight / 2, up + slotwidth / 2, vp + 2)
+        a.drawLine(up, vp + 2 + tileHeight / 2, up + slotwidth / 2, vp + 2)
       }
       if (neighbours(4).height < curr.height) {
         a.setColor(0, 0, 0, 95)
-        a.drawLine(up + slotwidth / 2, vp + 2, up + slotwidth, vp + 2 + slotheight / 2)
+        a.drawLine(up + slotwidth / 2, vp + 2, up + slotwidth, vp + 2 + tileHeight / 2)
       }
     }
   }
@@ -445,7 +445,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
     def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
       rect(
         up - slotwidth / 2, up, up + slotwidth / 2, up,
-        vp, vp - slotheight / 2, vp, vp + slotheight / 2
+        vp, vp - tileHeight / 2, vp, vp + tileHeight / 2
       )
       drawRect(0, 100, 200)
       setFontSize(8)
@@ -461,7 +461,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
         val lv = iso2planar_v(xp, yp + 1, lslothgt, area.sidelength) - v0
         rect(
           up - slotwidth / 2, up, lu + slotwidth / 2, lu,
-          vp, vp + slotheight / 2, lv, lv - slotheight / 2
+          vp, vp + tileHeight / 2, lv, lv - tileHeight / 2
         )
         drawRect(0, 100, 200)
       }
@@ -471,7 +471,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
         val lv = iso2planar_v(xp + 1, yp, rslothgt, area.sidelength) - v0
         rect(
           up, up + slotwidth / 2, lu, lu - slotwidth / 2,
-          vp + slotheight / 2, vp, lv - slotheight / 2, lv
+          vp + tileHeight / 2, vp, lv - tileHeight / 2, lv
         )
         drawRect(0, 100, 200)
       }
@@ -498,11 +498,11 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
       val (rx, ry) = info.rightXY(x, y)
       val (bx, by) = info.bottomXY(x, y)
       val u1 = iso2planar_u(x, y, 0, area.sidelength) - u0
-      val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0 - slotheight / 4 - vdelta
+      val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0 - tileHeight / 4 - vdelta
       val u2 = iso2planar_u(lx, ly, 0, area.sidelength) - u0 - slotwidth / 4
       val v2 = iso2planar_v(lx, ly, 0, area.sidelength) - v0 - vdelta
       val u3 = iso2planar_u(bx, by, 0, area.sidelength) - u0
-      val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0 + slotheight / 4 - vdelta
+      val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0 + tileHeight / 4 - vdelta
       val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0 + slotwidth / 4
       val v4 = iso2planar_v(rx, ry, 0, area.sidelength) - v0 - vdelta
       rect(u1, u2, u3, u4, v1 - hgt, v2 - hgt, v3 - hgt, v4 - hgt)
@@ -552,7 +552,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   
   def height: Int
   
-  def slotwidth = slotheight * ratio
+  def slotwidth = tileHeight * ratio
   
   def ratio = 2
   
@@ -573,14 +573,14 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   def framelength = (1000.0 / framespersec).toInt
   
   @inline final def planar2iso(u: Double, v: Double, mapsz: Int): (Double, Double) =
-    (v / slotheight + u / slotwidth - mapsz / 2, v / slotheight - u / slotwidth + mapsz / 2);
+    (v / tileHeight + u / slotwidth - mapsz / 2, v / tileHeight - u / slotwidth + mapsz / 2);
   
   @inline final def planar2iso(u: Int, v: Int, mapsz: Int): (Double, Double) =
     planar2iso(u.toDouble, v.toDouble, mapsz)
   
   @inline final def iso2planar_u(x: Double, y: Double, z: Double, mapsz: Int): Double = (mapsz - y + x) * slotwidth / 2
   
-  @inline final def iso2planar_v(x: Double, y: Double, z: Double, mapsz: Int): Double = (x + y) * slotheight / 2 - z * levelheight
+  @inline final def iso2planar_v(x: Double, y: Double, z: Double, mapsz: Int): Double = (x + y) * tileHeight / 2 - z * levelheight
   
   @inline final def iso2planar(x: Double, y: Double, z: Double, mapsz: Int): (Double, Double) =
     (iso2planar_u(x, y, z, mapsz), iso2planar_v(x, y, z, mapsz));
@@ -590,7 +590,7 @@ abstract class IsoCanvas(val slotheight: Int) extends Canvas with PaletteCanvas 
   
   def maxPlanarWidth(mapsz: Int) = iso2planar(mapsz, 0, 0, mapsz)._1 + slotwidth
   
-  def maxPlanarHeight(mapsz: Int) = iso2planar(mapsz, mapsz, 0, mapsz)._2 + slotheight
+  def maxPlanarHeight(mapsz: Int) = iso2planar(mapsz, mapsz, 0, mapsz)._2 + tileHeight
   
   def background(area: AreaView) = stars
   

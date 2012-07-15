@@ -32,7 +32,7 @@ import org.brijest.storm.engine.model._
 
 
 
-class GLIsoUI(val name: String) extends IsoUI with GLPaletteCanvas with Logging {
+trait GLIsoUI extends IsoUI with GLPaletteCanvas with Logging {
 self =>
   
   class AreaDisplay extends GLCanvas(caps)
@@ -41,12 +41,6 @@ self =>
   val glp = GLProfile.getDefault()
   val caps = new GLCapabilities(glp)
   val areadisplay = new AreaDisplay
-  val frame = new Frame {
-    title = name
-    location = new Point(0, 0)
-    peer.add(areadisplay)
-    areadisplay.requestFocus()
-  }
   
   areadisplay.addGLEventListener(new GLEventListener {
     def display(drawable: GLAutoDrawable) {
@@ -69,10 +63,6 @@ self =>
       resizestamp += 1
     }
   })
-  
-  frame.size = new Dimension(1680, 1050)
-  frame.peer.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
-  frame.open()
   
   /* implementations */
   

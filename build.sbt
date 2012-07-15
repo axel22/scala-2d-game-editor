@@ -56,4 +56,16 @@ libraryDependencies ++= {
   Seq(jogl, glue)
 }
 
+resolvers += "swt-repo" at "https://swt-repo.googlecode.com/svn/repo/"
 
+libraryDependencies += {
+  val os = sys.props("os.name") match {
+    case "Linux" => "gtk.linux.x86"
+    case "Mac OS X" => "cocoa.macosx"
+    case os if os.startsWith("Windows") => "win32.win32.x86"
+    case os => sys.error("Cannot obtain lib for OS: " + os)
+  }
+  val artifact = "org.eclipse.swt." + os
+  "org.eclipse.swt" % artifact % "3.8"
+}
+            

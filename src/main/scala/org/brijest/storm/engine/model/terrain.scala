@@ -17,7 +17,7 @@ import annotation.switch
 
 
 
-trait Slot extends Immutable {
+abstract class Slot extends Immutable {
   val identifier = this.getClass.getName
   protected val identhash = identifier.hashCode
   
@@ -60,6 +60,19 @@ object Slot {
         slot
     }
   }
+  
+}
+
+
+object Terrain {
+  private val terrains = mutable.Buffer[Class[Slot]]()
+  
+  def registered: Seq[Class[Slot]] = terrains
+  
+  def register[T <: Slot: Manifest] = terrains += manifest[T].erasure.asInstanceOf[Class[Slot]]
+  
+  register[HardRock]
+  register[DungeonFloor]
 }
 
 

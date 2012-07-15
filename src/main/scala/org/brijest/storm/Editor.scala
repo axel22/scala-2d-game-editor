@@ -11,7 +11,8 @@ package org.brijest.storm
 
 
 import org.github.scopt._
-import scala.swing._
+import org.eclipse.swt._
+import org.eclipse.swt.widgets._
 import java.awt.image._
 import engine.model._
 import engine.gui.iso._
@@ -46,10 +47,10 @@ class EditorConfigParser(config: Config) extends DefaultParser(app.editorcommand
 }
 
 
-class Editor(config: Config)
-extends GLIsoUI(app.editorname) {
+class Editor(config: Config) extends AnyRef with GLIsoUI {
   val area = Area.tileTest(config.area.width, config.area.height)
   val refresher = new Thread {
+    setDaemon(true)
     override def run() = while (true) {
       areadisplay.repaint()
       Thread.sleep(20)
@@ -59,6 +60,34 @@ extends GLIsoUI(app.editorname) {
   refresher.start()
   engine = Some(org.brijest.storm.engine.IdleEngine)
   refresh(area, engine.get)
+  
+  val dispatchThread = new Thread() {
+    setDaemon(true)
+    override def run() {
+      val display = Display.getDefault()
+      val editorwindow = new editor.EditorWindow(display)
+      editorwindow.areaCanvasPane.add(areadisplay)
+      editorwindow.setVisible(true)
+      
+      for (cls <- Terrain.registered) {
+        val inst = cls.newInstance
+        val tableItem = new TableItem(editorwindow.terrainTable, SWT.NONE);
+        val image = new graphics.Image(display, pngStream(inst.identifier));
+        tableItem.setImage(0, image)
+        tableItem.setText(1, cls.getSimpleName);
+        tableItem.setText(2, inst.identifier);
+      }
+      
+      editorwindow.open()
+      editorwindow.layout()
+      while (!editorwindow.isDisposed()) {
+	if (!display.readAndDispatch()) {
+	  display.sleep()
+	}
+      }
+    }
+  }
+  dispatchThread.start()
   
   /* events */
   
@@ -97,29 +126,6 @@ extends GLIsoUI(app.editorname) {
       if (mode == 'drag) onMiddleDrag((me.getX, me.getY))
     }
   })
-  
-  /* former event handlers for the swing ui */
-  
-  // areadisplay.listenTo(areadisplay.mouse.clicks)
-  // areadisplay.listenTo(areadisplay.mouse.moves)
-  
-  // areadisplay.reactions += {
-  //   case e @ event.MousePressed(_, p, mods, clicks, trig) =>
-  //     if (e.peer.getButton == java.awt.event.MouseEvent.BUTTON1) lastpress = p
-  //   case event.MouseDragged(_, p, mods) =>
-  //     pos = ((pos._1 + lastpress.getX - p.getX).toInt, (pos._2 + lastpress.getY - p.getY).toInt);
-  //     lastpress = p
-  //     refresh(area, engine.get)
-  // }
-  
-  // areadisplay.listenTo(areadisplay)
-  
-  // areadisplay.reactions += {
-  //   case event.UIElementResized(_) => this.synchronized {
-  //     buffer = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
-  //     refresh(area, engine.get)
-  //   }
-  // }
   
 }
 

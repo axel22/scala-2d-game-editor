@@ -26,3 +26,7 @@ deployrun
 
 # database
 *.db
+
+# eclipse stuff
+.project
+.classpath

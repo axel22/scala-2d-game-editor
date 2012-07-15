@@ -16,7 +16,7 @@ import collection._
 
 
 
-abstract class IsoUI extends IsoCanvas(24) with UI {
+trait IsoUI extends IsoCanvas with UI {
   var pos = (0, 0);
   var playerId: PlayerId = invalidPlayerId
   var engine: Option[Engine] = None
