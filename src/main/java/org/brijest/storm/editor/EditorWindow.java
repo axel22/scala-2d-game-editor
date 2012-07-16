@@ -175,6 +175,15 @@ public class EditorWindow extends Shell {
 		});
 		openAreaMenuItem.setText("Open area...");
 		
+		MenuItem mntmRemovePlane = new MenuItem(menu_3, SWT.NONE);
+		mntmRemovePlane.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Remove plane", arg0);
+			}
+		});
+		mntmRemovePlane.setText("Remove plane...");
+		
 		Composite composite_2 = new Composite(sashForm_1, SWT.NONE);
 		composite_2.setLayout(new FillLayout(SWT.HORIZONTAL));
 		

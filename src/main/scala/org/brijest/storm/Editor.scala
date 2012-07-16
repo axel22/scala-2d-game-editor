@@ -109,16 +109,18 @@ class Editor(config: Config) extends Logging {
   
   def loadfrom(fn: String): World.Default = {
     import java.io._
+    import java.util.zip._
     val file = new File(fn)
     if (!file.exists) null
     else {
       val fis = new FileInputStream(file)
-      val ois = new ObjectInputStream(fis)
       try {
+        val zis = new ZipInputStream(fis)
+        zis.getNextEntry()
+        val ois = new ObjectInputStream(zis)
         ois.readObject.asInstanceOf[World.Default]
       } finally {
         fis.close()
-        ois.close()
       }
     }      
   }
@@ -185,14 +187,21 @@ class Editor(config: Config) extends Logging {
     
     def saveto(fn: String) {
       import java.io._
+      import java.util.zip._
       val file = new File(fn)
       val fos = new FileOutputStream(file)
-      val oos = new ObjectOutputStream(fos)
       try {
+        val zos = new ZipOutputStream(fos)
+        zos.putNextEntry(new ZipEntry("world"));
+        val oos = new ObjectOutputStream(zos)
         oos.writeObject(world)
+        zos.closeEntry()
+      } catch {
+        case e =>
+          println(e)
+          e.printStackTrace()
       } finally {
         fos.close()
-        oos.close()
       }
     }
     
@@ -247,6 +256,19 @@ class Editor(config: Config) extends Logging {
             val canvasPane = createGLIsoUI(area)
             
             areaPanel.areaCanvasPane.add(canvasPane)
+          }
+        case ("Remove plane", _) =>
+          val selection = planeTable.getSelection
+          if (selection.nonEmpty) {
+            val id = selection.head.getText(0).toInt
+            val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.YES | SWT.NO)
+            messageBox.setText("Remove plane")
+            messageBox.setMessage("Are you sure you want to remove the plane?")
+            val response = messageBox.open();
+            if (response == SWT.YES) {
+              world.planes.remove(id)
+              loadPlaneTable()
+            }
           }
         case ("Add plane", e: SelectionEvent) =>
           val creator = new editor.PlaneCreatorDialog(editorwindow, SWT.APPLICATION_MODAL)
