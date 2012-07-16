@@ -93,7 +93,7 @@ case class HardRock(val height: Int) extends Slot {
   def seethrough = false
   def chr = '#'
   def color = 0x55555500
-  def layer = 600
+  def layer = 400
 }
 
 
