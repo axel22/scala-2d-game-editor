@@ -16,7 +16,7 @@ import collection._
 
 
 
-trait AreaProvider {
+trait AreaProvider extends Serializable {
   def name: String
   def acquire(): Area
   def release(a: Area): Unit

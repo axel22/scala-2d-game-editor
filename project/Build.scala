@@ -27,6 +27,7 @@ object StormEnrouteBuild extends Build {
     (artifact, classpath) =>
     val deploydir = new File("deploy")
     val libzdir = new File("deploy%slib".format(File.separator))
+    val worldzdir = new File("deploy%sworlds".format(File.separator))
     val editorscript = new File("deploy%seditor".format(File.separator))
     val pngtextscript = new File("deploy%spng-text".format(File.separator, File.separator))
     
@@ -36,6 +37,7 @@ object StormEnrouteBuild extends Build {
     // create subdirectory structure
     deploydir.mkdir()
     libzdir.mkdir()
+    worldzdir.mkdir()
     
     // copy deps and artifacts
     val fullcp = classpath.map(_.data) :+ artifact

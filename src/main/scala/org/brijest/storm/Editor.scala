@@ -44,9 +44,7 @@ object Editor {
 
 class EditorConfigParser(config: Config) extends DefaultParser(app.editorcommand) {
   help("h", "help", "Show this help message")
-  opt("width", "The width for the area, if it's newly created", { v: String => config.area.width = v.toInt })
-  opt("height", "The height for the area, if it's newly created", { v: String => config.area.height = v.toInt })
-  arg("<areaname>", "The name of the area, creates one if it doesn't exist.", { v: String => config.area.name = v})
+  opt("w", "worldname", "The name of the world, creates one if it doesn't exist.", { v: String => config.world = Some(v)})
 }
 
 
@@ -54,10 +52,13 @@ class Editor(config: Config) extends Logging {
   var glp: GLProfile = null //GLProfile.getDefault()
   var caps: GLCapabilities = null //new GLCapabilities(glp)
   
-  concurrent.ops.future {
-    glp = GLProfile.getDefault()
-    caps = new GLCapabilities(glp)
+  val glinitializer = new Thread {
+    override def run() {
+      glp = GLProfile.getDefault()
+      caps = new GLCapabilities(glp)
+    }
   }
+  glinitializer.run() // deliberate
   
   def createGLIsoUI(area: Area) = {
     val areadisplay = new GLIsoUI(area, caps)
@@ -104,9 +105,31 @@ class Editor(config: Config) extends Logging {
     areadisplay
   }
   
+  var filename: Option[String] = None
+  
+  def loadfrom(fn: String): World.Default = {
+    import java.io._
+    val file = new File(fn)
+    if (!file.exists) null
+    else {
+      val fis = new FileInputStream(file)
+      val ois = new ObjectInputStream(fis)
+      try {
+        ois.readObject.asInstanceOf[World.Default]
+      } finally {
+        fis.close()
+        ois.close()
+      }
+    }      
+  }
+  
   val world = config.world match {
-    case Some(name) => sys.error("unsupported")
-    case None => new World.Default("Untitled")
+    case Some(name) =>
+      filename = Some(app.dir.path(app.dir.worlds) + name)
+      val loaded = loadfrom(filename.get)
+      if (loaded != null) loaded else new World.Default(name)
+    case None =>
+      new World.Default("Untitled")
   }
   
   val displ = Display.getDefault()
@@ -145,6 +168,34 @@ class Editor(config: Config) extends Logging {
       totalPlanesLabel.setText(sortedplanes.size.toString)
     }
     
+    def save() = filename match {
+      case Some(str) => saveto(str)
+      case None => saveAs()
+    }
+    
+    def saveAs() {
+      val fd = new FileDialog(editorwindow, SWT.SAVE)
+      fd.setText("Save")
+      val fn = fd.open()
+      if (fn != null) {
+        filename = Some(fn)
+        saveto(filename.get)
+      }
+    }
+    
+    def saveto(fn: String) {
+      import java.io._
+      val file = new File(fn)
+      val fos = new FileOutputStream(file)
+      val oos = new ObjectOutputStream(fos)
+      try {
+        oos.writeObject(world)
+      } finally {
+        fos.close()
+        oos.close()
+      }
+    }
+    
     /* initialize */
     
     for (cls <- Terrain.registered) {
@@ -155,21 +206,6 @@ class Editor(config: Config) extends Logging {
       tableItem.setText(1, cls.getSimpleName);
       tableItem.setText(2, inst.identifier);
     }
-    
-    worldNameLabel.addSelectionListener(new SelectionAdapter() {
-      override def widgetSelected(e: SelectionEvent) {
-        world.name = worldNameLabel.getText
-      }
-    })
-    
-    mainPlaneCombo.addSelectionListener(new SelectionAdapter() {
-      override def widgetSelected(e: SelectionEvent) {
-        val sel = mainPlaneCombo.getSelectionIndex
-        if (sel != -1) {
-          world.mainPlane = sel
-        } else loadWorldInfo()
-      }
-    })
     
     eventHandler = new editor.EditorEventHandler {
       def event(name: String, arg: Object): Unit = (name, arg) match {
@@ -229,6 +265,17 @@ class Editor(config: Config) extends Logging {
           
           loadPlaneTable()
           loadWorldInfo()
+        case ("World name", _) =>
+          world.name = worldNameLabel.getText
+        case ("Main plane", _) =>
+          val sel = mainPlaneCombo.getSelectionIndex
+          if (sel != -1) {
+            world.mainPlane = sel
+          }
+        case ("Save", _) =>
+          save()
+        case ("Save as", _) =>
+          saveAs()
       }
     }
     

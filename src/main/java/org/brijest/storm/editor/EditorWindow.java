@@ -21,6 +21,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import java.awt.Frame;
+import org.eclipse.swt.awt.SWT_AWT;
+import java.awt.Panel;
+import java.awt.BorderLayout;
+import javax.swing.JRootPane;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 public class EditorWindow extends Shell {
 	public Table terrainTable;
@@ -73,9 +83,21 @@ public class EditorWindow extends Shell {
 		mntmFile.setMenu(menu_1);
 		
 		MenuItem mntmSave = new MenuItem(menu_1, SWT.NONE);
+		mntmSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Save", null);
+			}
+		});
 		mntmSave.setText("Save");
 		
 		MenuItem mntmSaveAs = new MenuItem(menu_1, SWT.NONE);
+		mntmSaveAs.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Save as", null);
+			}
+		});
 		mntmSaveAs.setText("Save as...");
 		
 		MenuItem menuItem = new MenuItem(menu_1, SWT.SEPARATOR);
@@ -161,19 +183,33 @@ public class EditorWindow extends Shell {
 		grpWorldInfo.setLayout(new GridLayout(2, false));
 		
 		Label lblName = new Label(grpWorldInfo, SWT.NONE);
-		lblName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblName.setText("Name:");
 		
 		worldNameLabel = new Text(grpWorldInfo, SWT.BORDER);
+		worldNameLabel.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent arg0) {
+				eventHandler.event("World name", arg0);
+			}
+		});
 		GridData gd_worldNameLabel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_worldNameLabel.widthHint = 150;
 		worldNameLabel.setLayoutData(gd_worldNameLabel);
 		
 		Label lblMainPlane = new Label(grpWorldInfo, SWT.NONE);
-		lblMainPlane.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblMainPlane.setText("Main plane:");
 		
 		mainPlaneCombo = new Combo(grpWorldInfo, SWT.NONE);
+		mainPlaneCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Main plane", arg0);
+			}
+		});
+		mainPlaneCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent arg0) {
+				eventHandler.event("Main plane", arg0);
+			}
+		});
 		GridData gd_mainPlaneCombo = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_mainPlaneCombo.widthHint = 150;
 		mainPlaneCombo.setLayoutData(gd_mainPlaneCombo);
@@ -211,6 +247,30 @@ public class EditorWindow extends Shell {
 		
 		CTabItem tbtmAreaDetails = new CTabItem(rightTabs, SWT.NONE);
 		tbtmAreaDetails.setText("Area Details");
+		
+		Composite composite_1 = new Composite(rightTabs, SWT.NONE);
+		tbtmAreaDetails.setControl(composite_1);
+		composite_1.setLayout(new GridLayout(1, false));
+		
+		Composite composite = new Composite(composite_1, SWT.EMBEDDED);
+		composite.setFont(SWTResourceManager.getFont("Monaco", 11, SWT.NORMAL));
+		GridData gd_composite = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_composite.heightHint = 13;
+		gd_composite.widthHint = 147;
+		composite.setLayoutData(gd_composite);
+		
+		Frame frame = SWT_AWT.new_Frame(composite);
+		frame.setVisible(false);
+		
+		Panel panel = new Panel();
+		panel.setVisible(false);
+		frame.add(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+		
+		JRootPane rootPane = new JRootPane();
+		rootPane.getContentPane().setVisible(false);
+		rootPane.setVisible(false);
+		panel.add(rootPane);
 		sashForm.setWeights(new int[] {85, 15});
 		createContents();
 	}

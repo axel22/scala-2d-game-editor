@@ -71,6 +71,16 @@ package object storm {
       this.shadows(sys.os != "Linux")
     }
     
+    object dir {
+      val separator = java.io.File.separator
+      val worlds = "worlds"
+      val libs = "lib"
+      
+      def path(dirs: String*) = {
+        app.sys.props("user.dir") + dirs.mkString(app.dir.separator, app.dir.separator, app.dir.separator)
+      }
+    }
+    
     object sys {
       
       object props {
