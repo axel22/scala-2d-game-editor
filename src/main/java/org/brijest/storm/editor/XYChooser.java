@@ -15,10 +15,12 @@ import org.eclipse.swt.graphics.Point;
 
 public class XYChooser extends Dialog {
 
-	protected Object result;
-	protected Shell shlChooseArea;
+	protected Point result;
+	public Shell chooserShell;
 	public int width;
 	public int height;
+	public int locx;
+	public int locy;
 
 	/**
 	 * Create the dialog.
@@ -34,12 +36,12 @@ public class XYChooser extends Dialog {
 	 * Open the dialog.
 	 * @return the result
 	 */
-	public Object open() {
+	public Point open() {
 		createContents();
-		shlChooseArea.open();
-		shlChooseArea.layout();
+		chooserShell.open();
+		chooserShell.layout();
 		Display display = getParent().getDisplay();
-		while (!shlChooseArea.isDisposed()) {
+		while (!chooserShell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
@@ -51,44 +53,53 @@ public class XYChooser extends Dialog {
 	 * Create contents of the dialog.
 	 */
 	private void createContents() {
-		shlChooseArea = new Shell(getParent(), getStyle());
-		shlChooseArea.setSize(149, 121);
-		shlChooseArea.setText("Choose Area");
-		shlChooseArea.setLayout(new GridLayout(2, false));
+		chooserShell = new Shell(getParent(), getStyle());
+		chooserShell.setSize(149, 121);
+		chooserShell.setText("Choose Area");
+		chooserShell.setLayout(new GridLayout(2, false));
+		chooserShell.setLocation(locx, locy);
 		
-		Label lblXPosition = new Label(shlChooseArea, SWT.NONE);
+		Label lblXPosition = new Label(chooserShell, SWT.NONE);
 		lblXPosition.setText("X position:");
 		
-		final Spinner xspinner = new Spinner(shlChooseArea, SWT.BORDER);
+		final Spinner xspinner = new Spinner(chooserShell, SWT.BORDER);
 		xspinner.setMaximum(width);
 		GridData gd_xspinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_xspinner.widthHint = 36;
 		xspinner.setLayoutData(gd_xspinner);
 		
-		Label lblYPosition = new Label(shlChooseArea, SWT.NONE);
+		Label lblYPosition = new Label(chooserShell, SWT.NONE);
 		lblYPosition.setText("Y position:");
 		
-		final Spinner yspinner = new Spinner(shlChooseArea, SWT.BORDER);
+		final Spinner yspinner = new Spinner(chooserShell, SWT.BORDER);
 		yspinner.setMaximum(height);
 		GridData gd_yspinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_yspinner.widthHint = 36;
 		yspinner.setLayoutData(gd_yspinner);
 		
-		Button btnNewButton = new Button(shlChooseArea, SWT.NONE);
+		Button btnNewButton = new Button(chooserShell, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				result = new Point(xspinner.getSelection(), yspinner.getSelection());
-				shlChooseArea.dispose();
+				chooserShell.dispose();
 			}
 		});
 		btnNewButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		btnNewButton.setText("OK");
 		
-		Button btnCancel = new Button(shlChooseArea, SWT.NONE);
+		Button btnCancel = new Button(chooserShell, SWT.NONE);
+		btnCancel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				result = null;
+				chooserShell.dispose();
+			}
+		});
 		btnCancel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		btnCancel.setText("Cancel");
 
 	}
 
 }
+

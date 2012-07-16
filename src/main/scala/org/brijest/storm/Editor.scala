@@ -162,10 +162,15 @@ class Editor(config: Config) extends Logging {
         if (selection.nonEmpty) {
           val id = selection.head.getText(0).toInt
           val plane = world.plane(id)
-          val chooser = new editor.XYChooser(editorwindow, SWT.NONE)
+          val chooser = new editor.XYChooser(editorwindow, SWT.APPLICATION_MODAL)
+          val cloc = displ.getCursorLocation
+          chooser.locx = cloc.x
+          chooser.locy = cloc.y
           chooser.width = plane.size - 1
           chooser.height = plane.size - 1
-          val coord = chooser.open().asInstanceOf[graphics.Point]
+          val coord = chooser.open()
+          if (coord == null) return
+          
           val (x, y) = (coord.x, coord.y);
           val areaid = areaId(id, x, y)
           val area = world.area(areaid) match {
