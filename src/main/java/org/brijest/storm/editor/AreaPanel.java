@@ -1,13 +1,13 @@
 package org.brijest.storm.editor;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.SWT;
-import java.awt.Frame;
-import org.eclipse.swt.awt.SWT_AWT;
-import java.awt.Panel;
 import java.awt.BorderLayout;
-import javax.swing.JRootPane;
+import java.awt.Frame;
+import java.awt.Panel;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 
 public class AreaPanel extends Composite {
 	public Panel areaCanvasPane;

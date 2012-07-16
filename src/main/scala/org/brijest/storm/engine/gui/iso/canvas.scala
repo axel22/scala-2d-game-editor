@@ -429,11 +429,11 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       
       // draw weak northern outline
       if (neighbours(6).height < curr.height) {
-        a.setColor(0, 0, 0, 95)
+        a.setColor(0, 0, 0, 120)
         a.drawLine(up, vp + 2 + tileHeight / 2, up + slotwidth / 2, vp + 2)
       }
       if (neighbours(4).height < curr.height) {
-        a.setColor(0, 0, 0, 95)
+        a.setColor(0, 0, 0, 120)
         a.drawLine(up + slotwidth / 2, vp + 2, up + slotwidth, vp + 2 + tileHeight / 2)
       }
     }

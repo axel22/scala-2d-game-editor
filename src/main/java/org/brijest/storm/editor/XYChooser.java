@@ -19,8 +19,6 @@ public class XYChooser extends Dialog {
 	public Shell chooserShell;
 	public int width;
 	public int height;
-	public int locx;
-	public int locy;
 
 	/**
 	 * Create the dialog.
@@ -57,7 +55,8 @@ public class XYChooser extends Dialog {
 		chooserShell.setSize(149, 121);
 		chooserShell.setText("Choose Area");
 		chooserShell.setLayout(new GridLayout(2, false));
-		chooserShell.setLocation(locx, locy);
+		Point loc = Display.getCurrent().getCursorLocation();
+		chooserShell.setLocation(loc.x, loc.y);
 		
 		Label lblXPosition = new Label(chooserShell, SWT.NONE);
 		lblXPosition.setText("X position:");

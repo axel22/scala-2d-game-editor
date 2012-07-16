@@ -32,6 +32,8 @@ public class EditorWindow extends Shell {
 	public MenuItem openAreaMenuItem;
 	public CTabFolder leftTabs;
 	
+	public EditorEventHandler eventHandler;
+	
 	/**
 	 * Launch the application.
 	 * @param args
@@ -58,7 +60,7 @@ public class EditorWindow extends Shell {
 	 */
 	public EditorWindow(Display display) {
 		super(display, SWT.SHELL_TRIM); 
-		setMinimumSize(new Point(1000, 750));
+		setMinimumSize(new Point(1100, 750));
 		setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		Menu menu = new Menu(this, SWT.BAR);
@@ -94,6 +96,12 @@ public class EditorWindow extends Shell {
 		mntmWorld.setMenu(menu_2);
 		
 		MenuItem mntmAddPlane = new MenuItem(menu_2, SWT.NONE);
+		mntmAddPlane.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Add plane", arg0);
+			}
+		});
 		mntmAddPlane.setText("Add plane...");
 		
 		SashForm sashForm = new SashForm(this, SWT.NONE);
@@ -127,7 +135,22 @@ public class EditorWindow extends Shell {
 		Menu menu_3 = new Menu(planeTable);
 		planeTable.setMenu(menu_3);
 		
+		MenuItem mntmAddPlane_1 = new MenuItem(menu_3, SWT.NONE);
+		mntmAddPlane_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Add plane", arg0);
+			}
+		});
+		mntmAddPlane_1.setText("Add plane...");
+		
 		openAreaMenuItem = new MenuItem(menu_3, SWT.NONE);
+		openAreaMenuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Open area", arg0);
+			}
+		});
 		openAreaMenuItem.setText("Open area...");
 		
 		Composite composite_2 = new Composite(sashForm_1, SWT.NONE);
@@ -143,7 +166,7 @@ public class EditorWindow extends Shell {
 		
 		worldNameLabel = new Text(grpWorldInfo, SWT.BORDER);
 		GridData gd_worldNameLabel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_worldNameLabel.widthHint = 190;
+		gd_worldNameLabel.widthHint = 150;
 		worldNameLabel.setLayoutData(gd_worldNameLabel);
 		
 		Label lblMainPlane = new Label(grpWorldInfo, SWT.NONE);
@@ -152,7 +175,7 @@ public class EditorWindow extends Shell {
 		
 		mainPlaneCombo = new Combo(grpWorldInfo, SWT.NONE);
 		GridData gd_mainPlaneCombo = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_mainPlaneCombo.widthHint = 173;
+		gd_mainPlaneCombo.widthHint = 150;
 		mainPlaneCombo.setLayoutData(gd_mainPlaneCombo);
 		
 		Label lblTotalPlanes = new Label(grpWorldInfo, SWT.NONE);
@@ -197,7 +220,7 @@ public class EditorWindow extends Shell {
 	 */
 	protected void createContents() {
 		setText("Storm-Enroute Editor");
-		setSize(1000, 750);
+		setSize(1100, 750);
 
 	}
 

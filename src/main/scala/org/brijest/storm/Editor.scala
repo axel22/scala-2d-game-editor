@@ -156,42 +156,81 @@ class Editor(config: Config) extends Logging {
       tableItem.setText(2, inst.identifier);
     }
     
-    openAreaMenuItem.addSelectionListener(new SelectionAdapter() {
+    worldNameLabel.addSelectionListener(new SelectionAdapter() {
       override def widgetSelected(e: SelectionEvent) {
-        val selection = planeTable.getSelection
-        if (selection.nonEmpty) {
-          val id = selection.head.getText(0).toInt
-          val plane = world.plane(id)
-          val chooser = new editor.XYChooser(editorwindow, SWT.APPLICATION_MODAL)
-          val cloc = displ.getCursorLocation
-          chooser.locx = cloc.x
-          chooser.locy = cloc.y
-          chooser.width = plane.size - 1
-          chooser.height = plane.size - 1
-          val coord = chooser.open()
-          if (coord == null) return
-          
-          val (x, y) = (coord.x, coord.y);
-          val areaid = areaId(id, x, y)
-          val area = world.area(areaid) match {
-            case Some(a) => a
-            case None =>
-              val a = Area.tileTest(config.area.width, config.area.height)
-              a
-          }
-          
-          val tbtmMap = new CTabItem(leftTabs, SWT.CLOSE);
-          tbtmMap.setText("Area: " + world.plane(id).get.name + " at (" + x + ", " + y + ")");
-          
-          areaPanel = new editor.AreaPanel(leftTabs, SWT.NONE)
-          tbtmMap.setControl(areaPanel)
-          
-          val canvasPane = createGLIsoUI(area)
-          
-          areaPanel.areaCanvasPane.add(canvasPane)
-        }
+        world.name = worldNameLabel.getText
       }
     })
+    
+    mainPlaneCombo.addSelectionListener(new SelectionAdapter() {
+      override def widgetSelected(e: SelectionEvent) {
+        val sel = mainPlaneCombo.getSelectionIndex
+        if (sel != -1) {
+          world.mainPlane = sel
+        } else loadWorldInfo()
+      }
+    })
+    
+    eventHandler = new editor.EditorEventHandler {
+      def event(name: String, arg: Object): Unit = (name, arg) match {
+        case ("Open area", e: SelectionEvent) =>
+          val selection = planeTable.getSelection
+          if (selection.nonEmpty) {
+            val id = selection.head.getText(0).toInt
+            val plane = world.plane(id)
+            val chooser = new editor.XYChooser(editorwindow, SWT.APPLICATION_MODAL)
+            chooser.width = plane.size - 1
+            chooser.height = plane.size - 1
+            val coord = chooser.open()
+            if (coord == null) return
+            
+            val (x, y) = (coord.x, coord.y);
+            val areaid = areaId(id, x, y)
+            val area = world.area(areaid) match {
+              case Some(a: AreaProvider.Strict) => a.acquire()
+              case Some(a) =>
+                val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.OK)
+                messageBox.setText("Unknown provider")
+                messageBox.setMessage("Unable to handle area provider type: " + a.name + ".")
+                messageBox.open()
+                return
+              case None =>
+                val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.OK)
+                messageBox.setText("Unknown area")
+                messageBox.setMessage("There is no area with id: " + areaid + " (plane: " + id + ", x: " + x + ", y: " + y + ").")
+                messageBox.open()
+                return
+            }
+            
+            val tbtmMap = new CTabItem(leftTabs, SWT.CLOSE);
+            tbtmMap.setText("Area: " + world.plane(id).get.name + " at (" + x + ", " + y + ")");
+            
+            areaPanel = new editor.AreaPanel(leftTabs, SWT.NONE)
+            tbtmMap.setControl(areaPanel)
+            
+            val canvasPane = createGLIsoUI(area)
+            
+            areaPanel.areaCanvasPane.add(canvasPane)
+          }
+        case ("Add plane", e: SelectionEvent) =>
+          val creator = new editor.PlaneCreatorDialog(editorwindow, SWT.APPLICATION_MODAL)
+          val info = creator.open()
+          if (info == null) return
+          
+          val plane = new world.DefaultPlane(info(0).toString, info(1).asInstanceOf[Int])
+          val id = world.newPlaneId()
+          world.planes(id) = plane
+          
+          for (x <- 0 until plane.size; y <- 0 until plane.size) {
+            info(2) match {
+              case "Strict" => world.areas(areaId(id, x, y)) = new AreaProvider.Strict(Area.emptyDungeon(32, 32))
+            }
+          }
+          
+          loadPlaneTable()
+          loadWorldInfo()
+      }
+    }
     
     loadPlaneTable()
     loadWorldInfo()
