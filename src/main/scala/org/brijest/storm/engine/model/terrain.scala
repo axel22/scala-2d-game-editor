@@ -73,6 +73,7 @@ object Terrain {
   
   register[HardRock]
   register[DungeonFloor]
+  register[DungeonFungus]
 }
 
 
@@ -105,6 +106,17 @@ case class DungeonFloor(val height: Int) extends Slot {
   def chr = '.'
   def color = 0x55555500
   def layer = 500
+}
+
+
+case class DungeonFungus(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  def walkable = true
+  def seethrough = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 600
 }
 
 
