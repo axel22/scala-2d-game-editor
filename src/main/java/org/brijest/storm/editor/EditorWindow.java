@@ -157,15 +157,6 @@ public class EditorWindow extends Shell {
 		Menu menu_3 = new Menu(planeTable);
 		planeTable.setMenu(menu_3);
 		
-		MenuItem mntmAddPlane_1 = new MenuItem(menu_3, SWT.NONE);
-		mntmAddPlane_1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				eventHandler.event("Add plane", arg0);
-			}
-		});
-		mntmAddPlane_1.setText("Add plane...");
-		
 		openAreaMenuItem = new MenuItem(menu_3, SWT.NONE);
 		openAreaMenuItem.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -174,6 +165,15 @@ public class EditorWindow extends Shell {
 			}
 		});
 		openAreaMenuItem.setText("Open area...");
+		
+		MenuItem mntmAddPlane_1 = new MenuItem(menu_3, SWT.NONE);
+		mntmAddPlane_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Add plane", arg0);
+			}
+		});
+		mntmAddPlane_1.setText("Add plane...");
 		
 		MenuItem mntmRemovePlane = new MenuItem(menu_3, SWT.NONE);
 		mntmRemovePlane.addSelectionListener(new SelectionAdapter() {
