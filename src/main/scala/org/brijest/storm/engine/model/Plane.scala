@@ -15,8 +15,8 @@ import collection._
 
 
 
-case class Plane(name: String) {
-  val areas = immutable.Set[AreaId]()
-  
-  def details = "%d areas".format(areas.size)
+trait Plane {
+  def name: String
+  def size: Int
+  def details = "size: %d".format(size)
 }

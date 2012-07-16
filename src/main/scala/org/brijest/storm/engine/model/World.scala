@@ -39,7 +39,9 @@ object World {
     val planes = mutable.Map[PlaneId, Plane]()
     var mainPlane: PlaneId = 0
     
-    planes(mainPlane) = new Plane("Main plane")
+    case class DefaultPlane(name: String, size: Int) extends Plane
+    
+    planes(mainPlane) = new DefaultPlane("Main plane", 1)
     
     def position(p: Player) = players(p)._1
     def pc(p: Player) = players(p)._2

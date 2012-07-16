@@ -51,21 +51,13 @@ class EditorConfigParser(config: Config) extends DefaultParser(app.editorcommand
 
 
 class Editor(config: Config) extends Logging {
-  // val area = Area.tileTest(config.area.width, config.area.height)
-  // val refresher = new Thread {
-  //   setDaemon(true)
-  //   override def run() = while (true) {
-  //     areadisplay.repaint()
-  //     Thread.sleep(20)
-  //   }
-  // }
+  var glp: GLProfile = null //GLProfile.getDefault()
+  var caps: GLCapabilities = null //new GLCapabilities(glp)
   
-  // refresher.start()
-  // engine = Some(org.brijest.storm.engine.IdleEngine)
-  // refresh(area, engine.get)
-  
-  val glp = GLProfile.getDefault()
-  val caps = new GLCapabilities(glp)
+  concurrent.ops.future {
+    glp = GLProfile.getDefault()
+    caps = new GLCapabilities(glp)
+  }
   
   def createGLIsoUI(area: Area) = {
     val areadisplay = new GLIsoUI(area, caps)
@@ -117,96 +109,100 @@ class Editor(config: Config) extends Logging {
     case None => new World.Default("Untitled")
   }
   
-  val dispatchThread = new Thread() {
-    override def run() {
-      val display = Display.getDefault()
-      val editorwindow = new editor.EditorWindow(display)
-      editorwindow.setVisible(true)
-      editorwindow.setImage(new graphics.Image(display, pngStream("lightning")))
-      
-      import editorwindow._
-      
-      def loadPlaneTable() {
-        planeTable.removeAll()
-        for ((id, plane) <- world.planes.toSeq.sortBy(_._1)) {
-          val item = new TableItem(planeTable, SWT.NONE)
-          item.setText(0, id.toString)
-          item.setText(1, plane.name)
-          item.setText(2, plane.details)
-        }
-      }
-      
-      def loadWorldInfo() {
-        worldNameLabel.setText(world.name)
-        mainPlaneCombo.removeAll()
-        
-        val sortedplanes = world.planes.toSeq.sortBy(_._1)
-        for ((id, plane) <- sortedplanes) {
-          mainPlaneCombo.add(id + ": " + plane.name)
-        }
-        mainPlaneCombo.select(sortedplanes.indexWhere(_._1 == world.mainPlane))
-        
-        totalPlanesLabel.setText(sortedplanes.size.toString)
-      }
-      
-      /* initialize */
-      
-      for (cls <- Terrain.registered) {
-        val inst = cls.newInstance
-        val tableItem = new TableItem(terrainTable, SWT.NONE);
-        val image = new graphics.Image(display, pngStream(inst.identifier));
-        tableItem.setImage(0, image)
-        tableItem.setText(1, cls.getSimpleName);
-        tableItem.setText(2, inst.identifier);
-      }
-      
-      openAreaMenuItem.addSelectionListener(new SelectionAdapter() {
-	override def widgetSelected(e: SelectionEvent) {
-          val selection = planeTable.getSelection
-          if (selection.nonEmpty) {
-            val id = selection.head.getText(0).toInt
-            val chooser = new editor.PlaneAreaChooser(editorwindow, SWT.NONE)
-            val coord = chooser.open().asInstanceOf[graphics.Point]
-            val (x, y) = (coord.x, coord.y);
-            val areaid = areaId(id, x, y)
-            val area = world.area(areaid) match {
-              case Some(a) => a
-              case None =>
-                val a = Area.tileTest(config.area.width, config.area.height)
-                // TODO add to world
-                a
-            }
-            
-            val tbtmMap = new CTabItem(leftTabs, SWT.CLOSE);
-            tbtmMap.setText("Area: " + world.plane(id).get.name + " at (" + x + ", " + y + ")");
-            
-            areaPanel = new editor.AreaPanel(leftTabs, SWT.NONE)
-            tbtmMap.setControl(areaPanel)
-            
-            val canvasPane = createGLIsoUI(area)
-            
-            areaPanel.areaCanvasPane.add(canvasPane)
-          }
-	}
-      })
-      
-      loadPlaneTable()
-      loadWorldInfo()
-      
-      try {
-        open()
-        layout()
-        while (!isDisposed()) {
-	  if (!display.readAndDispatch()) {
-	    display.sleep()
-          }
-        }
-      } catch {
-        case e => logger.error("exception in event dispatch thread: " + e)
+  val displ = Display.getDefault()
+  val editorwindow = new editor.EditorWindow(displ)
+  editorwindow.setVisible(true)
+  
+  displ.asyncExec(new Runnable {
+    override def run() = initialize()
+  })
+  
+  def initialize() {
+    editorwindow.setImage(new graphics.Image(displ, pngStream("lightning")))
+    
+    import editorwindow._
+    
+    def loadPlaneTable() {
+      planeTable.removeAll()
+      for ((id, plane) <- world.planes.toSeq.sortBy(_._1)) {
+        val item = new TableItem(planeTable, SWT.NONE)
+        item.setText(0, id.toString)
+        item.setText(1, plane.name)
+        item.setText(2, plane.details)
       }
     }
+    
+    def loadWorldInfo() {
+      worldNameLabel.setText(world.name)
+      mainPlaneCombo.removeAll()
+      
+      val sortedplanes = world.planes.toSeq.sortBy(_._1)
+      for ((id, plane) <- sortedplanes) {
+        mainPlaneCombo.add(id + ": " + plane.name)
+      }
+      mainPlaneCombo.select(sortedplanes.indexWhere(_._1 == world.mainPlane))
+      
+      totalPlanesLabel.setText(sortedplanes.size.toString)
+    }
+    
+    /* initialize */
+    
+    for (cls <- Terrain.registered) {
+      val inst = cls.newInstance
+      val tableItem = new TableItem(terrainTable, SWT.NONE);
+      val image = new graphics.Image(displ, pngStream(inst.identifier));
+      tableItem.setImage(0, image)
+      tableItem.setText(1, cls.getSimpleName);
+      tableItem.setText(2, inst.identifier);
+    }
+    
+    openAreaMenuItem.addSelectionListener(new SelectionAdapter() {
+      override def widgetSelected(e: SelectionEvent) {
+        val selection = planeTable.getSelection
+        if (selection.nonEmpty) {
+          val id = selection.head.getText(0).toInt
+          val plane = world.plane(id)
+          val chooser = new editor.XYChooser(editorwindow, SWT.NONE)
+          chooser.width = plane.size - 1
+          chooser.height = plane.size - 1
+          val coord = chooser.open().asInstanceOf[graphics.Point]
+          val (x, y) = (coord.x, coord.y);
+          val areaid = areaId(id, x, y)
+          val area = world.area(areaid) match {
+            case Some(a) => a
+            case None =>
+              val a = Area.tileTest(config.area.width, config.area.height)
+              a
+          }
+          
+          val tbtmMap = new CTabItem(leftTabs, SWT.CLOSE);
+          tbtmMap.setText("Area: " + world.plane(id).get.name + " at (" + x + ", " + y + ")");
+          
+          areaPanel = new editor.AreaPanel(leftTabs, SWT.NONE)
+          tbtmMap.setControl(areaPanel)
+          
+          val canvasPane = createGLIsoUI(area)
+          
+          areaPanel.areaCanvasPane.add(canvasPane)
+        }
+      }
+    })
+    
+    loadPlaneTable()
+    loadWorldInfo()
   }
-  dispatchThread.start()
+  
+  try {
+    editorwindow.open()
+    editorwindow.layout()
+    while (!editorwindow.isDisposed()) {
+      if (!displ.readAndDispatch()) {
+	displ.sleep()
+      }
+    }
+  } catch {
+    case e => logger.error("exception in event dispatch thread: " + e)
+  }
   
 }
 
