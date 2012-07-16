@@ -80,7 +80,11 @@ object Scripts {
     """#!/bin/sh
 BASEDIR=`dirname $0`
 JARS=%s
-java -server -XstartOnFirstThread -classpath $JARS %s org.brijest.storm.Editor "$@"
+UNAME=$(uname)
+if [[ "$UNAME" == 'FreeBSD' ]]; then
+   COCOAFLAGS=-XstartOnFirstThread
+fi
+java -server $COCOAFLAGS -classpath $JARS %s org.brijest.storm.Editor "$@"
 """.format(
     jars.map("$BASEDIR/lib/" + _).mkString(":"),
     flags
