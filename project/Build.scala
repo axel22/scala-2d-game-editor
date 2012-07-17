@@ -81,7 +81,7 @@ object Scripts {
 BASEDIR=`dirname $0`
 JARS=%s
 UNAME=$(uname)
-if [[ "$UNAME" == 'FreeBSD' ]]; then
+if [[ "$UNAME" == 'Darwin' ]]; then
    COCOAFLAGS=-XstartOnFirstThread
 fi
 java -server $COCOAFLAGS -classpath $JARS %s org.brijest.storm.Editor "$@"

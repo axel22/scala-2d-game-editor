@@ -22,7 +22,6 @@ abstract class Slot extends Immutable {
   protected val identhash = identifier.hashCode
   
   def walkable: Boolean
-  def seethrough: Boolean
   def height: Int
   def chr: Char
   def color: Int
@@ -71,15 +70,15 @@ object Terrain {
   
   def register[T <: Slot: Manifest] = terrains += manifest[T].erasure.asInstanceOf[Class[Slot]]
   
+  register[EmptySlot]
   register[HardRock]
   register[DungeonFloor]
   register[DungeonFungus]
 }
 
 
-object NoSlot extends Slot {
+class EmptySlot extends Slot {
   def walkable = false
-  def seethrough = true
   def height = 0
   def chr = '_'
   def color = 0x00000000
@@ -87,11 +86,13 @@ object NoSlot extends Slot {
 }
 
 
+case object NoSlot extends EmptySlot
+
+
 case class HardRock(val height: Int) extends Slot {
   def this() = this(0)
   
   def walkable = false
-  def seethrough = false
   def chr = '#'
   def color = 0x55555500
   def layer = 400
@@ -102,7 +103,6 @@ case class DungeonFloor(val height: Int) extends Slot {
   def this() = this(0)
   
   def walkable = true
-  def seethrough = true
   def chr = '.'
   def color = 0x55555500
   def layer = 500

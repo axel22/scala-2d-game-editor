@@ -206,6 +206,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   abstract class Drawer(a: DrawAdapter) {
     val xrect = new Array[Int](5)
     val yrect = new Array[Int](5)
+    var transparent = drawing.seethrough
     
     @inline implicit final def double2int(d: Double) = d.toInt
     
@@ -222,10 +223,10 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       yrect(4) = y0
     }
     
-    @inline final def drawRect(r: Int, g: Int, b: Int) {
+    @inline final def drawRect(r: Int, g: Int, b: Int, alpha: Int) {
       a.setColor(0, 0, 0, 255)
-      if (!drawing.seethrough) a.fillPoly(xrect, yrect, 5)
-      a.setColor(r, g, b, 255)
+      if (!transparent) a.fillPoly(xrect, yrect, 5)
+      a.setColor(r, g, b, alpha)
       a.drawPoly(xrect, yrect, 5)
     }
   }
@@ -234,7 +235,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
     def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int)
   }
   
-  class TerrainSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
+  class TerrainSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends TerrainOutlineDrawer(a, area, u0, v0) {
     import a._
     
     val neighbours = new Array[Slot](8)
@@ -267,7 +268,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       samelayer
     }
     
-    def drawTerrain(curr: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
+    override def drawTerrain(curr: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
       def random(x: Int, y: Int) = math.abs(Integer.reverseBytes(((x << 8) + y + x + (y << 4)) * 0x9e3775cd) * 0x9e3775cd)
       
       // obtain sprite for slot
@@ -436,18 +437,37 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
         a.setColor(0, 0, 0, 120)
         a.drawLine(up + slotwidth / 2, vp + 2, up + slotwidth, vp + 2 + tileHeight / 2)
       }
+      
+      // draw highlight
+      if ((highlight ne null) && highlight._1 == xp && highlight._2 == yp) {
+        transparent = true
+        uOffset = slotwidth / 2
+        vOffset = tileHeight / 2 + 1
+        outlineR = 0
+        outlineG = 180
+        outlineB = 255
+        outlineAlpha = 150
+        super.drawTerrain(curr, xp, yp, up, vp, vpuoffs, vpvoffs)
+      }
     }
   }
   
   class TerrainOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
     import a._
     
+    var uOffset = 0
+    var vOffset = 0
+    var outlineAlpha = 255
+    var outlineR = 0
+    var outlineG = 100
+    var outlineB = 120
+    
     def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
       rect(
-        up - slotwidth / 2, up, up + slotwidth / 2, up,
-        vp, vp - tileHeight / 2, vp, vp + tileHeight / 2
+        up + uOffset - slotwidth / 2, up + uOffset, up + uOffset + slotwidth / 2, up + uOffset,
+        vp + vOffset, vp - tileHeight / 2 + vOffset, vp + vOffset, vp + tileHeight / 2 + vOffset
       )
-      drawRect(0, 100, 200)
+      drawRect(outlineR, outlineG, outlineB, outlineAlpha)
       setFontSize(8)
       if (drawing.indices) drawString("%s, %s".format(xp, yp), up - slotwidth / 4, vp)
       
@@ -460,20 +480,20 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
         val lu = iso2planar_u(xp, yp + 1, lslothgt, area.sidelength) - u0
         val lv = iso2planar_v(xp, yp + 1, lslothgt, area.sidelength) - v0
         rect(
-          up - slotwidth / 2, up, lu + slotwidth / 2, lu,
-          vp, vp + tileHeight / 2, lv, lv - tileHeight / 2
+          up + uOffset - slotwidth / 2, up + uOffset, lu + uOffset + slotwidth / 2, lu + uOffset,
+          vp + vOffset, vp + vOffset + tileHeight / 2, lv + vOffset, lv + vOffset - tileHeight / 2
         )
-        drawRect(0, 100, 200)
+        drawRect(outlineR, outlineG, outlineB, outlineAlpha)
       }
       val rslothgt = if (area.contains(xp + 1, yp)) area.terrain(xp + 1, yp).height else 0
       if (slot.height > rslothgt) {
         val lu = iso2planar_u(xp + 1, yp, rslothgt, area.sidelength) - u0
         val lv = iso2planar_v(xp + 1, yp, rslothgt, area.sidelength) - v0
         rect(
-          up, up + slotwidth / 2, lu, lu - slotwidth / 2,
-          vp + tileHeight / 2, vp, lv - tileHeight / 2, lv
+          up + uOffset, up + uOffset + slotwidth / 2, lu + uOffset, lu + uOffset - slotwidth / 2,
+          vp + vOffset + tileHeight / 2, vp + vOffset, lv + vOffset - tileHeight / 2, lv + vOffset
         )
-        drawRect(0, 100, 200)
+        drawRect(outlineR, outlineG, outlineB, outlineAlpha)
       }
     }
   }
@@ -506,11 +526,11 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0 + slotwidth / 4
       val v4 = iso2planar_v(rx, ry, 0, area.sidelength) - v0 - vdelta
       rect(u1, u2, u3, u4, v1 - hgt, v2 - hgt, v3 - hgt, v4 - hgt)
-      drawRect(0, 200, 100)
+      drawRect(0, 200, 100, 255)
       rect(u2, u3, u3, u2, v2 - hgt, v3 - hgt, v3, v2)
-      drawRect(0, 200, 100)
+      drawRect(0, 200, 100, 255)
       rect(u3, u4, u4, u3, v3 - hgt, v4 - hgt, v4, v3)
-      drawRect(0, 200, 100)
+      drawRect(0, 200, 100, 255)
     }
   }
   
@@ -567,6 +587,8 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   }
   
   def pos: (Int, Int)
+  
+  var highlight: (Int, Int) = null
   
   def framespersec = 35
   

@@ -239,6 +239,7 @@ public class EditorWindow extends Shell {
 		rightTabs.setSelection(0);
 		
 		terrainTable = new Table(rightTabs, SWT.BORDER | SWT.FULL_SELECTION);
+		terrainTable.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
 		terrainTable.setHeaderVisible(true);
 		tbtmTerrain.setControl(terrainTable);
 		

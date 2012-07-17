@@ -59,7 +59,6 @@ libraryDependencies ++= {
 resolvers += "swt-repo" at "https://swt-repo.googlecode.com/svn/repo/"
 
 libraryDependencies += {
-  println(sys.props("os.arch"))
   val os = (sys.props("os.name"), sys.props("os.arch")) match {
     case ("Linux", _) => "gtk.linux.x86"
     case ("Mac OS X", "amd64" | "x86_64") => "cocoa.macosx.x86_64"
