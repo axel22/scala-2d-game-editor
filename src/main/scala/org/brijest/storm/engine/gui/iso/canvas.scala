@@ -23,6 +23,7 @@ trait Canvas {
   
   trait DrawAdapter {
     def setColor(r: Int, g: Int, b: Int, alpha: Int)
+    def setLineWidth(w: Float)
     def setFontSize(sz: Float)
     def drawLine(x1: Int, y1: Int, x2: Int, y2: Int)
     def drawLine(x1: Double, y1: Double, x2: Double, y2: Double): Unit = drawLine(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
@@ -32,6 +33,8 @@ trait Canvas {
     def fillPoly(xpoints: Array[Int], ypoints: Array[Int], n: Int)
     def fillRect(x1: Int, y1: Int, w: Int, h: Int)
   }
+  
+  def tileCoord(area: AreaView, u: Int, v: Int): (Int, Int)
   
   /* constants */
   
@@ -425,72 +428,76 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       }
       
       if (!loadNeighboursAndCheckEdge(xp, yp, curr.layer)) {
-        drawEdges()
+        if (!curr.isEmpty) drawEdges()
       }
       
       // draw weak northern outline
       if (neighbours(6).height < curr.height) {
         a.setColor(0, 0, 0, 120)
-        a.drawLine(up, vp + 2 + tileHeight / 2, up + slotwidth / 2, vp + 2)
+        a.drawLine(up, vp + 2 + tileHeight / 2, up + tileWidth / 2, vp + 2)
       }
       if (neighbours(4).height < curr.height) {
         a.setColor(0, 0, 0, 120)
-        a.drawLine(up + slotwidth / 2, vp + 2, up + slotwidth, vp + 2 + tileHeight / 2)
+        a.drawLine(up + tileWidth / 2, vp + 2, up + tileWidth, vp + 2 + tileHeight / 2)
       }
       
       // draw highlight
       if ((highlight ne null) && highlight._1 == xp && highlight._2 == yp) {
         transparent = true
-        uOffset = slotwidth / 2
-        vOffset = tileHeight / 2 + 1
-        outlineR = 0
-        outlineG = 180
-        outlineB = 255
-        outlineAlpha = 150
         super.drawTerrain(curr, xp, yp, up, vp, vpuoffs, vpvoffs)
       }
     }
+    
+    override def uOffset = tileWidth / 2
+    override def vOffset = tileHeight / 2 + 1
+    override def outlineR = 0
+    override def outlineG = 180
+    override def outlineB = 255
+    override def outlineAlpha = 120
+    override def thickness = 2
   }
   
   class TerrainOutlineDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with TerrainDrawer {
     import a._
     
-    var uOffset = 0
-    var vOffset = 0
-    var outlineAlpha = 255
-    var outlineR = 0
-    var outlineG = 100
-    var outlineB = 120
+    def uOffset = 0
+    def vOffset = 0
+    def outlineAlpha = 255
+    def outlineR = 0
+    def outlineG = 100
+    def outlineB = 120
+    def thickness = 1
     
     def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
+      setLineWidth(thickness)
       rect(
-        up + uOffset - slotwidth / 2, up + uOffset, up + uOffset + slotwidth / 2, up + uOffset,
+        up + uOffset - tileWidth / 2, up + uOffset, up + uOffset + tileWidth / 2, up + uOffset,
         vp + vOffset, vp - tileHeight / 2 + vOffset, vp + vOffset, vp + tileHeight / 2 + vOffset
       )
       drawRect(outlineR, outlineG, outlineB, outlineAlpha)
       setFontSize(8)
-      if (drawing.indices) drawString("%s, %s".format(xp, yp), up - slotwidth / 4, vp)
+      if (drawing.indices) drawString("%s, %s".format(xp, yp), up - tileWidth / 4, vp)
       
-      drawTerrainSides(slot, xp, yp, up, vp)
+      drawTerrainSides(slot.height, xp, yp, up, vp)
     }
     
-    private def drawTerrainSides(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int) {
+    private def drawTerrainSides(currheight: Int, xp: Int, yp: Int, up: Int, vp: Int) {
       val lslothgt = if (area.contains(xp, yp + 1)) area.terrain(xp, yp + 1).height else 0
-      if (slot.height > lslothgt) {
+      if (currheight > lslothgt) {
         val lu = iso2planar_u(xp, yp + 1, lslothgt, area.sidelength) - u0
         val lv = iso2planar_v(xp, yp + 1, lslothgt, area.sidelength) - v0
         rect(
-          up + uOffset - slotwidth / 2, up + uOffset, lu + uOffset + slotwidth / 2, lu + uOffset,
+          up + uOffset - tileWidth / 2, up + uOffset, lu + uOffset + tileWidth / 2, lu + uOffset,
           vp + vOffset, vp + vOffset + tileHeight / 2, lv + vOffset, lv + vOffset - tileHeight / 2
         )
         drawRect(outlineR, outlineG, outlineB, outlineAlpha)
       }
       val rslothgt = if (area.contains(xp + 1, yp)) area.terrain(xp + 1, yp).height else 0
-      if (slot.height > rslothgt) {
+      if (currheight > rslothgt) {
         val lu = iso2planar_u(xp + 1, yp, rslothgt, area.sidelength) - u0
         val lv = iso2planar_v(xp + 1, yp, rslothgt, area.sidelength) - v0
         rect(
-          up + uOffset, up + uOffset + slotwidth / 2, lu + uOffset, lu + uOffset - slotwidth / 2,
+          up + uOffset, up + uOffset + tileWidth / 2, lu + uOffset, lu + uOffset - tileWidth / 2,
           vp + vOffset + tileHeight / 2, vp + vOffset, lv + vOffset - tileHeight / 2, lv + vOffset
         )
         drawRect(outlineR, outlineG, outlineB, outlineAlpha)
@@ -519,11 +526,11 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       val (bx, by) = info.bottomXY(x, y)
       val u1 = iso2planar_u(x, y, 0, area.sidelength) - u0
       val v1 = iso2planar_v(x, y, 0, area.sidelength) - v0 - tileHeight / 4 - vdelta
-      val u2 = iso2planar_u(lx, ly, 0, area.sidelength) - u0 - slotwidth / 4
+      val u2 = iso2planar_u(lx, ly, 0, area.sidelength) - u0 - tileWidth / 4
       val v2 = iso2planar_v(lx, ly, 0, area.sidelength) - v0 - vdelta
       val u3 = iso2planar_u(bx, by, 0, area.sidelength) - u0
       val v3 = iso2planar_v(bx, by, 0, area.sidelength) - v0 + tileHeight / 4 - vdelta
-      val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0 + slotwidth / 4
+      val u4 = iso2planar_u(rx, ry, 0, area.sidelength) - u0 + tileWidth / 4
       val v4 = iso2planar_v(rx, ry, 0, area.sidelength) - v0 - vdelta
       rect(u1, u2, u3, u4, v1 - hgt, v2 - hgt, v3 - hgt, v4 - hgt)
       drawRect(0, 200, 100, 255)
@@ -572,10 +579,6 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   
   def iheight: Int
   
-  def slotwidth = tileHeight * ratio
-  
-  def ratio = 2
-  
   def levelheight = 16
   
   object drawing {
@@ -588,19 +591,19 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   
   def pos: (Int, Int)
   
-  var highlight: (Int, Int) = null
+  var highlight: (Int, Int) = null;
   
   def framespersec = 35
   
   def framelength = (1000.0 / framespersec).toInt
   
   @inline final def planar2iso(u: Double, v: Double, mapsz: Int): (Double, Double) =
-    (v / tileHeight + u / slotwidth - mapsz / 2, v / tileHeight - u / slotwidth + mapsz / 2);
+    (v / tileHeight + u / tileWidth - mapsz / 2, v / tileHeight - u / tileWidth + mapsz / 2);
   
   @inline final def planar2iso(u: Int, v: Int, mapsz: Int): (Double, Double) =
     planar2iso(u.toDouble, v.toDouble, mapsz)
   
-  @inline final def iso2planar_u(x: Double, y: Double, z: Double, mapsz: Int): Double = (mapsz - y + x) * slotwidth / 2
+  @inline final def iso2planar_u(x: Double, y: Double, z: Double, mapsz: Int): Double = (mapsz - y + x) * tileWidth / 2
   
   @inline final def iso2planar_v(x: Double, y: Double, z: Double, mapsz: Int): Double = (x + y) * tileHeight / 2 - z * levelheight
   
@@ -610,7 +613,12 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   @inline final def iso2planar(x: Int, y: Int, z: Int, mapsz: Int): (Double, Double) =
     iso2planar(x.toDouble, y.toDouble, z.toDouble, mapsz)
   
-  def maxPlanarWidth(mapsz: Int) = iso2planar(mapsz, 0, 0, mapsz)._1 + slotwidth
+  def tileCoord(area: AreaView, u: Int, v: Int): (Int, Int) = {
+    val (x, y) = planar2iso(u + pos._1, v + pos._2, area.sidelength)
+    (x.toInt, y.toInt)
+  }
+  
+  def maxPlanarWidth(mapsz: Int) = iso2planar(mapsz, 0, 0, mapsz)._1 + tileWidth
   
   def maxPlanarHeight(mapsz: Int) = iso2planar(mapsz, mapsz, 0, mapsz)._2 + tileHeight
   
@@ -715,8 +723,8 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
           val (xtop, ytop) = planar2iso(u, vhi, area.sidelength)
           val (xl, yl) = info.leftXY(x, y)
           val (xr, yr) = info.rightXY(x, y)
-          val uleft = iso2planar_u(xl, yl, 0, area.sidelength) - slotwidth / 2
-          val uright = iso2planar_u(xr, yr, 0, area.sidelength) + slotwidth / 2
+          val uleft = iso2planar_u(xl, yl, 0, area.sidelength) - tileWidth / 2
+          val uright = iso2planar_u(xr, yr, 0, area.sidelength) + tileWidth / 2
           
           // add everything in the rectangle to the dependency list
           for (xp <- xtop.toInt to xr; yp <- ytop.toInt to yl) {

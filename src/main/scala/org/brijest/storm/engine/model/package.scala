@@ -18,16 +18,10 @@ import model.components._
 
 package model {
   case class PlayerId(id: Long) extends Immutable
-  
-  trait MutableEvidence {
-    protected implicit val mutableEvidence: mutable = new mutable {}
-  }
 }
 
 
 package object model {
-  
-  trait mutable extends Access with Serializable
   
   def within(x: Int, y: Int, w: Int, h: Int) = x >= 0 && x < w && y >= 0 && y < h
   

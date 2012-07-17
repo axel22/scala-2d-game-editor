@@ -11,6 +11,7 @@ package org.brijest.storm.engine.model
 
 
 import collection._
+import annotation.implicitNotFound
 
 
 
@@ -44,5 +45,16 @@ package components {
   }
   
   sealed trait const extends Access
+  
+  @implicitNotFound(msg = "The component is not mutable.")
+  trait mutable extends Access with Serializable
+  
+  trait Struct extends Serializable
+  
+  trait ProtectedMutable {
+    protected implicit val mutableEvidence: mutable = new mutable {}
+  }
+  
+  trait PublicMutable extends ProtectedMutable with mutable
   
 }

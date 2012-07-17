@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -31,9 +32,19 @@ import javax.swing.JRootPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 public class EditorWindow extends Shell {
-	public Table terrainTable;
+	public EditorEventHandler eventHandler;
+	
 	public Text worldNameLabel;
 	public Table planeTable;
 	public Combo mainPlaneCombo;
@@ -41,8 +52,9 @@ public class EditorWindow extends Shell {
 	public AreaPanel areaPanel;
 	public MenuItem openAreaMenuItem;
 	public CTabFolder leftTabs;
-	
-	public EditorEventHandler eventHandler;
+	public Table terrainTable;
+	public ToolItem paintTerrain;
+	public ToolItem elevateTerrain;
 	
 	/**
 	 * Launch the application.
@@ -64,13 +76,20 @@ public class EditorWindow extends Shell {
 		}
 	}
 
+	public String selectedTerrain() {
+		TableItem[] selected = terrainTable.getSelection();
+		if (selected.length > 0) {
+			return selected[0].getText(2);
+		} else return null;
+	}
+	
 	/**
 	 * Create the shell.
 	 * @param display
 	 */
 	public EditorWindow(Display display) {
 		super(display, SWT.SHELL_TRIM); 
-		setMinimumSize(new Point(1100, 750));
+		setMinimumSize(new Point(1250, 850));
 		setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		Menu menu = new Menu(this, SWT.BAR);
@@ -236,24 +255,45 @@ public class EditorWindow extends Shell {
 		
 		CTabItem tbtmTerrain = new CTabItem(rightTabs, SWT.NONE);
 		tbtmTerrain.setText("Terrain");
-		rightTabs.setSelection(0);
 		
-		terrainTable = new Table(rightTabs, SWT.BORDER | SWT.FULL_SELECTION);
-		terrainTable.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		Composite composite_3 = new Composite(rightTabs, SWT.NONE);
+		tbtmTerrain.setControl(composite_3);
+		GridLayout gl_composite_3 = new GridLayout(1, false);
+		gl_composite_3.verticalSpacing = 1;
+		gl_composite_3.marginWidth = 1;
+		gl_composite_3.marginHeight = 1;
+		gl_composite_3.horizontalSpacing = 1;
+		composite_3.setLayout(gl_composite_3);
+		
+		ToolBar toolBar = new ToolBar(composite_3, SWT.FLAT | SWT.RIGHT);
+		toolBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		
+		paintTerrain = new ToolItem(toolBar, SWT.RADIO);
+		paintTerrain.setSelection(true);
+		paintTerrain.setText("Paint");
+		
+		elevateTerrain = new ToolItem(toolBar, SWT.RADIO);
+		elevateTerrain.setText("Elevate");
+		
+		terrainTable = new Table(composite_3, SWT.BORDER | SWT.FULL_SELECTION);
+		GridData gd_terrainTable = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_terrainTable.widthHint = 125;
+		terrainTable.setLayoutData(gd_terrainTable);
 		terrainTable.setHeaderVisible(true);
-		tbtmTerrain.setControl(terrainTable);
+		terrainTable.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
 		
-		TableColumn tblclmnImage = new TableColumn(terrainTable, SWT.NONE);
-		tblclmnImage.setWidth(51);
-		tblclmnImage.setText("Image");
+		TableColumn tableColumn = new TableColumn(terrainTable, SWT.NONE);
+		tableColumn.setWidth(51);
+		tableColumn.setText("Image");
 		
-		TableColumn tblclmnName = new TableColumn(terrainTable, SWT.NONE);
-		tblclmnName.setWidth(100);
-		tblclmnName.setText("Name");
+		TableColumn tableColumn_1 = new TableColumn(terrainTable, SWT.NONE);
+		tableColumn_1.setWidth(100);
+		tableColumn_1.setText("Name");
 		
-		TableColumn tblclmnNewColumn = new TableColumn(terrainTable, SWT.NONE);
-		tblclmnNewColumn.setWidth(100);
-		tblclmnNewColumn.setText("Full name");
+		TableColumn tableColumn_2 = new TableColumn(terrainTable, SWT.NONE);
+		tableColumn_2.setWidth(100);
+		tableColumn_2.setText("Full name");
+		rightTabs.setSelection(0);
 		
 		CTabItem tbtmAreaDetails = new CTabItem(rightTabs, SWT.NONE);
 		tbtmAreaDetails.setText("Area Details");

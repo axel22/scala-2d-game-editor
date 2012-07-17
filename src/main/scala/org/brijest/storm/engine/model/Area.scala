@@ -15,7 +15,7 @@ import components._
 
 
 
-class AreaView extends Struct with MutableEvidence {
+class AreaView extends Struct with ProtectedMutable {
   private val entitycount = access[mutable] cell(0l)
   private var rawterrain = access[mutable].quad[Slot](1, 1, Some(NoSlot), true)
   val id = access[mutable] cell(invalidAreaId)
@@ -59,6 +59,8 @@ class AreaView extends Struct with MutableEvidence {
   
   def safeTerrain(x: Int, y: Int) = if (contains(x, y)) terrain(x, y) else NoSlot
   
+  def safeTerrain(p: (Int, Int)): Slot = safeTerrain(p._1, p._2)
+  
   def character(id: EntityId): Character = characters.ids(id)
   
   def character(x: Int, y: Int): Character = characters.locs(x, y)
@@ -101,7 +103,7 @@ class AreaView extends Struct with MutableEvidence {
 }
 
 
-class Area extends AreaView with mutable
+class Area extends AreaView with PublicMutable
 
 
 object Area {

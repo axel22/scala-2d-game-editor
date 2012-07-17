@@ -52,58 +52,8 @@ class Editor(config: Config) extends Logging {
   var glp: GLProfile = null //GLProfile.getDefault()
   var caps: GLCapabilities = null //new GLCapabilities(glp)
   
-  val glinitializer = new Thread {
-    override def run() {
-      glp = GLProfile.getDefault()
-      caps = new GLCapabilities(glp)
-    }
-  }
-  glinitializer.run() // deliberate
-  
-  def createGLIsoUI(area: Area) = {
-    val areadisplay = new GLIsoUI(area, caps)
-    
-    /* events */
-    
-    var lastpress = (0, 0);
-    var mode = 'none
-    
-    def onMiddleDrag(p: (Int, Int)) {
-      areadisplay.pos = ((areadisplay.pos._1 + lastpress._1 - p._1).toInt, (areadisplay.pos._2 + lastpress._2 - p._2).toInt);
-      lastpress = p
-    }
-    
-    def onMiddlePress(p: (Int, Int)) {
-      lastpress = p
-      mode = 'drag
-    }
-    
-    def onMiddleRelease(p: (Int, Int)) {
-      mode = 'none
-    }
-    
-    /* awt events */
-    
-    import java.awt.event._
-    
-    areadisplay.addMouseListener(new MouseAdapter {
-      override def mousePressed(me: MouseEvent) {
-        if (me.getButton == MouseEvent.BUTTON2) onMiddlePress((me.getX, me.getY))
-      }
-      override def mouseReleased(me: MouseEvent) {
-        if (me.getButton == MouseEvent.BUTTON2) onMiddleRelease((me.getX, me.getY))
-      }
-    })
-    
-    areadisplay.addMouseMotionListener(new MouseMotionAdapter {
-      override def mouseDragged(me: MouseEvent) {
-        if (mode == 'drag) onMiddleDrag((me.getX, me.getY))
-        areadisplay.repaint()
-      }
-    })
-    
-    areadisplay
-  }
+  glp = GLProfile.getDefault()
+  caps = new GLCapabilities(glp)
   
   var filename: Option[String] = None
   
@@ -141,6 +91,117 @@ class Editor(config: Config) extends Logging {
   displ.asyncExec(new Runnable {
     override def run() = initialize()
   })
+  
+  def createGLIsoUI(implicit area: Area) = {
+    val areadisplay = new GLIsoUI(area, caps)
+    
+    /* events */
+    
+    var lastpress = (0, 0);
+    var elevpress = (0, 0);
+    var elevzeroheight = 0;
+    var mode = 'none
+    
+    def tileAt(p: (Int, Int)) = areadisplay.tileCoord(area, p._1 - areadisplay.tileWidth / 2, p._2)
+    
+    def modifyTerrain(p: (Int, Int)) = {
+      val (x, y) = tileAt(p)
+      
+      displ.syncExec(new Runnable {
+        override def run() {
+          if (editorwindow.paintTerrain.getSelection) {
+            areadisplay.highlight = (x, y);
+            
+            val selected = editorwindow.selectedTerrain
+            if (selected != null && area.contains(x, y)) {
+              val oslot = area.terrain(x, y)
+              val nheight = if (selected == classOf[EmptySlot].getName) 0 else oslot.height
+              val nslot = Slot(selected, nheight)
+              area.terrain(x, y) = nslot
+            }
+          } else if (editorwindow.elevateTerrain.getSelection) {
+            val (xt, yt) = tileAt(elevpress._1, elevpress._2)
+            areadisplay.highlight = (xt, yt);
+            
+            if (area.contains(xt, yt)) {
+              val diff = elevpress._2 - p._2
+              val leveldiff = diff / areadisplay.levelheight
+              val oslot = area.terrain(xt, yt)
+              val nheight = if (oslot.isEmpty) 0 else math.min(math.max(0, elevzeroheight + leveldiff), area.maxheight())
+              val nslot = Slot(oslot, nheight)
+              area.terrain(xt, yt) = nslot
+            }
+          }
+        }
+      })
+    }
+    
+    def onMiddleDrag(p: (Int, Int)) {
+      areadisplay.pos = ((areadisplay.pos._1 + lastpress._1 - p._1).toInt, (areadisplay.pos._2 + lastpress._2 - p._2).toInt);
+      lastpress = p
+    }
+    
+    def onLeftDrag(p: (Int, Int)) {
+      modifyTerrain(p)
+      lastpress = p
+    }
+    
+    def onMiddlePress(p: (Int, Int)) {
+      lastpress = p
+      mode = 'scroll
+    }
+    
+    def onMiddleRelease(p: (Int, Int)) {
+      mode = 'none
+    }
+    
+    def onLeftPress(p: (Int, Int)) {
+      lastpress = p
+      elevpress = p
+      elevzeroheight = area.safeTerrain(tileAt(p._1, p._2)).height
+      mode = 'paint
+      modifyTerrain(p)
+    }
+    
+    def onLeftRelease(p: (Int, Int)) {
+      mode = 'none
+    }
+    
+    def onMouseMove(p: (Int, Int)) {
+      areadisplay.highlight = tileAt(p)
+    }
+    
+    /* awt events */
+    
+    import java.awt.event._
+    
+    areadisplay.addMouseListener(new MouseAdapter {
+      override def mousePressed(me: MouseEvent) {
+        if (me.getButton == MouseEvent.BUTTON2) onMiddlePress((me.getX, me.getY))
+        if (me.getButton == MouseEvent.BUTTON1) onLeftPress((me.getX, me.getY))
+      }
+      override def mouseReleased(me: MouseEvent) {
+        if (me.getButton == MouseEvent.BUTTON2) onMiddleRelease((me.getX, me.getY))
+        if (me.getButton == MouseEvent.BUTTON1) onLeftRelease((me.getX, me.getY))
+      }
+    })
+    
+    areadisplay.addMouseMotionListener(new MouseMotionAdapter {
+      override def mouseDragged(me: MouseEvent) {
+        if (mode == 'scroll) onMiddleDrag((me.getX, me.getY))
+        if (mode == 'paint) onLeftDrag((me.getX, me.getY))
+        areadisplay.repaint()
+      }
+      override def mouseMoved(me: MouseEvent) {
+        if (mode == 'none) {
+          onMouseMove((me.getX, me.getY))
+          areadisplay.repaint()
+        }
+      }
+    })
+    
+    areadisplay
+  }
   
   def initialize() {
     editorwindow.setImage(new graphics.Image(displ, pngStream("lightning")))
@@ -249,6 +310,7 @@ class Editor(config: Config) extends Logging {
             
             val tbtmMap = new CTabItem(leftTabs, SWT.CLOSE);
             tbtmMap.setText("Area: " + world.plane(id).get.name + " at (" + x + ", " + y + ")");
+            leftTabs.setSelection(tbtmMap)
             
             areaPanel = new editor.AreaPanel(leftTabs, SWT.NONE)
             tbtmMap.setControl(areaPanel)

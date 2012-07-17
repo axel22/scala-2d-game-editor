@@ -32,6 +32,8 @@ abstract class Slot extends Immutable {
   
   def edgesuffix = "-edges"
   
+  def isEmpty = false
+  
   assert(height >= 0)
   
   def atHeight(h: Int) = Slot(this.getClass, h)
@@ -43,7 +45,7 @@ object Slot {
   
   def apply[T <: Slot: Manifest](h: Int): Slot = apply(implicitly[Manifest[T]].erasure, h)
   
-  def apply(cls: Class[_], h: Int) = {
+  def apply(cls: Class[_], h: Int): Slot = {
     def newslot = cls.getConstructor(classOf[Int]).newInstance(h.asInstanceOf[AnyRef]).asInstanceOf[Slot]
     cachedslots.get(cls) match {
       case Some(hmap) => hmap.get(h) match {
@@ -59,6 +61,10 @@ object Slot {
         slot
     }
   }
+  
+  def apply(classname: String, h: Int): Slot = apply(Class.forName(classname), h)
+  
+  def apply(s: Slot, h: Int): Slot = apply(s.getClass, h)
   
 }
 
@@ -77,12 +83,14 @@ object Terrain {
 }
 
 
-class EmptySlot extends Slot {
+case class EmptySlot(val height: Int) extends Slot {
+  def this() = this(0)
+  
   def walkable = false
-  def height = 0
   def chr = '_'
   def color = 0x00000000
   def layer = 0
+  override def isEmpty = true
 }
 
 
@@ -116,7 +124,7 @@ case class DungeonFungus(val height: Int) extends Slot {
   def seethrough = true
   def chr = '.'
   def color = 0x55555500
-  def layer = 600
+  def layer = 10000
 }
 
 

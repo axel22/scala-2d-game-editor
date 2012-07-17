@@ -31,4 +31,4 @@ trait EntityView extends Struct {
 }
 
 
-trait Entity extends EntityView with MutableEvidence
+trait Entity extends EntityView with PublicMutable

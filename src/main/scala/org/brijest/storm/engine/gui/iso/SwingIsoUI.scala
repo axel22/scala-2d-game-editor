@@ -78,6 +78,9 @@ abstract class ImageDrawAdapter(buffer: java.awt.image.BufferedImage) {
   def drawLine(x1: Int, y1: Int, x2: Int, y2: Int) {
     gr.drawLine(x1, y1, x2, y2)
   }
+  def setLineWidth(w: Float) {
+    // TODO
+  }
   def setColor(r: Int, g: Int, b: Int, alpha: Int) {
     gr.setColor(new java.awt.Color(r, g, b))
   }

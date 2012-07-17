@@ -15,7 +15,7 @@ import components._
 
 
 
-class CharacterTable(w: Int, h: Int) extends MutableEvidence with Struct {
+class CharacterTable(w: Int, h: Int) extends PublicMutable with Struct {
   private val dflt = Some(NoCharacter)
   val ids = access[mutable].table[EntityId, Character]
   val locs = access[mutable].quad[Character](w, h, dflt)

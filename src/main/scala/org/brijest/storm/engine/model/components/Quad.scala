@@ -60,6 +60,7 @@ class Quad[T, Acc](w: Int, h: Int, d: (Int, Int) => Option[T], compress: Boolean
   final def dimensions = dims
   final override def size = root.elems
   final def apply(x: Int, y: Int) = app(x, y)
+  final def apply(p: (Int, Int)) = app(p._1, p._2)
   final def within(p: Quad.Area): Seq[(Int, Int, T)] = {
     val b = mutable.Buffer[(Int, Int, T)]()
     root.within(0, 0, p, b)

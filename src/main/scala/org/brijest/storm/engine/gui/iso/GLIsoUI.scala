@@ -35,10 +35,8 @@ import org.brijest.storm.engine.model._
 class GLIsoUI(val area: Area, val caps: GLCapabilities) extends GLCanvas(caps) with IsoUI with GLPaletteCanvas with Logging {
 self =>
   
-  //class AreaDisplay extends GLCanvas(caps)
-  
   var resizestamp = 0L
-  val areadisplay = this //new AreaDisplay
+  val areadisplay = this
   
   areadisplay.addGLEventListener(new GLEventListener {
     def display(drawable: GLAutoDrawable) {
@@ -273,6 +271,7 @@ self =>
       def drawCube(x: Int, y: Int) {
         val slot = area.terrain(x, y)
         val hgt = slot.height * 0.55f
+        if (slot.isInstanceOf[EmptySlot]) return
         
         glBegin(GL_QUADS)
         
@@ -668,6 +667,10 @@ self =>
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glDisable(GL_CULL_FACE)
+    
+    def setLineWidth(w: Float) {
+      glLineWidth(w.toFloat)
+    }
     
     def drawLine(x1: Int, y1: Int, x2: Int, y2: Int) {
       // TODO fix
