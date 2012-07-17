@@ -31,7 +31,6 @@ import java.awt.BorderLayout;
 import javax.swing.JRootPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
@@ -280,7 +279,6 @@ public class EditorWindow extends Shell {
 		gd_terrainTable.widthHint = 125;
 		terrainTable.setLayoutData(gd_terrainTable);
 		terrainTable.setHeaderVisible(true);
-		terrainTable.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		TableColumn tableColumn = new TableColumn(terrainTable, SWT.NONE);
 		tableColumn.setWidth(51);
@@ -303,7 +301,6 @@ public class EditorWindow extends Shell {
 		composite_1.setLayout(new GridLayout(1, false));
 		
 		Composite composite = new Composite(composite_1, SWT.EMBEDDED);
-		composite.setFont(SWTResourceManager.getFont("Monaco", 11, SWT.NORMAL));
 		GridData gd_composite = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_composite.heightHint = 13;
 		gd_composite.widthHint = 147;
