@@ -6,7 +6,8 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package model
 
 
@@ -18,10 +19,9 @@ import annotation.switch
 
 
 abstract class Slot extends Immutable {
-  val identifier = this.getClass.getName
-  val edgeIdentifier = identifier + "-edges"
-  val wallIdentifier = identifier + "-wall"
-  protected val identhash = identifier.hashCode
+  def identifier = this.getClass.getName
+  def edgeIdentifier = this.getClass.getName + "-edges"
+  def wallIdentifier = this.getClass.getName + "-wall"
   
   def walkable: Boolean
   def height: Int
@@ -67,18 +67,25 @@ object Slot {
 }
 
 
-object Terrain {
+object Terrain extends Logging {
   private val terrains = mutable.Buffer[Class[Slot]]()
   
   def registered: Seq[Class[Slot]] = terrains
   
-  def register[T <: Slot: Manifest] = terrains += manifest[T].erasure.asInstanceOf[Class[Slot]]
+  def register[T <: Slot: Manifest] = {
+    val cls = manifest[T].erasure.asInstanceOf[Class[Slot]]
+    logger.debug("registering terrain: " + cls.getName)
+    terrains += cls
+  }
   
   register[EmptySlot]
   register[HardRock]
   register[DungeonFloor]
-  register[DungeonFungus]
   register[DungeonSkeleton]
+  register[DungeonSkeletonLeft]
+  register[DungeonShackles]
+  register[DungeonMoss]
+  register[DungeonFungus]
 }
 
 
@@ -120,7 +127,6 @@ case class DungeonFungus(val height: Int) extends Slot {
   def this() = this(0)
   
   def walkable = true
-  def seethrough = true
   def chr = '.'
   def color = 0x55555500
   def layer = 10600
@@ -130,18 +136,50 @@ case class DungeonFungus(val height: Int) extends Slot {
 case class DungeonSkeleton(val height: Int) extends Slot {
   def this() = this(0)
   
-  override val edgeIdentifier = classOf[DungeonFloor].getName + "-edges"
+  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
   
   def walkable = true
-  def seethrough = true
   def chr = '.'
   def color = 0x55555500
-  def layer = 10500
+  def layer = 10525
 }
 
 
+case class DungeonSkeletonLeft(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 10515
+}
 
 
+case class DungeonShackles(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 10520
+}
+
+
+case class DungeonMoss(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
+  override def wallIdentifier = classOf[DungeonFloor].getName + "-wall"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 10510
+}
 
 
 

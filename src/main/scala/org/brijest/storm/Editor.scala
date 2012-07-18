@@ -267,7 +267,6 @@ class Editor(config: Config) extends Logging {
     }
     
     /* initialize */
-    
     for (cls <- Terrain.registered) {
       val inst = cls.newInstance
       val tableItem = new TableItem(terrainTable, SWT.NONE);
