@@ -19,6 +19,8 @@ import annotation.switch
 
 abstract class Slot extends Immutable {
   val identifier = this.getClass.getName
+  val edgeIdentifier = identifier + "-edges"
+  val wallIdentifier = identifier + "-wall"
   protected val identhash = identifier.hashCode
   
   def walkable: Boolean
@@ -27,10 +29,6 @@ abstract class Slot extends Immutable {
   def color: Int
   /** Never use 2 different terrain types with the same layer in the same area. */
   def layer: Int
-  
-  def wallsuffix = "-wall"
-  
-  def edgesuffix = "-edges"
   
   def isEmpty = false
   
@@ -84,7 +82,7 @@ object Terrain {
 }
 
 
-case class EmptySlot(val height: Int) extends Slot {
+class EmptySlot(val height: Int) extends Slot {
   def this() = this(0)
   
   def walkable = false
@@ -131,6 +129,8 @@ case class DungeonFungus(val height: Int) extends Slot {
 
 case class DungeonSkeleton(val height: Int) extends Slot {
   def this() = this(0)
+  
+  override val edgeIdentifier = classOf[DungeonFloor].getName + "-edges"
   
   def walkable = true
   def seethrough = true

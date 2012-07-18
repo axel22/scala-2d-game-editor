@@ -193,9 +193,9 @@ trait PaletteCanvas extends Canvas {
     
     def sprite(t: Slot) = findSprite(t.identifier)
     
-    def wall(t: Slot) = findSprite(t.identifier + t.wallsuffix)
+    def wall(t: Slot) = findSprite(t.wallIdentifier)
     
-    def edges(t: Slot) = findSprite(t.identifier + t.edgesuffix)
+    def edges(t: Slot) = findSprite(t.edgeIdentifier)
     
     def maxSpriteHeight = Sprites.maxheight
     
