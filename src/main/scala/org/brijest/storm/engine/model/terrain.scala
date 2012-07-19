@@ -18,7 +18,7 @@ import annotation.switch
 
 
 
-abstract class Slot extends Immutable {
+abstract class Slot extends Immutable with Serializable {
   def identifier = this.getClass.getName
   def edgeIdentifier = this.getClass.getName + "-edges"
   def wallIdentifier = this.getClass.getName + "-wall"
