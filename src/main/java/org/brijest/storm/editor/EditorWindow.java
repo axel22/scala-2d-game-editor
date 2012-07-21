@@ -40,6 +40,7 @@ import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.custom.CLabel;
 
 public class EditorWindow extends Shell {
 	public EditorEventHandler eventHandler;
@@ -54,6 +55,8 @@ public class EditorWindow extends Shell {
 	public Table terrainTable;
 	public ToolItem paintTerrain;
 	public ToolItem elevateTerrain;
+	public Text terrainFilter;
+	public CLabel searchLabel;
 	
 	/**
 	 * Launch the application.
@@ -273,6 +276,30 @@ public class EditorWindow extends Shell {
 		
 		elevateTerrain = new ToolItem(toolBar, SWT.RADIO);
 		elevateTerrain.setText("Elevate");
+		
+		Composite composite_4 = new Composite(composite_3, SWT.NONE);
+		composite_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		GridLayout gl_composite_4 = new GridLayout(2, false);
+		gl_composite_4.verticalSpacing = 0;
+		gl_composite_4.marginWidth = 0;
+		gl_composite_4.marginHeight = 0;
+		gl_composite_4.horizontalSpacing = 0;
+		composite_4.setLayout(gl_composite_4);
+		
+		terrainFilter = new Text(composite_4, SWT.BORDER);
+		terrainFilter.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		terrainFilter.setSize(178, 19);
+		terrainFilter.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent arg0) {
+				eventHandler.event("Terrain filter", arg0);
+			}
+		});
+		
+		searchLabel = new CLabel(composite_4, SWT.NONE);
+		GridData gd_searchLabel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_searchLabel.widthHint = 22;
+		searchLabel.setLayoutData(gd_searchLabel);
+		searchLabel.setText("");
 		
 		terrainTable = new Table(composite_3, SWT.BORDER | SWT.FULL_SELECTION);
 		GridData gd_terrainTable = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);

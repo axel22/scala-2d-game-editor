@@ -266,15 +266,29 @@ class Editor(config: Config) extends Logging {
       }
     }
     
+    val searchicon = new graphics.Image(displ, pngStream("magnify"))
+    editorwindow.searchLabel.setImage(searchicon)
+    editorwindow.searchLabel.pack()
+    
     /* initialize */
-    for (cls <- Terrain.registered) {
-      val inst = cls.newInstance
-      val tableItem = new TableItem(terrainTable, SWT.NONE);
-      val image = new graphics.Image(displ, pngStream(inst.identifier));
-      tableItem.setImage(0, image)
-      tableItem.setText(1, cls.getSimpleName);
-      tableItem.setText(2, inst.identifier);
+    def loadTerrainTable() {
+      val filtertxt = terrainFilter.getText
+      def isFiltered(cls: Class[_]) = cls.getName.toLowerCase.indexOf(filtertxt.toLowerCase) != -1
+      
+      terrainTable.removeAll()
+      for (
+        cls <- Terrain.registered;
+        if isFiltered(cls)
+      ) {
+        val inst = cls.newInstance
+        val tableItem = new TableItem(terrainTable, SWT.NONE)
+        val image = new graphics.Image(displ, pngStream(inst.identifier))
+        tableItem.setImage(0, image)
+        tableItem.setText(1, cls.getSimpleName)
+        tableItem.setText(2, inst.identifier)
+      }
     }
+    loadTerrainTable()
     
     eventHandler = new editor.EditorEventHandler {
       def event(name: String, arg: Object): Unit = (name, arg) match {
@@ -355,6 +369,8 @@ class Editor(config: Config) extends Logging {
           if (sel != -1) {
             world.mainPlane = sel
           }
+        case ("Terrain filter", _) =>
+          loadTerrainTable()
         case ("Save", _) =>
           save()
         case ("Save as", _) =>
