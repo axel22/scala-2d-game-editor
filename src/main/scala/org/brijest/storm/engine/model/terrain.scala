@@ -89,6 +89,7 @@ object Terrain extends Logging {
   register[DungeonMoss]
   register[DungeonBlood]
   register[DungeonFungus]
+  register[StoneTiles]
 }
 
 
@@ -223,7 +224,16 @@ case class DungeonBlood(val height: Int) extends Slot {
 }
 
 
-
+case class StoneTiles(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 500
+}
 
 
 
