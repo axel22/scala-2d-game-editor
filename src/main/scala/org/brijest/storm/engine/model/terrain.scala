@@ -125,7 +125,7 @@ case class HardRockMoss(val height: Int) extends Slot {
   def walkable = false
   def chr = '#'
   def color = 0x55555500
-  def layer = 401
+  def layer = 10401
 }
 
 
@@ -138,7 +138,7 @@ case class HardRockFungus(val height: Int) extends Slot {
   def walkable = false
   def chr = '#'
   def color = 0x55555500
-  def layer = 402
+  def layer = 10402
 }
 
 
@@ -227,12 +227,10 @@ case class DungeonBlood(val height: Int) extends Slot {
 case class StoneTiles(val height: Int) extends Slot {
   def this() = this(0)
   
-  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
-  
   def walkable = true
   def chr = '.'
   def color = 0x55555500
-  def layer = 500
+  def layer = 600
 }
 
 
