@@ -80,6 +80,7 @@ object Terrain extends Logging {
   
   register[EmptySlot]
   register[HardRock]
+  register[HardRockMoss]
   register[DungeonFloor]
   register[DungeonSkeleton]
   register[DungeonSkeletonLeft]
@@ -111,6 +112,18 @@ case class HardRock(val height: Int) extends Slot {
   def chr = '#'
   def color = 0x55555500
   def layer = 400
+}
+
+
+case class HardRockMoss(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[HardRock].getName + "-edges"
+  
+  def walkable = false
+  def chr = '#'
+  def color = 0x55555500
+  def layer = 401
 }
 
 
