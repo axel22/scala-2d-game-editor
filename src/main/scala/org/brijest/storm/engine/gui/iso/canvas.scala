@@ -41,9 +41,11 @@ trait Canvas {
   final def tileWidth = 48
   final def tileHeight = 24
   final def wallHeight = 64
-  final def wallWidth = 48
+  final def wallWidth = tileWidth
   final def edgesheetWidth = 192
   final def edgesheetHeight = 60
+  final def topHeight = 32
+  final def topWidth = tileWidth
   
   /* see docs/edges.jpg for explanation */
   val edgelut = new Array[Int](32)
@@ -277,6 +279,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       // obtain sprite for slot
       val tile = palette.sprite(curr)
       val wall = palette.wall(curr)
+      val wtop = palette.top(curr)
       val edgeNeeded = !loadNeighboursAndCheckEdge(xp, yp, curr.layer)
       
       // draw terrain walls
@@ -299,12 +302,29 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
           }
         }
       }
+      
+      def drawTop(nbheight: Int, nx: Int, ny: Int, topoffset: Int) {
+        if (nbheight < curr.height) {
+          val lu = iso2planar_u(nx, ny, nbheight, area.sidelength) - u0 + tileWidth / 2
+          var lv = iso2planar_v(nx, ny, nbheight, area.sidelength) - v0 + tileHeight / 2 + 3
+          val limit = lv - levelheight * (curr.height - nbheight)
+          drawImage(
+            wtop.image(random(nx, ny) % wtop.frames),
+            lu - topWidth / 2 + topoffset, limit - topHeight / 2 - 1, lu + topoffset, limit + topHeight / 2 - 1,
+            topoffset, 0, topWidth / 2 + topoffset, topHeight
+          )
+        }
+      }
+      
+      val leftnbheight = if ((yp + 1) < area.terrain.dimensions._2) area.terrain(xp, yp + 1).height else 0
+      val rightnbheight = if ((xp + 1) < area.terrain.dimensions._1) area.terrain(xp + 1, yp).height else 0
+      
       drawWall(
-        if ((yp + 1) < area.terrain.dimensions._2) area.terrain(xp, yp + 1).height else 0,
+        leftnbheight,
         xp, yp + 1, wallWidth / 2
       )
       drawWall(
-        if ((xp + 1) < area.terrain.dimensions._1) area.terrain(xp + 1, yp).height else 0,
+        rightnbheight,
         xp + 1, yp, 0
       )
       
@@ -321,6 +341,16 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       // draw terrain tile
       def frame = if (!tile.animated) random(xp, yp) % tile.frames else 0
       drawImage(tile.image(frame), up, vp, up + tile.width, vp + tile.height, tile.xoffset, tile.yoffset, tile.xoffset + tile.width, tile.yoffset + tile.height)
+      
+      // draw wall tops
+      drawTop(
+        leftnbheight,
+        xp, yp + 1, wallWidth / 2
+      )
+      drawTop(
+        rightnbheight,
+        xp + 1, yp, 0
+      )
       
       // draw edges based on neighbours
       // we detect all the different terrain layers next to curr
