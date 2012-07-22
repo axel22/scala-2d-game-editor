@@ -277,6 +277,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       // obtain sprite for slot
       val tile = palette.sprite(curr)
       val wall = palette.wall(curr)
+      val edgeNeeded = !loadNeighboursAndCheckEdge(xp, yp, curr.layer)
       
       // draw terrain walls
       def drawWall(nbheight: Int, nx: Int, ny: Int, walloffset: Int) {
@@ -306,6 +307,16 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
         if ((xp + 1) < area.terrain.dimensions._1) area.terrain(xp + 1, yp).height else 0,
         xp + 1, yp, 0
       )
+      
+      // draw weak northern outline
+      if (neighbours(6).height < curr.height) {
+        a.setColor(0, 0, 0, 100)
+        a.drawLine(up, vp + 2 + tileHeight / 2, up + tileWidth / 2, vp + 2)
+      }
+      if (neighbours(4).height < curr.height) {
+        a.setColor(0, 0, 0, 100)
+        a.drawLine(up + tileWidth / 2, vp + 2, up + tileWidth, vp + 2 + tileHeight / 2)
+      }
       
       // draw terrain tile
       def frame = if (!tile.animated) random(xp, yp) % tile.frames else 0
@@ -427,18 +438,8 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
         drawEdge(3)
       }
       
-      if (!loadNeighboursAndCheckEdge(xp, yp, curr.layer)) {
+      if (edgeNeeded) {
         if (!curr.isEmpty) drawEdges()
-      }
-      
-      // draw weak northern outline
-      if (neighbours(6).height < curr.height) {
-        a.setColor(0, 0, 0, 120)
-        a.drawLine(up, vp + 2 + tileHeight / 2, up + tileWidth / 2, vp + 2)
-      }
-      if (neighbours(4).height < curr.height) {
-        a.setColor(0, 0, 0, 120)
-        a.drawLine(up + tileWidth / 2, vp + 2, up + tileWidth, vp + 2 + tileHeight / 2)
       }
       
       // draw highlight

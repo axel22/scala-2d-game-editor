@@ -91,6 +91,7 @@ object Terrain extends Logging {
   register[DungeonFungus]
   register[StoneTiles]
   register[RedCarpet]
+  register[MeadowGrass]
 }
 
 
@@ -243,7 +244,19 @@ case class RedCarpet(val height: Int) extends Slot {
   def walkable = true
   def chr = '.'
   def color = 0x55555500
-  def layer = 4000
+  def layer = 2000
+}
+
+
+case class MeadowGrass(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def wallIdentifier = classOf[MeadowGrass].getName + "-wall"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 12500
 }
 
 
