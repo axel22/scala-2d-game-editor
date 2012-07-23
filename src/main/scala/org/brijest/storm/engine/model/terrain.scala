@@ -95,6 +95,8 @@ object Terrain extends Logging {
   register[MeadowGrassPlain]
   register[MeadowGrass]
   register[MeadowPoppy]
+  register[MeadowLobelia]
+  register[MeadowSunflower]
 }
 
 
@@ -274,6 +276,34 @@ case class MeadowPoppy(val height: Int) extends Slot {
   def chr = '.'
   def color = 0x55555500
   def layer = 12505
+}
+
+
+case class MeadowLobelia(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
+  override def wallIdentifier = classOf[MeadowGrass].getName + "-wall"
+  override def topIdentifier = classOf[MeadowGrass].getName + "-top"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 12506
+}
+
+
+case class MeadowSunflower(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
+  override def wallIdentifier = classOf[MeadowGrass].getName + "-wall"
+  override def topIdentifier = classOf[MeadowGrass].getName + "-top"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 12507
 }
 
 
