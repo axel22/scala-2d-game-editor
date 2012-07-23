@@ -36,9 +36,8 @@ class GLIsoUI(val area: Area, val caps: GLCapabilities) extends GLCanvas(caps) w
 self =>
   
   var resizestamp = 0L
-  val areadisplay = this
   
-  areadisplay.addGLEventListener(new GLEventListener {
+  this.addGLEventListener(new GLEventListener {
     def display(drawable: GLAutoDrawable) {
       val gl = drawable.getGL().getGL2()
       
@@ -60,15 +59,15 @@ self =>
   
   /* implementations */
   
-  def iwidth: Int = areadisplay.getWidth
+  def iwidth: Int = this.getWidth
   
-  def iheight: Int = areadisplay.getHeight
+  def iheight: Int = this.getHeight
   
   def refresh(area: AreaView, state: Engine.State) = this.synchronized {
     // cachedarea = area
-    // areadisplay.repaint()
+    // this.repaint()
     
-    // val glad = new GLAutoDrawableDrawAdapter(areadisplay)
+    // val glad = new GLAutoDrawableDrawAdapter(this)
     
     // val t = timed {
     //   redraw(area, state, glad)
@@ -257,51 +256,48 @@ self =>
     val xlook = xmid - 14.50
     val ylook = ymid - 13.50
     
-    type Vec3 = (Float, Float, Float)
+    type Vec3 = (Float, Float, Float);
     
     trait Light {
       def shader: Int
       def color: Vec3
     }
+    
     case class OrthoLight(pos: Vec3, color: Vec3) extends Light {
       def shader = orthoshadowProgram
     }
     
-    def drawScene() {
-      def drawCube(x: Int, y: Int) {
-        val slot = area.terrain(x, y)
-        val hgt = slot.height * 0.55f
-        if (slot.isInstanceOf[EmptySlot]) return
-        
+    def drawScene(withCharacters: Boolean) {
+      def drawCube(x: Int, y: Int, span: Float, bottom: Float, top: Float) {
         glBegin(GL_QUADS)
         
         /* top */
-        glVertex3d(x - 0.5f, y - 0.5f, hgt)
-        glVertex3d(x - 0.5f, y + 0.5f, hgt)
-        glVertex3d(x + 0.5f, y + 0.5f, hgt)
-        glVertex3d(x + 0.5f, y - 0.5f, hgt)
+        glVertex3d(x - span, y - span, top)
+        glVertex3d(x - span, y + span, top)
+        glVertex3d(x + span, y + span, top)
+        glVertex3d(x + span, y - span, top)
         
         /* sides */
-        if (hgt > 0) {
-          glVertex3f(x - 0.5f, y - 0.5f, hgt)
-          glVertex3f(x - 0.5f, y - 0.5f, 0)
-          glVertex3f(x - 0.5f, y + 0.5f, 0)
-          glVertex3f(x - 0.5f, y + 0.5f, hgt)
+        if (top > 0) {
+          glVertex3f(x - span, y - span, top)
+          glVertex3f(x - span, y - span, bottom)
+          glVertex3f(x - span, y + span, bottom)
+          glVertex3f(x - span, y + span, top)
           
-          glVertex3f(x + 0.5f, y - 0.5f, hgt)
-          glVertex3f(x + 0.5f, y - 0.5f, 0)
-          glVertex3f(x - 0.5f, y - 0.5f, 0)
-          glVertex3f(x - 0.5f, y - 0.5f, hgt)
+          glVertex3f(x + span, y - span, top)
+          glVertex3f(x + span, y - span, bottom)
+          glVertex3f(x - span, y - span, bottom)
+          glVertex3f(x - span, y - span, top)
           
-          glVertex3f(x + 0.5f, y + 0.5f, hgt)
-          glVertex3f(x + 0.5f, y + 0.5f, 0)
-          glVertex3f(x + 0.5f, y - 0.5f, 0)
-          glVertex3f(x + 0.5f, y - 0.5f, hgt)
+          glVertex3f(x + span, y + span, top)
+          glVertex3f(x + span, y + span, bottom)
+          glVertex3f(x + span, y - span, bottom)
+          glVertex3f(x + span, y - span, top)
           
-          glVertex3f(x - 0.5f, y + 0.5f, hgt)
-          glVertex3f(x - 0.5f, y + 0.5f, 0)
-          glVertex3f(x + 0.5f, y + 0.5f, 0)
-          glVertex3f(x + 0.5f, y + 0.5f, hgt)
+          glVertex3f(x - span, y + span, top)
+          glVertex3f(x - span, y + span, bottom)
+          glVertex3f(x + span, y + span, bottom)
+          glVertex3f(x + span, y + span, top)
         }
         
         glEnd()
@@ -311,7 +307,17 @@ self =>
       var y = yfrom
       while (y < yuntil) {
         while (x < xuntil) {
-          drawCube(x, y)
+          val slot = area.terrain(x, y)
+          slot match {
+            case slot: EmptySlot =>
+            case slot => drawCube(x, y, 0.5f, 0.f, slot.height * 0.55f)
+          }
+          if (withCharacters) area.character(x, y) match {
+            case NoCharacter =>
+            case chr =>
+              val sprite = palette.sprite(chr)
+              drawCube(x, y, 0.5f, slot.height, slot.height * 0.55f + sprite.height / 16.f)
+          }
           x += 1
         }
         y += 1
@@ -448,7 +454,7 @@ self =>
       
       glClear(GL_DEPTH_BUFFER_BIT)
       
-      drawScene()
+      drawScene(true)
       
       glBindFramebuffer(GL_FRAMEBUFFER, 0)
       
@@ -557,7 +563,7 @@ self =>
       glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
       
-      drawScene()
+      drawScene(false)
       
       glBindFramebuffer(GL_FRAMEBUFFER, 0)
       
