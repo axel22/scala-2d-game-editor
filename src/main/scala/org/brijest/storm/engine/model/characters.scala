@@ -22,6 +22,7 @@ import rules._
  *  Each has a manager which controls what they do - choose their next action
  *  depending on the current state.
  */
+@SerialVersionUID(1000L)
 abstract class Character extends Entity {
   val pos = access[mutable] cell(Pos(0, 0))
   val dimensions = access[mutable] cell((1, 1))
@@ -43,6 +44,12 @@ abstract class Character extends Entity {
     }
   }
   
+  def positions = new Traversable[(Int, Int)] {
+    def foreach[U](f: ((Int, Int)) => U) = foreachPos {
+      (x, y) => f((x, y))
+    }
+  }
+  
   def action(area: AreaView) = manager.action(area)
   
   def manager: Manager
@@ -55,11 +62,18 @@ abstract class Character extends Entity {
   
   def foreach(f: Character => Unit) = f(this)
   
+  def identifier = this.getClass.getName
+  
 }
 
 
 object Character {
   def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[Character]) Some(e.id) else None
+}
+
+
+object CharacterSet extends ClassSet[Character] {
+  register[characters.MeadowBush]
 }
 
 

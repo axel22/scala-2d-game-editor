@@ -15,6 +15,7 @@ import components._
 
 
 
+@SerialVersionUID(1000L)
 class CharacterTable(w: Int, h: Int) extends PublicMutable with Struct {
   private val dflt = Some(NoCharacter)
   val ids = access[mutable].table[EntityId, Character]
@@ -31,7 +32,18 @@ class CharacterTable(w: Int, h: Int) extends PublicMutable with Struct {
     c.foreachPos((x, y) => locs(x, y) = c)
     c match {
       case pc: PlayerCharacter => pcs(pc.pid) = pc.id
-      case _ => // do nothing
+      case _ =>
+    }
+  }
+  
+  def remove(c: Character)(implicit m: Area) {
+    if (ids.contains(c.id)) {
+      ids.remove(c.id)
+      c.foreachPos((x, y) => locs.remove(x, y))
+      c match {
+        case pc: PlayerCharacter => pcs.remove(pc.pid)
+        case _ =>
+      }
     }
   }
   

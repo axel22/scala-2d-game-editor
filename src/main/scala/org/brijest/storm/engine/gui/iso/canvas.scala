@@ -233,8 +233,10 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       if (!transparent) a.fillPoly(xrect, yrect, 5)
       a.setColor(r, g, b, alpha)
       a.drawPoly(xrect, yrect, 5)
-    }
-  }
+    } 
+    
+    def random(x: Int, y: Int) = math.abs(Integer.reverseBytes(((x << 8) + y + x + (y << 4)) * 0x9e3775cd) * 0x9e3775cd)
+ }
   
   trait TerrainDrawer {
     def drawTerrain(slot: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int)
@@ -274,12 +276,10 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
     }
     
     override def drawTerrain(curr: Slot, xp: Int, yp: Int, up: Int, vp: Int, vpuoffs: Int, vpvoffs: Int) {
-      def random(x: Int, y: Int) = math.abs(Integer.reverseBytes(((x << 8) + y + x + (y << 4)) * 0x9e3775cd) * 0x9e3775cd)
-      
       // obtain sprite for slot
       val tile = palette.sprite(curr)
       val wall = palette.wall(curr)
-      val wtop = palette.top(curr)
+      val wtop = palette.walltop(curr)
       val edgeNeeded = !loadNeighboursAndCheckEdge(xp, yp, curr.layer)
       
       // draw terrain walls
@@ -442,9 +442,10 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
           val xlen = halftilewdt * (1 + (0 + (block + blocky) % 2))
           val ylen = halftilehgt * (1 + (1 - (block + blocky) % 2))
           val s = getNbSprite(slotidx).asInstanceOf[palette.Sprite]
+          val frame = random(xp, yp) % s.frames
           val eu = up + intilexoff
           val ev = vp + intileyoff - (sectionhgt - tileHeight)
-          drawImage(s.image(0), eu - 1, ev + 2, eu + xlen + 1, ev + ylen + 4, xoff - 1, yoff - 1, xoff + xlen + 1, yoff + ylen + 1)
+          drawImage(s.image(frame), eu - 1, ev + 2, eu + xlen + 1, ev + ylen + 4, xoff - 1, yoff - 1, xoff + xlen + 1, yoff + ylen + 1)
         }
         
         var i = 0
@@ -543,8 +544,19 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   class CharacterSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with CharacterDrawer {
     def drawCharacter(c: Character, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int) {
       // get sprite for character
+      val s = palette.sprite(c)
+      val frame = if (s.animated) 0 else random(x, y) % s.frames
+      
+      // coordinates
+      val (w, h) = c.dimensions()
+      val utl = iso2planar_u(x, y + h, 0, area.sidelength) - u0
+      val ubr = iso2planar_u(x + w, y + h, 0, area.sidelength) - u0
+      val vbr = iso2planar_v(x + w, y + h, 0, area.sidelength) - v0
+      val ustart = utl
+      val vstart = vbr - s.height
       
       // draw sprite
+      a.drawImage(s.image(frame), ustart, vstart, ustart + s.width, vstart + s.height, 0, 0, s.width, s.height)
     }
   }
   

@@ -27,6 +27,7 @@ package object components {
     def queue[T] = new Queue[T, Acc]
     def heap[T: Ordering] = new Heap[T, Acc]
     def pile[T] = new Pile[T, Acc]
+    def trie[K, V] = new Trie[K, V, Acc]
   }
   
   object factory extends Factory[Nothing]

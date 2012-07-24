@@ -21,6 +21,7 @@ trait ItemTableView extends Struct {
 }
 
 
+@SerialVersionUID(1000L)
 class ItemTable(w: Int, h: Int) extends ItemTableView with PublicMutable {
   private val dflt: Option[List[Item]] = Some(Nil)
   private var rawlocs = access[mutable] quad(w, h, dflt)

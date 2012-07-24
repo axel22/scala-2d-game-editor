@@ -9,27 +9,30 @@
 package org.brijest.storm
 package engine
 package model
+package characters
 
 
 
-import collection._
+import components._
+import rules.{Stats, Inventory}
 
 
 
-trait AreaProvider extends Serializable {
-  def name: String
-  def acquire(): Area
-  def release(a: Area): Unit
+class Rock(val id: EntityId, sz: (Int, Int) = (3, 3)) extends Character {
+  dimensions := sz
+  
+  def manager = IdleManager
+  def canWalk(from: Slot, to: Slot) = false
+  def chr = '#'
+  def color = 0xffffff00
+  def pov(area: AreaView) = area
 }
 
 
-object AreaProvider {
-  
-  @SerialVersionUID(1000L)
-  final class Strict(area: Area) extends AreaProvider {
-    def name = "Strict"
-    def acquire() = area
-    def release(a: Area) {}
-  }
-  
+class MeadowBush(val id: EntityId) extends Character {
+  def manager = IdleManager
+  def canWalk(from: Slot, to: Slot) = false
+  def chr = 'T'
+  def color = 0xffffff00
+  def pov(area: AreaView) = area
 }

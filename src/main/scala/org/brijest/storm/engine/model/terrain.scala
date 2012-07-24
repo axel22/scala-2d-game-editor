@@ -68,17 +68,7 @@ object Slot {
 }
 
 
-object Terrain extends Logging {
-  private val terrains = mutable.Buffer[Class[Slot]]()
-  
-  def registered: Seq[Class[Slot]] = terrains
-  
-  def register[T <: Slot: Manifest] = {
-    val cls = manifest[T].erasure.asInstanceOf[Class[Slot]]
-    logger.debug("registering terrain: " + cls.getName)
-    terrains += cls
-  }
-  
+object Terrain extends ClassSet[Slot] {
   register[EmptySlot]
   register[HardRock]
   register[HardRockMoss]
@@ -117,7 +107,7 @@ case object NoSlot extends EmptySlot
 case class HardRock(val height: Int) extends Slot {
   def this() = this(0)
   
-  def walkable = false
+  def walkable = true
   def chr = '#'
   def color = 0x55555500
   def layer = 400
@@ -129,7 +119,7 @@ case class HardRockMoss(val height: Int) extends Slot {
   
   override def edgeIdentifier = classOf[HardRock].getName + "-edges"
   
-  def walkable = false
+  def walkable = true
   def chr = '#'
   def color = 0x55555500
   def layer = 10401
@@ -142,7 +132,7 @@ case class HardRockFungus(val height: Int) extends Slot {
   override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
   override def wallIdentifier = classOf[HardRock].getName + "-wall"
   
-  def walkable = false
+  def walkable = true
   def chr = '#'
   def color = 0x55555500
   def layer = 10402

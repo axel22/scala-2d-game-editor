@@ -12,12 +12,25 @@ package engine
 
 
 import scala.annotation.switch
+import scala.collection._
 import model.components._
 
 
 
 package model {
   case class PlayerId(id: Long) extends Immutable
+  
+  trait ClassSet[C] {
+    private val classes = mutable.Buffer[Class[C]]()
+    
+    def registered: Seq[Class[C]] = classes
+    
+    def register[T <: C: Manifest] = {
+      val cls = manifest[T].erasure.asInstanceOf[Class[C]]
+      classes += cls
+    }
+    
+  }
 }
 
 

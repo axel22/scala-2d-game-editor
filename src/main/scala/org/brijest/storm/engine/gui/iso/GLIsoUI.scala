@@ -314,9 +314,11 @@ self =>
           }
           if (withCharacters) area.character(x, y) match {
             case NoCharacter =>
-            case chr =>
+            case chr if chr.pos().x == x && chr.pos().y == y =>
+              val (w, h) = chr.dimensions()
               val sprite = palette.sprite(chr)
-              drawCube(x, y, 0.5f, slot.height, slot.height * 0.55f + sprite.height / 16.f)
+              // TODO adjust for multi slot characters
+              drawCube(x + w / 2, y + h / 2, sprite.width / 32.f, slot.height * 0.55f, slot.height * 0.55f + sprite.height / 16.f)
           }
           x += 1
         }

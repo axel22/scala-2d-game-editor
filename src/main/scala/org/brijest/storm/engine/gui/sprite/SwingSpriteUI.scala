@@ -1,3 +1,4 @@
+
 /*    ______________  ___  __  ___  _____  _____  ____  __  ____________  *\
 **   / __/_  __/ __ \/ _ \/  |/  / / __/ |/ / _ \/ __ \/ / / /_  __/ __/  **
 **  _\ \  / / / /_/ / , _/ /|_/ / / _//    / , _/ /_/ / /_/ / / / / _/    **
@@ -133,7 +134,7 @@ class SwingSpriteUI(val name: String) extends SpriteUI {
       case None => loadSprite(ident)
     }
     
-    def sprite(e: EntityView): Sprite = sprite(e.identifier)
+    def sprite(e: EntityView): Sprite = sprite("")
     
     def sprite(s: Slot): Sprite = sprite(s.identifier)
   }

@@ -47,7 +47,7 @@ trait PaletteCanvas extends Canvas {
     
     def wall(t: Slot): Sprite
     
-    def top(t: Slot): Sprite
+    def walltop(t: Slot): Sprite
     
     def edges(t: Slot): Sprite
     
@@ -197,7 +197,7 @@ trait PaletteCanvas extends Canvas {
     
     def wall(t: Slot) = findSprite(t.wallIdentifier)
     
-    def top(t: Slot) = findSprite(t.topIdentifier)
+    def walltop(t: Slot) = findSprite(t.topIdentifier)
     
     def edges(t: Slot) = findSprite(t.edgeIdentifier)
     

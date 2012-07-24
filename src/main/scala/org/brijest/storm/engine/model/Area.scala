@@ -15,6 +15,7 @@ import components._
 
 
 
+@SerialVersionUID(1000L)
 class AreaView extends Struct with ProtectedMutable {
   private val entitycount = access[mutable] cell(0l)
   private var rawterrain = access[mutable].quad[Slot](1, 1, Some(NoSlot), true)
@@ -45,6 +46,8 @@ class AreaView extends Struct with ProtectedMutable {
   def playerCharacter(playerId: PlayerId): PlayerCharacter = characters.ids(characters.pcs(playerId)).asInstanceOf[PlayerCharacter]
   
   final def isWalkable(pos: Pos): Boolean = isWalkable(pos.x, pos.y)
+  
+  final def isWalkable(p: (Int, Int)): Boolean = isWalkable(p._1, p._2)
   
   final def isWalkable(x: Int, y: Int) = isWalkableTerrain(x, y) && (characters.locs.apply(x, y) == NoCharacter)
   
@@ -103,6 +106,7 @@ class AreaView extends Struct with ProtectedMutable {
 }
 
 
+@SerialVersionUID(1000L)
 class Area extends AreaView with PublicMutable
 
 

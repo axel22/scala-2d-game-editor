@@ -15,6 +15,7 @@ import org.eclipse.swt._
 import org.eclipse.swt.custom._
 import org.eclipse.swt.widgets._
 import org.eclipse.swt.events._
+import org.eclipse.swt.graphics._
 import java.awt.image._
 import javax.media.opengl._
 import engine.model._
@@ -106,12 +107,11 @@ class Editor(config: Config) extends Logging {
     
     def modifyTerrain(p: (Int, Int)) = {
       val (x, y) = tileAt(p)
+      areadisplay.highlight = (x, y);
       
       displ.syncExec(new Runnable {
         override def run() {
           if (editorwindow.paintTerrain.getSelection) {
-            areadisplay.highlight = (x, y);
-            
             val selected = editorwindow.selectedTerrain
             if (selected != null && area.contains(x, y)) {
               val oslot = area.terrain(x, y)
@@ -130,6 +130,18 @@ class Editor(config: Config) extends Logging {
               val nheight = if (oslot.isEmpty) 0 else math.min(math.max(0, elevzeroheight + leveldiff), area.maxheight())
               val nslot = Slot(oslot, nheight)
               area.terrain(xt, yt) = nslot
+            }
+          } else if (editorwindow.insertCharacter.getSelection) {
+            val selected = editorwindow.selectedChar[Character]
+            if (selected != null) {
+              val chr = selected.getConstructor(classOf[EntityId]).newInstance(area.newEntityId())
+              chr.pos := Pos(x, y)
+              if (chr.positions.forall(area.isWalkable(_))) area.characters.insert(chr)
+            }
+          } else if (editorwindow.removeCharacter.getSelection) {
+            area.character(x, y) match {
+              case NoCharacter =>
+              case c: Character => area.characters.remove(c)
             }
           }
         }
@@ -267,28 +279,117 @@ class Editor(config: Config) extends Logging {
     }
     
     val searchicon = new graphics.Image(displ, pngStream("magnify"))
-    editorwindow.searchLabel.setImage(searchicon)
-    editorwindow.searchLabel.pack()
+    val painticon = new graphics.Image(displ, pngStream("paint"))
+    val elevateicon = new graphics.Image(displ, pngStream("up"))
+    val inserticon = new graphics.Image(displ, pngStream("insert"))
+    val removeicon = new graphics.Image(displ, pngStream("remove"))
+    val packageicon = new graphics.Image(displ, pngStream("package"))
+    val monstericon = new graphics.Image(displ, pngStream("monster"))
+    paintTerrain.setImage(painticon)
+    elevateTerrain.setImage(elevateicon)
+    insertCharacter.setImage(inserticon)
+    removeCharacter.setImage(removeicon)
+    modeToolbar.pack()
     
     /* initialize */
     def loadTerrainTable() {
-      val filtertxt = terrainFilter.getText
-      def isFiltered(cls: Class[_]) = cls.getName.toLowerCase.indexOf(filtertxt.toLowerCase) != -1
+      val filtertxt = terrainFilter.getText.toLowerCase
+      def isFiltered(cls: Class[_]) = cls.getName.toLowerCase.indexOf(filtertxt) != -1
       
       terrainTable.removeAll()
-      for (
-        cls <- Terrain.registered;
-        if isFiltered(cls)
-      ) {
+      for (cls <- Terrain.registered; if isFiltered(cls)) {
         val inst = cls.newInstance
         val tableItem = new TableItem(terrainTable, SWT.NONE)
-        val image = new graphics.Image(displ, pngStream(inst.identifier))
+        val image = new Image(displ, pngStream(inst.identifier))
         tableItem.setImage(0, image)
         tableItem.setText(1, cls.getSimpleName)
         tableItem.setText(2, inst.identifier)
       }
     }
     loadTerrainTable()
+    
+    def resizeImage(image: Image, width: Int, height: Int) = {
+      val resized = new Image(displ, image.getImageData.scaledTo(width, height))
+      image.dispose()
+      resized
+    }
+    
+    def boundDimension(img: Image, maxsz: Int) = {
+      val w = img.getBounds.width
+      val h = img.getBounds.height
+      if (w > maxsz || h > maxsz) {
+        if (w > h) (maxsz, h / (w / maxsz))
+        else (w / (h / maxsz), maxsz)
+      } else (w, h)
+    }
+    
+    def characterImage(cls: Class[Character]) = {
+      val inst = cls.getConstructor(classOf[EntityId]).newInstance(invalidEntityId)
+      new Image(displ, pngStream(inst.identifier))
+    }
+    
+    def loadCharacterTable() {
+      val filtertxt = characterFilter.getText.toLowerCase
+      def isFiltered(cls: Class[_]) = cls.getName.toLowerCase.indexOf(filtertxt) != -1
+      
+      characterTable.removeAll()
+      
+      import components._
+      val nodes = access[free].trie[String, (Image, Class[Character])]
+      val treeRoot = new TreeItem(characterTable, SWT.NONE)
+      treeRoot.setText("Characters")
+      treeRoot.setImage(monstericon)
+      
+      for (cls <- CharacterSet.registered; if isFiltered(cls)) {
+        val origimage = characterImage(cls)
+        val (w, h) = boundDimension(origimage, 18)
+        val image = resizeImage(origimage, w, h)
+        val path = cls.getName.split("\\.")
+        nodes(path) = (image, cls)
+      }
+      
+      def insertChildren(ti: TreeItem, n: nodes.Node) {
+        for ((k, child) <- n.children) insert(ti, child, Nil)
+      }
+      def insert(parent: TreeItem, n: nodes.Node, prefix: Seq[String]) {
+        def onlyChild = n.children.iterator.next._2
+        if (n.children.size == 1 && onlyChild.children.size > 0)
+          insert(parent, onlyChild, prefix :+ n.prefix.last)
+        else {
+          val item = new TreeItem(parent, SWT.NONE)
+          n.value match {
+            case Some((img, cls)) =>
+              item.setText(cls.getSimpleName)
+              item.setImage(img)
+              item.setData(cls)
+            case None =>
+              item.setText((prefix :+ n.prefix.last).mkString("."))
+              item.setImage(packageicon)
+          }
+          insertChildren(item, n)
+          item.setExpanded(true)
+        }
+      }
+      insertChildren(treeRoot, nodes.tree)
+      treeRoot.setExpanded(true)
+    }
+    loadCharacterTable()
+    
+    def createCharacterTip(p: Point) {
+      val item = characterTable.getItem(p)
+      if (item != null && item.getData != null) {
+        if (characterTip != null) {
+          characterTip.dispose()
+          characterTip = null
+        }
+        characterTip = new editor.CharacterTip(displ)
+        val origimage = characterImage(item.getData.asInstanceOf[Class[Character]])
+        val (w, h) = boundDimension(origimage, 128)
+        val image = resizeImage(origimage, w, h)
+        characterTip.imageLabel.setImage(image)
+        characterTip.setVisible(true)
+      }
+    }
     
     eventHandler = new editor.EditorEventHandler {
       def event(name: String, arg: Object): Unit = (name, arg) match {
@@ -371,6 +472,10 @@ class Editor(config: Config) extends Logging {
           }
         case ("Terrain filter", _) =>
           loadTerrainTable()
+        case ("Character filter", _) =>
+          loadCharacterTable()
+        case ("Character hover", p: Point) =>
+          createCharacterTip(p)
         case ("Save", _) =>
           save()
         case ("Save as", _) =>

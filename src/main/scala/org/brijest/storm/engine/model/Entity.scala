@@ -26,8 +26,6 @@ trait EntityView extends Struct {
   def isItem: Boolean
   def isRC: Boolean = false
   def isPC: Boolean = false
-  
-  def identifier = this.getClass.getName
 }
 
 
