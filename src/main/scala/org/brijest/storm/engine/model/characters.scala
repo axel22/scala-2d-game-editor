@@ -74,6 +74,7 @@ object Character {
 
 object CharacterSet extends ClassSet[Character] {
   register[characters.MeadowBush]
+  register[characters.MeadowShrub]
 }
 
 
