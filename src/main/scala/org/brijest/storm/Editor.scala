@@ -278,6 +278,7 @@ class Editor(config: Config) extends Logging {
       }
     }
     
+    val saveicon = new graphics.Image(displ, pngStream("save"))
     val searchicon = new graphics.Image(displ, pngStream("magnify"))
     val painticon = new graphics.Image(displ, pngStream("paint"))
     val elevateicon = new graphics.Image(displ, pngStream("up"))
@@ -285,6 +286,7 @@ class Editor(config: Config) extends Logging {
     val removeicon = new graphics.Image(displ, pngStream("remove"))
     val packageicon = new graphics.Image(displ, pngStream("package"))
     val monstericon = new graphics.Image(displ, pngStream("monster"))
+    saveButton.setImage(saveicon)
     paintTerrain.setImage(painticon)
     elevateTerrain.setImage(elevateicon)
     insertCharacter.setImage(inserticon)
@@ -323,8 +325,12 @@ class Editor(config: Config) extends Logging {
       } else (w, h)
     }
     
+    def dummyInstance(cls: Class[Character]) = {
+      cls.getConstructor(classOf[EntityId]).newInstance(invalidEntityId)
+    }
+    
     def characterImage(cls: Class[Character]) = {
-      val inst = cls.getConstructor(classOf[EntityId]).newInstance(invalidEntityId)
+      val inst = dummyInstance(cls)
       new Image(displ, pngStream(inst.identifier))
     }
     
@@ -383,10 +389,13 @@ class Editor(config: Config) extends Logging {
           characterTip = null
         }
         characterTip = new editor.CharacterTip(displ)
-        val origimage = characterImage(item.getData.asInstanceOf[Class[Character]])
+        val cls = item.getData.asInstanceOf[Class[Character]]
+        val origimage = characterImage(cls)
         val (w, h) = boundDimension(origimage, 128)
         val image = resizeImage(origimage, w, h)
         characterTip.imageLabel.setImage(image)
+        characterTip.nameLabel.setText(cls.getSimpleName)
+        characterTip.dimensionLabel.setText("Size: " + dummyInstance(cls).dimensions())
         characterTip.setVisible(true)
       }
     }

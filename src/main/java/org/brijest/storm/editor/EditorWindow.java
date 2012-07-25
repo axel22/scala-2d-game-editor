@@ -56,6 +56,7 @@ public class EditorWindow extends Shell {
 	public CTabFolder charTabs;
 	public ToolBar modeToolbar;
 	public CharacterTip characterTip;
+	public ToolItem saveButton;
 	
 	/**
 	 * Launch the application.
@@ -104,13 +105,19 @@ public class EditorWindow extends Shell {
 	 */
 	public EditorWindow(Display display) {
 		super(display, SWT.SHELL_TRIM); 
+		setLocation(new Point(50, 50));
 		addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent arg0) {
 			}
 		});
 		setMinimumSize(new Point(1250, 850));
-		setLayout(new FillLayout(SWT.HORIZONTAL));
+		GridLayout gridLayout = new GridLayout(1, false);
+		gridLayout.verticalSpacing = 0;
+		gridLayout.marginWidth = 0;
+		gridLayout.marginHeight = 0;
+		gridLayout.horizontalSpacing = 0;
+		setLayout(gridLayout);
 		
 		Menu menu = new Menu(this, SWT.BAR);
 		setMenuBar(menu);
@@ -165,7 +172,30 @@ public class EditorWindow extends Shell {
 		});
 		mntmAddPlane.setText("Add plane...");
 		
+		modeToolbar = new ToolBar(this, SWT.FLAT | SWT.RIGHT);
+		modeToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		
+		saveButton = new ToolItem(modeToolbar, SWT.NONE);
+		saveButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Save", null);
+			}
+		});
+		
+		ToolItem toolItem = new ToolItem(modeToolbar, SWT.SEPARATOR);
+		
+		paintTerrain = new ToolItem(modeToolbar, SWT.RADIO);
+		paintTerrain.setSelection(true);
+		
+		elevateTerrain = new ToolItem(modeToolbar, SWT.RADIO);
+		
+		insertCharacter = new ToolItem(modeToolbar, SWT.RADIO);
+		
+		removeCharacter = new ToolItem(modeToolbar, SWT.RADIO);
+		
 		SashForm sashForm = new SashForm(this, SWT.NONE);
+		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
 		leftTabs = new CTabFolder(sashForm, SWT.BORDER);
 		leftTabs.setSelectionBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
@@ -284,18 +314,6 @@ public class EditorWindow extends Shell {
 		gl_composite.marginHeight = 0;
 		gl_composite.horizontalSpacing = 0;
 		composite.setLayout(gl_composite);
-		
-		modeToolbar = new ToolBar(composite, SWT.FLAT | SWT.RIGHT);
-		modeToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		
-		paintTerrain = new ToolItem(modeToolbar, SWT.RADIO);
-		paintTerrain.setSelection(true);
-		
-		elevateTerrain = new ToolItem(modeToolbar, SWT.RADIO);
-		
-		insertCharacter = new ToolItem(modeToolbar, SWT.RADIO);
-		
-		removeCharacter = new ToolItem(modeToolbar, SWT.RADIO);
 		
 		SashForm sashForm_2 = new SashForm(composite, SWT.VERTICAL);
 		sashForm_2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));

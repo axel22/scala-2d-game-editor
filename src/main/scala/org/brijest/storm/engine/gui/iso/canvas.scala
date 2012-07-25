@@ -549,11 +549,11 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       
       // coordinates
       val (w, h) = c.dimensions()
-      val utl = iso2planar_u(x, y + h, 0, area.sidelength) - u0
+      val ubl = iso2planar_u(x, y + h, 0, area.sidelength) - u0
       val ubr = iso2planar_u(x + w, y + h, 0, area.sidelength) - u0
       val vbr = iso2planar_v(x + w, y + h, 0, area.sidelength) - v0
-      val ustart = utl
-      val vstart = vbr - s.height
+      val ustart = ubl + tileWidth / 2
+      val vstart = vbr - area.terrain(x, y).height * levelheight - s.height
       
       // draw sprite
       a.drawImage(s.image(frame), ustart, vstart, ustart + s.width, vstart + s.height, 0, 0, s.width, s.height)
