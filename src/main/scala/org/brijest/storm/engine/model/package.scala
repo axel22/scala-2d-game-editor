@@ -78,6 +78,10 @@ package object model {
   
   def defaultPlayerId = PlayerId(0)
   
+  /* terrain */
+  
+  lazy val NoSlot = Slot[EmptySlot](0)
+  
   /* various types */
   
   type Dir = Int

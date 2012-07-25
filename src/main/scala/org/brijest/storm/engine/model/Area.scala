@@ -97,7 +97,7 @@ class AreaView extends Struct with ProtectedMutable {
     characters.resize(w, h)
     items.resize(w, h)
     val old = rawterrain
-    rawterrain.dimensions = (w, h);
+    rawterrain = access[mutable].quad[Slot](w, h, Some(NoSlot), true)
     old.foreach {
       (x, y, t) => rawterrain(x, y) = t
     }

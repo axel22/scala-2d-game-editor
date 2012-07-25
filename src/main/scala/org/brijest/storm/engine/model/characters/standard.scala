@@ -7,8 +7,7 @@
 \*                                            www.storm-enroute.com       */
 
 package org.brijest.storm
-package engine
-package model
+package engine.model
 package characters
 
 
@@ -29,19 +28,47 @@ class Rock(val id: EntityId, sz: (Int, Int) = (3, 3)) extends Character {
 }
 
 
-class MeadowBush(val id: EntityId) extends Character {
-  def manager = IdleManager
-  def canWalk(from: Slot, to: Slot) = false
-  def chr = 'T'
-  def color = 0xffffff00
-  def pov(area: AreaView) = area
+package meadow {
+  
+  class Bush(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0xffffff00
+    def pov(area: AreaView) = area
+  }
+  
+  class Shrub(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0xffffff00
+    def pov(area: AreaView) = area
+  }
+  
+  class Pepperbush(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0xffffff00
+    def pov(area: AreaView) = area
+  }
+  
+  class Forsythia(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0xffffff00
+    def pov(area: AreaView) = area
+  }
+  
+  class Elderberry(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0xffffff00
+    def pov(area: AreaView) = area
+  }
+  
 }
 
-
-class MeadowShrub(val id: EntityId) extends Character {
-  def manager = IdleManager
-  def canWalk(from: Slot, to: Slot) = false
-  def chr = 'T'
-  def color = 0xffffff00
-  def pov(area: AreaView) = area
-}

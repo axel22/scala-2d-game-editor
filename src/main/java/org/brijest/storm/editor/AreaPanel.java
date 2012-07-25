@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class AreaPanel extends Composite {
 	public Panel areaCanvasPane;
-
+	
 	/**
 	 * Create the composite.
 	 * @param parent

@@ -17,6 +17,8 @@ public class XYChooser extends Dialog {
 
 	protected Point result;
 	public Shell chooserShell;
+	public int xinit;
+	public int yinit;
 	public int width;
 	public int height;
 
@@ -63,6 +65,7 @@ public class XYChooser extends Dialog {
 		
 		final Spinner xspinner = new Spinner(chooserShell, SWT.BORDER);
 		xspinner.setMaximum(width);
+		xspinner.setSelection(xinit);
 		GridData gd_xspinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_xspinner.widthHint = 36;
 		xspinner.setLayoutData(gd_xspinner);
@@ -72,6 +75,7 @@ public class XYChooser extends Dialog {
 		
 		final Spinner yspinner = new Spinner(chooserShell, SWT.BORDER);
 		yspinner.setMaximum(height);
+		yspinner.setSelection(yinit);
 		GridData gd_yspinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_yspinner.widthHint = 36;
 		yspinner.setLayoutData(gd_yspinner);

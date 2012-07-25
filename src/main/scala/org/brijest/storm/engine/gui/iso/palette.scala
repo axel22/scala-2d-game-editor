@@ -157,6 +157,7 @@ trait PaletteCanvas extends Canvas {
       val tmpfile = java.io.File.createTempFile("storm", "tmp")
       tmpfile.deleteOnExit()
       val pngis = pngStream(name)
+      assert(pngis != null, "sprite " + name + " does not exist")
       val tmpfos = new java.io.FileOutputStream(tmpfile)
       try {
         IOUtils.copy(pngis, tmpfos)
@@ -213,7 +214,7 @@ trait PaletteCanvas extends Canvas {
 
 
 trait GLPaletteCanvas extends PaletteCanvas {
-  case class Img()(val width: Int, val height: Int, val data: ByteBuffer) {
+  case class Img()(val width: Int, val height: Int, val texWidth: Int, val texHeight: Int, val data: ByteBuffer) {
     private var stamp = -1L
     var texno = -1
     
@@ -244,9 +245,11 @@ trait GLPaletteCanvas extends PaletteCanvas {
     def newSprite(imgs: Seq[Img]) = new Sprite(imgs)
     
     def toImg(img: BufferedImage) = {
-      val w = ceilpow2(img.getWidth(null))
-      val h = ceilpow2(img.getWidth(null))
-      val raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, w, h, 4, null)
+      val iw = img.getWidth(null)
+      val ih = img.getHeight(null)
+      val w = ceilpow2(iw)
+      val h = ceilpow2(ih)
+      val raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, iw, ih, 4, null)
       val colorModel = new ComponentColorModel(
         ColorSpace.getInstance(ColorSpace.CS_sRGB),
 	Array(8, 8, 8, 8),
@@ -263,7 +266,7 @@ trait GLPaletteCanvas extends PaletteCanvas {
       data.position(0)
       data.mark()
       
-      Img()(w, h, data)
+      Img()(iw, ih, w, h, data)
     }
     
     def width(img: Img) = img.width

@@ -101,9 +101,6 @@ class EmptySlot(val height: Int) extends Slot {
 }
 
 
-case object NoSlot extends EmptySlot
-
-
 case class HardRock(val height: Int) extends Slot {
   def this() = this(0)
   

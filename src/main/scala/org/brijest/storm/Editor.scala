@@ -437,10 +437,26 @@ class Editor(config: Config) extends Logging {
             
             areaPanel = new editor.AreaPanel(leftTabs, SWT.NONE)
             tbtmMap.setControl(areaPanel)
+            tbtmMap.setData(area)
             
             val canvasPane = createGLIsoUI(area)
             
             areaPanel.areaCanvasPane.add(canvasPane)
+          }
+        case ("Resize area", _) =>
+          val selection = leftTabs.getSelection
+          selection.getData match {
+            case area: Area =>
+              implicit val _ = area
+              val chooser = new editor.XYChooser(editorwindow, SWT.APPLICATION_MODAL)
+              chooser.width = 1024
+              chooser.height = 1024
+              chooser.xinit = area.width
+              chooser.yinit = area.height
+              val coord = chooser.open()
+              if (coord == null) return
+              area.resize(coord.x, coord.y)
+            case _ =>
           }
         case ("Remove plane", _) =>
           val selection = planeTable.getSelection

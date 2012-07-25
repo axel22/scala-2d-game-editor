@@ -172,6 +172,21 @@ public class EditorWindow extends Shell {
 		});
 		mntmAddPlane.setText("Add plane...");
 		
+		MenuItem mntmArea = new MenuItem(menu, SWT.CASCADE);
+		mntmArea.setText("Area");
+		
+		Menu menu_4 = new Menu(mntmArea);
+		mntmArea.setMenu(menu_4);
+		
+		MenuItem mntmResize = new MenuItem(menu_4, SWT.NONE);
+		mntmResize.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Resize area", arg0);
+			}
+		});
+		mntmResize.setText("Resize...");
+		
 		modeToolbar = new ToolBar(this, SWT.FLAT | SWT.RIGHT);
 		modeToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
