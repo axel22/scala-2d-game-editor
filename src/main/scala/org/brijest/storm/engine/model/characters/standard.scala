@@ -78,5 +78,21 @@ package meadow {
     def pov(area: AreaView) = area
   }
   
+  class BurnedBush(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }
+  
+  class BurnedShrub(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }
+  
 }
 

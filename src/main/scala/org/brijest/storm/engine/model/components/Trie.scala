@@ -29,7 +29,7 @@ class Trie[K, V, Acc] extends immutable.Trie[K, V] {
   }
   
   private case class Internal(val prefix: Seq[K]) extends Node {
-    val children = mutable.Map[K, Internal]()
+    val children = mutable.LinkedHashMap[K, Internal]()
     var value: Option[V] = None
     override def toString = "Internal(" + prefix.mkString(", ") + "):" + children.mkString(", ")
   }
