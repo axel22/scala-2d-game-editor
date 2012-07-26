@@ -178,6 +178,15 @@ public class EditorWindow extends Shell {
 		Menu menu_4 = new Menu(mntmArea);
 		mntmArea.setMenu(menu_4);
 		
+		MenuItem mntmSetDefaultTerrain = new MenuItem(menu_4, SWT.NONE);
+		mntmSetDefaultTerrain.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				eventHandler.event("Set default terrain", arg0);
+			}
+		});
+		mntmSetDefaultTerrain.setText("Set default terrain...");
+		
 		MenuItem mntmResize = new MenuItem(menu_4, SWT.NONE);
 		mntmResize.addSelectionListener(new SelectionAdapter() {
 			@Override

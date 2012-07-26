@@ -457,6 +457,31 @@ class Editor(config: Config) extends Logging {
               if (coord == null) return
               area.resize(coord.x, coord.y)
             case _ =>
+              val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.OK)
+              messageBox.setText("Select area")
+              messageBox.setMessage("Must select a tab with an area.")
+              messageBox.open()
+          }
+        case ("Set default terrain", _) =>
+          val selection = leftTabs.getSelection
+          selection.getData match {
+            case area: Area =>
+              implicit val _ = area
+              val chooser = new editor.TerrainChooser(editorwindow, SWT.APPLICATION_MODAL)
+              chooser.terrains = Terrain.registeredNames.toArray
+              val name = chooser.open()
+              if (name == null) return
+              Terrain.forName(name) match {
+                case Some(cls) =>
+                  val slot = Some(Slot(cls, 0))
+                  area.terrain.default = (x, y) => slot
+                case None =>
+              }
+            case _ =>
+              val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.OK)
+              messageBox.setText("Select area")
+              messageBox.setMessage("Must select a tab with an area.")
+              messageBox.open()
           }
         case ("Remove plane", _) =>
           val selection = planeTable.getSelection

@@ -55,7 +55,7 @@ public class XYChooser extends Dialog {
 	private void createContents() {
 		chooserShell = new Shell(getParent(), getStyle());
 		chooserShell.setSize(149, 121);
-		chooserShell.setText("Choose Area");
+		chooserShell.setText("Choose XY");
 		chooserShell.setLayout(new GridLayout(2, false));
 		Point loc = Display.getCurrent().getCursorLocation();
 		chooserShell.setLocation(loc.x, loc.y);

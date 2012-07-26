@@ -21,13 +21,17 @@ package model {
   case class PlayerId(id: Long) extends Immutable
   
   trait ClassSet[C] {
-    private val classes = mutable.Buffer[Class[C]]()
+    private val classes = mutable.LinkedHashMap[String, Class[C]]()
     
-    def registered: Seq[Class[C]] = classes
+    def registered: Iterable[Class[C]] = classes.values
+    
+    def registeredNames: Iterable[String] = classes.keys
+    
+    def forName(s: String) = classes.get(s)
     
     def register[T <: C: Manifest] = {
       val cls = manifest[T].erasure.asInstanceOf[Class[C]]
-      classes += cls
+      classes(cls.getName) = cls
     }
     
   }
