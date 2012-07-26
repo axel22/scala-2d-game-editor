@@ -74,9 +74,11 @@ object Terrain extends ClassSet[Slot] {
   register[HardRockMoss]
   register[HardRockFungus]
   register[DungeonFloor]
+  register[DungeonBrokenFloor]
   register[DungeonSkeleton]
   register[DungeonSkeletonLeft]
   register[DungeonShackles]
+  register[DungeonPassage]
   register[DungeonMoss]
   register[DungeonBlood]
   register[DungeonFungus]
@@ -146,6 +148,19 @@ case class DungeonFloor(val height: Int) extends Slot {
 }
 
 
+case class DungeonBrokenFloor(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[DungeonFloor].getName + "-edges"
+  override def wallIdentifier = classOf[DungeonFloor].getName + "-wall"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 500
+}
+
+
 case class DungeonFungus(val height: Int) extends Slot {
   def this() = this(0)
   
@@ -181,6 +196,18 @@ case class DungeonSkeletonLeft(val height: Int) extends Slot {
 
 
 case class DungeonShackles(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 10520
+}
+
+
+case class DungeonPassage(val height: Int) extends Slot {
   def this() = this(0)
   
   override def edgeIdentifier = classOf[EmptySlot].getName + "-edges"

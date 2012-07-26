@@ -78,6 +78,7 @@ object CharacterSet extends ClassSet[Character] {
   register[characters.meadow.Pepperbush]
   register[characters.meadow.Forsythia]
   register[characters.meadow.Elderberry]
+  register[characters.meadow.Sward]
 }
 
 

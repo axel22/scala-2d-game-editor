@@ -70,5 +70,13 @@ package meadow {
     def pov(area: AreaView) = area
   }
   
+  class Sward(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0xffffff00
+    def pov(area: AreaView) = area
+  }
+  
 }
 
