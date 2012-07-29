@@ -401,48 +401,56 @@ class Editor(config: Config) extends Logging {
     }
     
     eventHandler = new editor.EditorEventHandler {
-      def event(name: String, arg: Object): Unit = (name, arg) match {
-        case ("Open area", e: SelectionEvent) =>
-          val selection = planeTable.getSelection
-          if (selection.nonEmpty) {
-            val id = selection.head.getText(0).toInt
-            val plane = world.plane(id)
+      def openArea() {
+        val selection = planeTable.getSelection
+        if (selection.nonEmpty) {
+          val id = selection.head.getText(0).toInt
+          val plane = world.plane(id)
+          
+          val (x, y) = if (plane.size == 1) (0, 0) else {
             val chooser = new editor.XYChooser(editorwindow, SWT.APPLICATION_MODAL)
             chooser.width = plane.size - 1
             chooser.height = plane.size - 1
             val coord = chooser.open()
             if (coord == null) return
-            
-            val (x, y) = (coord.x, coord.y);
-            val areaid = areaId(id, x, y)
-            val area = world.area(areaid) match {
-              case Some(a: AreaProvider.Strict) => a.acquire()
-              case Some(a) =>
-                val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.OK)
-                messageBox.setText("Unknown provider")
-                messageBox.setMessage("Unable to handle area provider type: " + a.name + ".")
-                messageBox.open()
-                return
-              case None =>
-                val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.OK)
-                messageBox.setText("Unknown area")
-                messageBox.setMessage("There is no area with id: " + areaid + " (plane: " + id + ", x: " + x + ", y: " + y + ").")
-                messageBox.open()
-                return
-            }
-            
-            val tbtmMap = new CTabItem(leftTabs, SWT.CLOSE);
-            tbtmMap.setText("Area: " + world.plane(id).get.name + " at (" + x + ", " + y + ")");
-            leftTabs.setSelection(tbtmMap)
-            
-            areaPanel = new editor.AreaPanel(leftTabs, SWT.NONE)
-            tbtmMap.setControl(areaPanel)
-            tbtmMap.setData(area)
-            
-            val canvasPane = createGLIsoUI(area)
-            
-            areaPanel.areaCanvasPane.add(canvasPane)
+            (coord.x, coord.y);
           }
+          val areaid = areaId(id, x, y)
+          val area = world.area(areaid) match {
+            case Some(a: AreaProvider.Strict) => a.acquire()
+            case Some(a) =>
+              val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.OK)
+              messageBox.setText("Unknown provider")
+              messageBox.setMessage("Unable to handle area provider type: " + a.name + ".")
+              messageBox.open()
+              return
+            case None =>
+              val messageBox = new MessageBox(editorwindow, SWT.ICON_WARNING | SWT.OK)
+              messageBox.setText("Unknown area")
+              messageBox.setMessage("There is no area with id: " + areaid + " (plane: " + id + ", x: " + x + ", y: " + y + ").")
+              messageBox.open()
+              return
+          }
+          
+          val tbtmMap = new CTabItem(leftTabs, SWT.CLOSE);
+          tbtmMap.setText("Area: " + world.plane(id).get.name + " at (" + x + ", " + y + ")");
+          leftTabs.setSelection(tbtmMap)
+          
+          areaPanel = new editor.AreaPanel(leftTabs, SWT.NONE)
+          tbtmMap.setControl(areaPanel)
+          tbtmMap.setData(area)
+          
+          val canvasPane = createGLIsoUI(area)
+          
+          areaPanel.areaCanvasPane.add(canvasPane)
+        }
+      }
+      
+      def event(name: String, arg: Object): Unit = (name, arg) match {
+        case ("Fast open area", _) =>
+          openArea()
+        case ("Open area", e: SelectionEvent) =>
+          openArea()
         case ("Resize area", _) =>
           val selection = leftTabs.getSelection
           selection.getData match {

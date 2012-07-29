@@ -232,6 +232,12 @@ public class EditorWindow extends Shell {
 		tbtmWorld.setControl(sashForm_1);
 		
 		planeTable = new Table(sashForm_1, SWT.BORDER | SWT.FULL_SELECTION);
+		planeTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(MouseEvent arg0) {
+				eventHandler.event("Fast open area", arg0);
+			}
+		});
 		planeTable.setLinesVisible(true);
 		planeTable.setHeaderVisible(true);
 		

@@ -46,6 +46,16 @@ package meadow {
     def pov(area: AreaView) = area
   }
   
+  class LargeBush(val id: EntityId) extends Character {
+    dimensions := (2, 2);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0xffffff00
+    def pov(area: AreaView) = area
+  }
+  
   class Pepperbush(val id: EntityId) extends Character {
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
@@ -95,4 +105,25 @@ package meadow {
   }
   
 }
+
+
+package misc {
+
+  class Altar(val id: EntityId) extends Character {
+    dimensions := (2, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '_'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }
+  
+}
+
+
+
+
+
+
 

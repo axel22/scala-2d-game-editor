@@ -75,12 +75,14 @@ object Character {
 object CharacterSet extends ClassSet[Character] {
   register[characters.meadow.Bush]
   register[characters.meadow.Shrub]
+  register[characters.meadow.LargeBush]
   register[characters.meadow.Pepperbush]
   register[characters.meadow.Forsythia]
   register[characters.meadow.Elderberry]
   register[characters.meadow.Sward]
   register[characters.meadow.BurnedBush]
   register[characters.meadow.BurnedShrub]
+  register[characters.misc.Altar]
 }
 
 
