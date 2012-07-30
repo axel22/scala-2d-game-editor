@@ -1,6 +1,7 @@
 package org.brijest.storm.editor;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
@@ -8,6 +9,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
@@ -33,7 +35,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.swt.events.MouseAdapter;
 
 public class EditorWindow extends Shell {
 	public EditorEventHandler eventHandler;
@@ -57,6 +58,7 @@ public class EditorWindow extends Shell {
 	public ToolBar modeToolbar;
 	public CharacterTip characterTip;
 	public ToolItem saveButton;
+	public CCombo brushSize;
 	
 	/**
 	 * Launch the application.
@@ -196,27 +198,46 @@ public class EditorWindow extends Shell {
 		});
 		mntmResize.setText("Resize...");
 		
-		modeToolbar = new ToolBar(this, SWT.FLAT | SWT.RIGHT);
-		modeToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		Composite composite_7 = new Composite(this, SWT.NONE);
+		GridLayout gl_composite_7 = new GridLayout(2, false);
+		gl_composite_7.verticalSpacing = 0;
+		gl_composite_7.marginWidth = 0;
+		gl_composite_7.marginHeight = 0;
+		gl_composite_7.horizontalSpacing = 0;
+		composite_7.setLayout(gl_composite_7);
+		
+		modeToolbar = new ToolBar(composite_7, SWT.FLAT | SWT.RIGHT);
 		
 		saveButton = new ToolItem(modeToolbar, SWT.NONE);
+		saveButton.setToolTipText("Saves current world data.");
+		
+		ToolItem toolItem = new ToolItem(modeToolbar, SWT.SEPARATOR);
+		
+		paintTerrain = new ToolItem(modeToolbar, SWT.RADIO);
+		paintTerrain.setToolTipText("Applies the selected terrain.");
+		paintTerrain.setSelection(true);
+		
+		elevateTerrain = new ToolItem(modeToolbar, SWT.RADIO);
+		elevateTerrain.setToolTipText("Elevates the terrain.");
+		
+		insertCharacter = new ToolItem(modeToolbar, SWT.RADIO);
+		insertCharacter.setToolTipText("Adds a character.");
+		
+		removeCharacter = new ToolItem(modeToolbar, SWT.RADIO);
+		removeCharacter.setToolTipText("Removes a character.");
+		
+		ToolItem toolItem_1 = new ToolItem(modeToolbar, SWT.SEPARATOR);
+		
+		brushSize = new CCombo(composite_7, SWT.BORDER | SWT.FLAT);
+		brushSize.setItems(new String[] {"x1", "x2", "x4", "x8"});
+		brushSize.setText("x1");
+		
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				eventHandler.event("Save", null);
 			}
 		});
-		
-		ToolItem toolItem = new ToolItem(modeToolbar, SWT.SEPARATOR);
-		
-		paintTerrain = new ToolItem(modeToolbar, SWT.RADIO);
-		paintTerrain.setSelection(true);
-		
-		elevateTerrain = new ToolItem(modeToolbar, SWT.RADIO);
-		
-		insertCharacter = new ToolItem(modeToolbar, SWT.RADIO);
-		
-		removeCharacter = new ToolItem(modeToolbar, SWT.RADIO);
 		
 		SashForm sashForm = new SashForm(this, SWT.NONE);
 		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -231,7 +252,7 @@ public class EditorWindow extends Shell {
 		sashForm_1.setOrientation(SWT.VERTICAL);
 		tbtmWorld.setControl(sashForm_1);
 		
-		planeTable = new Table(sashForm_1, SWT.BORDER | SWT.FULL_SELECTION);
+		planeTable = new Table(sashForm_1, SWT.FULL_SELECTION);
 		planeTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDoubleClick(MouseEvent arg0) {

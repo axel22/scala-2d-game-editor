@@ -109,28 +109,40 @@ class Editor(config: Config) extends Logging {
       val (x, y) = tileAt(p)
       areadisplay.highlight = (x, y);
       
+      def paintTerrain(x: Int, y: Int) {
+        val selected = editorwindow.selectedTerrain
+        if (selected != null && area.contains(x, y)) {
+          val oslot = area.terrain(x, y)
+          val nheight = if (selected == classOf[EmptySlot].getName) 0 else oslot.height
+          val nslot = Slot(selected, nheight)
+          area.terrain(x, y) = nslot
+        }
+      }
+      
+      def elevateTerrain(xt: Int, yt: Int) {
+        if (area.contains(xt, yt)) {
+          val diff = elevpress._2 - p._2
+          val leveldiff = diff / areadisplay.levelheight
+          val oslot = area.terrain(xt, yt)
+          val nheight = if (oslot.isEmpty) 0 else math.min(math.max(0, elevzeroheight + leveldiff), area.maxheight())
+          val nslot = Slot(oslot, nheight)
+          area.terrain(xt, yt) = nslot
+        }
+      }
+      
       displ.syncExec(new Runnable {
         override def run() {
+          val mult = editorwindow.brushSize.getText.tail.toInt
+          def multiply(x0: Int, y0: Int)(action: (Int, Int) => Unit) {
+            for (x <- x0 until (x0 + mult); y <- y0 until (y0 + mult)) action(x, y)
+          }
+          
           if (editorwindow.paintTerrain.getSelection) {
-            val selected = editorwindow.selectedTerrain
-            if (selected != null && area.contains(x, y)) {
-              val oslot = area.terrain(x, y)
-              val nheight = if (selected == classOf[EmptySlot].getName) 0 else oslot.height
-              val nslot = Slot(selected, nheight)
-              area.terrain(x, y) = nslot
-            }
+            multiply(x, y)(paintTerrain)
           } else if (editorwindow.elevateTerrain.getSelection) {
             val (xt, yt) = tileAt(elevpress._1, elevpress._2)
             areadisplay.highlight = (xt, yt);
-            
-            if (area.contains(xt, yt)) {
-              val diff = elevpress._2 - p._2
-              val leveldiff = diff / areadisplay.levelheight
-              val oslot = area.terrain(xt, yt)
-              val nheight = if (oslot.isEmpty) 0 else math.min(math.max(0, elevzeroheight + leveldiff), area.maxheight())
-              val nslot = Slot(oslot, nheight)
-              area.terrain(xt, yt) = nslot
-            }
+            multiply(xt, yt)(elevateTerrain)
           } else if (editorwindow.insertCharacter.getSelection) {
             val selected = editorwindow.selectedChar[Character]
             if (selected != null) {

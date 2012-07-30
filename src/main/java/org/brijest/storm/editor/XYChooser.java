@@ -61,7 +61,7 @@ public class XYChooser extends Dialog {
 		chooserShell.setLocation(loc.x, loc.y);
 		
 		Label lblXPosition = new Label(chooserShell, SWT.NONE);
-		lblXPosition.setText("X position:");
+		lblXPosition.setText("X dimension:");
 		
 		final Spinner xspinner = new Spinner(chooserShell, SWT.BORDER);
 		xspinner.setMaximum(width);
@@ -71,7 +71,7 @@ public class XYChooser extends Dialog {
 		xspinner.setLayoutData(gd_xspinner);
 		
 		Label lblYPosition = new Label(chooserShell, SWT.NONE);
-		lblYPosition.setText("Y position:");
+		lblYPosition.setText("Y dimension:");
 		
 		final Spinner yspinner = new Spinner(chooserShell, SWT.BORDER);
 		yspinner.setMaximum(height);

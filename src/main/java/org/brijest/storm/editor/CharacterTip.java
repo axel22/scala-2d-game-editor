@@ -42,7 +42,7 @@ public class CharacterTip extends Shell {
 	public CharacterTip(Display display) {
 		super(display, SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.ON_TOP | SWT.TOOL);
 		setMinimumSize(new Point(128, 64));
-		GridLayout gridLayout = new GridLayout(2, false);
+		GridLayout gridLayout = new GridLayout(1, false);
 		gridLayout.verticalSpacing = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginHeight = 0;
@@ -50,7 +50,7 @@ public class CharacterTip extends Shell {
 		setLayout(gridLayout);
 		
 		imageLabel = new CLabel(this, SWT.BORDER);
-		GridData gd_imageLabel = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		GridData gd_imageLabel = new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1);
 		gd_imageLabel.widthHint = 128;
 		gd_imageLabel.heightHint = 128;
 		imageLabel.setLayoutData(gd_imageLabel);
@@ -63,7 +63,8 @@ public class CharacterTip extends Shell {
 		gl_composite.marginHeight = 0;
 		gl_composite.horizontalSpacing = 0;
 		composite.setLayout(gl_composite);
-		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
+		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_composite.heightHint = 50;
 		gd_composite.widthHint = 96;
 		composite.setLayoutData(gd_composite);
 		
@@ -80,7 +81,7 @@ public class CharacterTip extends Shell {
 	 */
 	protected void createContents() {
 		setText("Character info");
-		setSize(243, 166);
+		setSize(140, 211);
 		
 		Point loc = Display.getCurrent().getCursorLocation();
 		this.setLocation(loc.x, loc.y);
