@@ -622,7 +622,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   
   def iheight: Int
   
-  def levelheight = 16
+  def levelheight = 8
   
   object drawing {
     var outline: Boolean = app.render.outline

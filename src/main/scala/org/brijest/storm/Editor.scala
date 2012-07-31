@@ -132,9 +132,10 @@ class Editor(config: Config) extends Logging {
       
       displ.syncExec(new Runnable {
         override def run() {
-          val mult = editorwindow.brushSize.getText.tail.toInt
+          val mults = editorwindow.brushSize.getText.split("x").map(_.toInt)
+          val (xm, ym) = (mults(0), mults(1));
           def multiply(x0: Int, y0: Int)(action: (Int, Int) => Unit) {
-            for (x <- x0 until (x0 + mult); y <- y0 until (y0 + mult)) action(x, y)
+            for (x <- x0 until (x0 + xm); y <- y0 until (y0 + ym)) action(x, y)
           }
           
           if (editorwindow.paintTerrain.getSelection) {

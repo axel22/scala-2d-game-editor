@@ -228,9 +228,9 @@ public class EditorWindow extends Shell {
 		
 		ToolItem toolItem_1 = new ToolItem(modeToolbar, SWT.SEPARATOR);
 		
-		brushSize = new CCombo(composite_7, SWT.BORDER | SWT.FLAT);
-		brushSize.setItems(new String[] {"x1", "x2", "x4", "x8"});
-		brushSize.setText("x1");
+		brushSize = new CCombo(composite_7, SWT.BORDER | SWT.READ_ONLY | SWT.FLAT);
+		brushSize.setItems(new String[] {"1x1", "2x2", "4x4", "8x8", "16x16", "1x8", "8x1", "1x16", "16x1"});
+		brushSize.setText("1x1");
 		
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
