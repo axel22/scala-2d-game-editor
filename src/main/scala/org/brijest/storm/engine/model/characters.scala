@@ -83,13 +83,14 @@ object CharacterSet extends ClassSet[Character] {
   register[characters.meadow.BurnedBush]
   register[characters.meadow.BurnedShrub]
   
-  register[characters.misc.Altar]
-  
   register[characters.castle.Ivy]
   register[characters.castle.SmallLeftIvy]
   register[characters.castle.SmallRightIvy]
   register[characters.castle.RightBarDoor]
   register[characters.castle.LeftBarDoor]
+  
+  register[characters.dungeon.Sarcophagus]
+  register[characters.dungeon.Altar]
 }
 
 

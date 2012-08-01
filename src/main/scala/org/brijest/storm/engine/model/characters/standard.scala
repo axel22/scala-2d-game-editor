@@ -152,8 +152,18 @@ package castle {
 }
 
 
-package misc {
-
+package dungeon {
+  
+  class Sarcophagus(val id: EntityId) extends Character {
+    dimensions := (3, 2);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '+'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }  
+  
   class Altar(val id: EntityId) extends Character {
     dimensions := (2, 1);
     
@@ -163,6 +173,11 @@ package misc {
     def color = 0x99999900
     def pov(area: AreaView) = area
   }
+  
+}
+
+
+package misc {
   
 }
 
