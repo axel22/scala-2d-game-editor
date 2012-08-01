@@ -107,6 +107,51 @@ package meadow {
 }
 
 
+package castle {
+  
+  class Ivy(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '_'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }
+  
+  class SmallLeftIvy(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '_'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }
+  
+  class SmallRightIvy(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '_'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }
+  
+  class RightBarDoor(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '+'
+    def color = 0x55555500
+    def pov(area: AreaView) = area
+  }
+  
+  class LeftBarDoor(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '+'
+    def color = 0x55555500
+    def pov(area: AreaView) = area
+  }
+  
+}
+
+
 package misc {
 
   class Altar(val id: EntityId) extends Character {
