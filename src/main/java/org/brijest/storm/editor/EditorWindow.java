@@ -229,6 +229,7 @@ public class EditorWindow extends Shell {
 		ToolItem toolItem_1 = new ToolItem(modeToolbar, SWT.SEPARATOR);
 		
 		brushSize = new CCombo(composite_7, SWT.BORDER | SWT.READ_ONLY | SWT.FLAT);
+		brushSize.setToolTipText("Sets the size of the terrain brush.");
 		brushSize.setItems(new String[] {"1x1", "2x2", "4x4", "8x8", "16x16", "1x8", "8x1", "1x16", "16x1"});
 		brushSize.setText("1x1");
 		

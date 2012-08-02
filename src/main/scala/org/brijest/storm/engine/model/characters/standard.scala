@@ -107,6 +107,23 @@ package meadow {
 }
 
 
+package tree {
+  
+  class Oak(val id: EntityId) extends Character {
+    override def hasTop = true
+    override def topx = -32
+    override def topy = -72
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }
+  
+}
+
+
 package castle {
   
   class Ivy(val id: EntityId) extends Character {
@@ -145,6 +162,22 @@ package castle {
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
     def chr = '+'
+    def color = 0x55555500
+    def pov(area: AreaView) = area
+  }
+  
+  class RightBarFence(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '|'
+    def color = 0x55555500
+    def pov(area: AreaView) = area
+  }
+  
+  class LeftBarFence(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '|'
     def color = 0x55555500
     def pov(area: AreaView) = area
   }

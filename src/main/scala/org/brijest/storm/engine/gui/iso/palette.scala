@@ -41,6 +41,8 @@ trait PaletteCanvas extends Canvas {
     
     def sprite(c: Character): Sprite
     
+    def top(c: Character): Sprite
+    
     def sprite(e: Effect): Sprite
     
     def sprite(t: Slot): Sprite
@@ -190,6 +192,11 @@ trait PaletteCanvas extends Canvas {
     def sprite(c: Character): Sprite = c match {
       case NoCharacter => NullSprite
       case c => findSprite(c.identifier)
+    }
+    
+    def top(c: Character): Sprite = c match {
+      case NoCharacter => NullSprite
+      case c => findSprite(c.topIdentifier)
     }
     
     def sprite(e: Effect) = NullSprite

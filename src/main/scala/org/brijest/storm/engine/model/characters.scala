@@ -64,6 +64,14 @@ abstract class Character extends Entity {
   
   def identifier = this.getClass.getName
   
+  def hasTop = false
+  
+  def topIdentifier = this.getClass.getName + "-top"
+  
+  def topx = 0
+  
+  def topy = 0
+  
 }
 
 
@@ -83,11 +91,15 @@ object CharacterSet extends ClassSet[Character] {
   register[characters.meadow.BurnedBush]
   register[characters.meadow.BurnedShrub]
   
+  register[characters.tree.Oak]
+  
   register[characters.castle.Ivy]
   register[characters.castle.SmallLeftIvy]
   register[characters.castle.SmallRightIvy]
   register[characters.castle.RightBarDoor]
   register[characters.castle.LeftBarDoor]
+  register[characters.castle.RightBarFence]
+  register[characters.castle.LeftBarFence]
   
   register[characters.dungeon.Sarcophagus]
   register[characters.dungeon.Altar]

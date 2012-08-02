@@ -114,38 +114,40 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   val oneone = (1, 1);
   
   final class Info extends singlethread.Linkable[Info] {
-    var top: Pos = null
+    var anchor: Pos = null
     var deps: DepNode = null
     var effectdeps: DepNode = null
     var dims: (Int, Int) = oneone
-    var drawn = false
+    var lastdrawn = -1
     var id = 0L
     var effect: Effect = null
-    def isTop = deps ne null
+    var top: String = null
+    def isAnchor = deps ne null
     def isEffect = effect ne null
     def reset() {
-      top = null
+      anchor = null
       deps = null
       dims = oneone
-      drawn = false
+      lastdrawn = -1
       id = 0L
       effect = null
+      top = null
     }
     def addDep(x: Int, y: Int, other: Info) {
-      if (other.isTop) deps = deps.add(x, y)
-      else deps = deps.add(other.top.x, other.top.y)
+      if (other.isAnchor) deps = deps.add(x, y)
+      else deps = deps.add(other.anchor.x, other.anchor.y)
     }
     def addEffectDep(x: Int, y: Int, other: Info) {
       if (effectdeps eq null) effectdeps = deppool.allocate()
-      if (other.isTop) effectdeps = effectdeps.add(x, y)
-      else effectdeps = effectdeps.add(other.top.x, other.top.y)
+      if (other.isAnchor) effectdeps = effectdeps.add(x, y)
+      else effectdeps = effectdeps.add(other.anchor.x, other.anchor.y)
     }
-    def sameTop(thisxp: Int, thisyp: Int, other: Info, xp: Int, yp: Int) = if (isTop) {
-      if (other.isTop) thisxp == xp && thisyp == yp
-      else thisxp == other.top.x && thisyp == other.top.y
+    def sameAnchor(thisxp: Int, thisyp: Int, other: Info, xp: Int, yp: Int) = if (isAnchor) {
+      if (other.isAnchor) thisxp == xp && thisyp == yp
+      else thisxp == other.anchor.x && thisyp == other.anchor.y
     } else {
-      if (other.isTop) this.top.x == xp && this.top.y == yp
-      else this.top.x == other.top.x && this.top.y == other.top.y
+      if (other.isAnchor) this.anchor.x == xp && this.anchor.y == yp
+      else this.anchor.x == other.anchor.x && this.anchor.y == other.anchor.y
     }
     @inline def foreach[U](x0: Int, y0: Int)(f: (Int, Int) => U) = foreachNW2SE(x0, y0, dims._1, dims._2)(f)
     def contains(x0: Int, y0: Int, x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + dims._1) && y < (y0 + dims._2)
@@ -539,6 +541,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   
   trait CharacterDrawer {
     def drawCharacter(c: Character, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int)
+    def drawCharacterTop(c: Character, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int)
   }
   
   class CharacterSpriteDrawer(a: DrawAdapter, area: AreaView, u0: Int, v0: Int) extends Drawer(a) with CharacterDrawer {
@@ -556,6 +559,19 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       val vstart = vbr - area.terrain(x, y).height * levelheight - s.height
       
       // draw sprite
+      a.drawImage(s.image(frame), ustart, vstart, ustart + s.width, vstart + s.height, 0, 0, s.width, s.height)
+    }
+    def drawCharacterTop(c: Character, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int) {
+      val s = palette.top(c)
+      val frame = if (s.animated) 0 else random(x, y) % s.frames
+      
+      val (w, h) = c.dimensions()
+      val ubl = iso2planar_u(x, y + h, 0, area.sidelength) - u0
+      val ubr = iso2planar_u(x + w, y + h, 0, area.sidelength) - u0
+      val vbr = iso2planar_v(x + w, y + h, 0, area.sidelength) - v0
+      val ustart = ubl + tileWidth / 2 + c.topx
+      val vstart = vbr - area.terrain(x, y).height * levelheight - s.height + c.topy
+      
       a.drawImage(s.image(frame), ustart, vstart, ustart + s.width, vstart + s.height, 0, 0, s.width, s.height)
     }
   }
@@ -594,6 +610,8 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       }
       val s = palette.sprite(c)
       drawOutline(x, y, maxheight, s.height, info)
+    }
+    def drawCharacterTop(c: Character, x: Int, y: Int, info: Info, vpuoffs: Int, vpvoffs: Int) {
     }
   }
   
@@ -748,7 +766,8 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
           if (c.pos().equalTo(x, y)) {
             info.deps = deppool.allocate()
             info.dims = c.dimensions()
-          } else info.top = c.pos()
+          } else info.anchor = c.pos()
+          if (c.hasTop) info.top = c.topIdentifier
           slotinfo(x, y) = info
       }
       
@@ -759,18 +778,18 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
     // 2) compute dependencies - iterate over all the infos diagonal-wise
     def dependencies(x: Int, y: Int) {
       def regularDependencies(info: Info) {
-        if ((info ne null) && info.isTop) {
+        if ((info ne null) && info.isAnchor) {
           val cspr = palette.sprite(area.characters(x, y))
           val vhi = info.lowestV(x, y, area) - cspr.height
           val (u, v) = iso2planar(x, y, area.terrain(x, y).height, area.sidelength)
-          val (xtop, ytop) = planar2iso(u, vhi, area.sidelength)
+          val (xanchor, yanchor) = planar2iso(u, vhi, area.sidelength)
           val (xl, yl) = info.leftXY(x, y)
           val (xr, yr) = info.rightXY(x, y)
           val uleft = iso2planar_u(xl, yl, 0, area.sidelength) - tileWidth / 2
           val uright = iso2planar_u(xr, yr, 0, area.sidelength) + tileWidth / 2
           
           // add everything in the rectangle to the dependency list
-          for (xp <- xtop.toInt to xr; yp <- ytop.toInt to yl) {
+          for (xp <- xanchor.toInt to xr; yp <- yanchor.toInt to yl) {
             val up = iso2planar_u(xp, yp, 0, area.sidelength)
             if (up >= uleft && up <= uright && !info.contains(x, y, xp, yp)) {
               val depinfo = slotinfo(xp, yp)
@@ -781,13 +800,13 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
         }
       }
       def effectDependencies(info: Info) {
-        if (info.isTop) for (
-          xp <- info.top.x until (info.top.x + info.dims._1);
-          yp <- info.top.y until (info.top.y + info.dims._2)
+        if (info.isAnchor) for (
+          xp <- info.anchor.x until (info.anchor.x + info.dims._1);
+          yp <- info.anchor.y until (info.anchor.y + info.dims._2)
         ) {
           // overlapping effects
           if (effects.exist(xp, yp)) for (e <- effects(xp, yp)) {
-            if (!info.sameTop(x, y, e, xp, yp))
+            if (!info.sameAnchor(x, y, e, xp, yp))
               if (xp < x || (xp == x && (yp < y || (yp == y && info.id < e.id))))
                 info.addEffectDep(xp, yp, e)
           }
@@ -807,46 +826,61 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
     for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) dependencies(x0 + x, y0 + y)
     
     // 3) reverse drawing
-    val terraindrawer = if (drawing.outline) new TerrainOutlineDrawer(a, area, u0, v0) else new TerrainSpriteDrawer(a, area, u0, v0)
-    val characterdrawer = if (drawing.outline) new CharacterOutlineDrawer(a, area, u0, v0) else new CharacterSpriteDrawer(a, area, u0, v0)
-    val effectdrawer = if (drawing.outline) new EffectOutlineDrawer(a, area, u0, v0) else new EffectSpriteDrawer(a, area, u0, v0)
-    import terraindrawer._
-    import characterdrawer._
-    import effectdrawer._
-    def drawTop(x: Int, y: Int, info: Info) {
-      // draw terrain and sides
-      info.foreach(x, y) {
-        (xp, yp) =>
-        val slot = area.terrain(xp, yp)
-        val u = iso2planar_u(xp, yp, slot.height, area.sidelength) - u0
-        val v = iso2planar_v(xp, yp, slot.height, area.sidelength) - v0
-        drawTerrain(slot, xp, yp, u, v, vpuoffs, vpvoffs)
-      }
-      
-      // draw character
-      area.characters(x, y) match {
-        case NoCharacter => // do nothing
-        case c => if (!hidden(c)) drawCharacter(c, x, y, info, vpuoffs, vpvoffs)
-      }
-    }
-    def reverseDraw(x: Int, y: Int) {
-      def drawInfo(info: Info) {
-        if (info != null && !info.drawn) {
-          if (info.isTop) {
-            info.drawn = true
-            info.deps.foreach((xp, yp) => reverseDraw(xp, yp))
-            if (info.isEffect) drawEffect(info.effect, x, y, info, vpuoffs, vpvoffs) else drawTop(x, y, info)
-          } else {
-            info.drawn = true
-            reverseDraw(info.top.x, info.top.y)
-          }
+    def reverseDraw(layer: Int) {
+      val terraindrawer = if (drawing.outline) new TerrainOutlineDrawer(a, area, u0, v0) else new TerrainSpriteDrawer(a, area, u0, v0)
+      val characterdrawer = if (drawing.outline) new CharacterOutlineDrawer(a, area, u0, v0) else new CharacterSpriteDrawer(a, area, u0, v0)
+      val effectdrawer = if (drawing.outline) new EffectOutlineDrawer(a, area, u0, v0) else new EffectSpriteDrawer(a, area, u0, v0)
+      import terraindrawer._
+      import characterdrawer._
+      import effectdrawer._
+      def drawAnchor(x: Int, y: Int, info: Info) {
+        layer match {
+          case 0 => // terrain and characters
+            if (info.isEffect) drawEffect(info.effect, x, y, info, vpuoffs, vpvoffs)
+            else {
+              // draw terrain and sides
+              info.foreach(x, y) {
+                (xp, yp) =>
+                val slot = area.terrain(xp, yp)
+                val u = iso2planar_u(xp, yp, slot.height, area.sidelength) - u0
+                val v = iso2planar_v(xp, yp, slot.height, area.sidelength) - v0
+                drawTerrain(slot, xp, yp, u, v, vpuoffs, vpvoffs)
+              }
+              
+              // draw character
+              area.characters(x, y) match {
+                case NoCharacter => // do nothing
+                case c => if (!hidden(c)) drawCharacter(c, x, y, info, vpuoffs, vpvoffs)
+              }
+            }
+          case 1 => // top parts for characters that have it
+            if (info.top != null) {
+              val c = area.characters(x, y)
+              drawCharacterTop(c, x, y, info, vpuoffs, vpvoffs)
+            }
         }
       }
-      drawInfo(slotinfo(x, y))
-      if (effects.exist(x, y)) for (e <- effects(x, y)) drawInfo(e)
+      def drawAfterDeps(x: Int, y: Int) {
+        def drawInfo(info: Info) {
+          if (info != null && info.lastdrawn < layer) {
+            if (info.isAnchor) {
+              info.lastdrawn = layer
+              info.deps.foreach((xp, yp) => drawAfterDeps(xp, yp))
+              drawAnchor(x, y, info)
+            } else {
+              info.lastdrawn = layer
+              drawAfterDeps(info.anchor.x, info.anchor.y)
+            }
+          }
+        }
+        drawInfo(slotinfo(x, y))
+        if (effects.exist(x, y)) for (e <- effects(x, y)) drawInfo(e)
+      }
+      for (i <- 0 until h; x <- 0 to i; y = i - x) drawAfterDeps(x0 + x, y0 + y)
+      for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) drawAfterDeps(x0 + x, y0 + y)
     }
-    for (i <- 0 until h; x <- 0 to i; y = i - x) reverseDraw(x0 + x, y0 + y)
-    for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) reverseDraw(x0 + x, y0 + y)
+    reverseDraw(0)
+    reverseDraw(1)
     
     // 4) dispose dependencies and cleanup
     for (i <- 0 until infos.length) {
