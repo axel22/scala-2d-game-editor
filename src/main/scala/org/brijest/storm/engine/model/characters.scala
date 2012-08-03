@@ -92,6 +92,7 @@ object CharacterSet extends ClassSet[Character] {
   register[characters.meadow.BurnedShrub]
   
   register[characters.tree.Oak]
+  register[characters.tree.OldOak]
   
   register[characters.castle.Ivy]
   register[characters.castle.SmallLeftIvy]

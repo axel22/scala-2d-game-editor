@@ -81,7 +81,7 @@ public class CharacterTip extends Shell {
 	 */
 	protected void createContents() {
 		setText("Character info");
-		setSize(140, 211);
+		setSize(148, 211);
 		
 		Point loc = Display.getCurrent().getCursorLocation();
 		this.setLocation(loc.x, loc.y);

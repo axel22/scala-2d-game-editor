@@ -121,6 +121,20 @@ package tree {
     def pov(area: AreaView) = area
   }
   
+  class OldOak(val id: EntityId) extends Character {
+    override def hasTop = true
+    override def topx = -36
+    override def topy = -60
+    
+    dimensions := (2, 2);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = 'T'
+    def color = 0x99999900
+    def pov(area: AreaView) = area
+  }
+  
 }
 
 
