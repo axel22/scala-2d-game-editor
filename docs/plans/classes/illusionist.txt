@@ -25,11 +25,13 @@ Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent 
 
 Friendlyness - gives the opponents a temporary illusion that the spellcaster is his friend. The illusion ends if the spellcaster attacks any of the opponents. This can lend the caster some time.
 
-Flash - all characters around the spellcaster suffer from a temporary decrease in perception.
+Flash - all characters around the spellcaster suffer from a temporary decrease in perception, unless they are quick enough to shield their eyes.
 
-Veiling - hides the spellcaster from characters, given that the spellcaster is not too close and their perception is not too good. If the spellcaster moves, the veiling enchantment stops and he becomes visible again.
+Veiling - hides the spellcaster from his opponents, given that the spellcaster is not too close and the opponents are not too perceptive. If the spellcaster moves, the veiling enchantment stops and he becomes visible again.
 
 Deceptive Throw - throws a missile weapon such as a dagger while in the same time casting a deceptive illusion, making it harder for the target to notice and evade the dagger.
+
+Distract - distracts the target that is casting a spell, causing the spell to fail.
 
 
 Level 2:
@@ -52,9 +54,13 @@ Pessimism - changes the target's perception of the surroundings so that it is mo
 
 Kaleidoscope - twists the light around the caster, creating double images. Each time an opponent misses the spellcaster, one of these images disappears. The chance of hitting the spellcaster is inversely proportionate to the number of images surrounding him.
 
-Touch of Vile Visage - creates an aura around an opponent which makes him appear as a vile monster to others, possibly provoking an attack.
+Aura of Vile Visage - creates an aura around an opponent which makes him appear as a vile monster to others, possibly provoking an attack.
+
+Illusion of Vile Visage - dillutes the opponent into thinking that the caster is a vile monster, possibly provoking an attack.
 
 Mirror Shield - creates an illusionary mirror around the caster, protecting him against light-based magic attacks. It additionally reflects these attacks back to their caster.
+
+Eagle Eye - temporarily increases the perception of the character touched by the spellcaster.
 
 
 Level 3:
@@ -73,13 +79,11 @@ Darkness - conjures a globe of darkness around the spellcaster.
 
 Wall of the Wasp - summons an illusionary wall of violent wasps in front of the caster. Opponents think twice before proceeding through it.
 
-Hypnosis - puts the spellcaster and the target in a state of hypnosis. As long as the spellcaster does not move, cast spells, nor attack, the target cannot move, cast spells or attack. During this time, the target's defenses are lowered.
+Hypnosis - puts the spellcaster and a nearby non-suspecting target in a state of hypnosis. As long as the spellcaster does not move, cast spells, nor attack, the target cannot move, cast spells or attack. During this time, the target's defenses are lowered.
 
-Sequencer - stores spells that the spellcaster chooses. It can store the level of the spellcaster minus one spell. It gives spellcaster the ability to release these spells one after another, rapidly.
+Sequencer - stores spells that the spellcaster chooses. It can store the level of the spellcaster minus one spell. It gives spellcaster the ability to release these spells one after another, instantly. A caster can have only a single sequencer instance at once.
 
 Cloaking - magically cloaks the spellcaster so that opponents far enough and with a low perception fail to notice him. If the spellcaster attacks or casts a spell at some opponent, then only that opponent will notice him.
-
-Eagle Eye - temporarily increases the perception of the character touched by the spellcaster.
 
 
 Level 4:
@@ -88,19 +92,23 @@ Level 4:
 
 Serpent Sword - if the characters affected by this spell wield a melee or a long range weapon, they will perceive it as a venomous serpent. Those with either a weak strength of will or without the knowledge that this may be a trick are quick to drop their weapons.
 
-Vile Visages - enchants an area, creating an aura around each character such that it appears as if it were vile monster. This can provoke attacks.
+Vile Visages - enchants an area, creating an aura around each character such that it appears as if it were vile monster. This is known to start brawls.
 
 Helmet of the Wasp - an opponent affected by this illusion which wears a helmet will see wasps inside of it. Those weak of will or not knowing this trick throw their helmet away instantly.
 
 Mirror Image - creates a mirror image of the spellcaster which mimics the things he does, but inflicts no damage. The opponents often attack the wrong person, buying the caster some time.
 
-Phantoms - summons illusionary monsters to distract or scare of the enemies.
+Phantoms - summons illusionary monsters to distract or scare the enemies.
 
 Dispel Illusion - dispels an illusion of level 5 or below.
 
 Deflagration - causes the target location to start burning. The fire is at first small and cannot do harm, but grows quickly and may damage opponents which decide not to move away from it.
 
 Counterimage - enchants the target so that the next illusion of level 5 or below cast by it or cast on it fails.
+
+Spider Boot - sets an illusion of having the target opponent's boots filled with spiders. Opponents weak of will are quick to take off their boots in horror, even if they are in the middle of a combat.
+
+Armor of the Scorpion - gives the target opponent an illusion that his armor is filled with scorpions. Even the strongest are so terrified that they throw away their armor in an instant.
 
 
 Level 5:
@@ -141,12 +149,12 @@ Origin: Long ago, in the harsh deserts in the south fierce warriors ruled the la
 Decription: Creates an impenetrable globe around the caster, greatly increasing his protection value.
 
 Paralysis
-Origin: Its origins unknown to most, this spell was forbidden by the Great Count Gerald who declared it a form of necromancy, although he was no wizard himself. This was probably due to the fact that illusionists used it far too often to fulfill their own goals. In any case, the use of it is forbidden under penalty of death and any master illusionists today will claim that he knows it not, though this is less than likely.
+Origin: Its origins unknown to most, this spell was forbidden by the Great Count Gerald who declared it a form of necromancy, although he was no wizard himself. This was probably done due to the fact that illusionists used it far too often to fulfill their own goals. In any case, the use of it is forbidden under penalty of death and any master illusionists today will, when asked, claim that he knows it not, though such ignorance is less than likely.
 Description: Renders an opponent paralyzed.
 
 Ganilot's Persuasion
-Origin: The story of the first use of this spell is well known among illusionists of the lands. A young king's wife succumbed to a disease, leaving him in depression and despair. When he refused to lead his armies to defend the kingdom against a barbarian attack, a wizard by the name of Ganilot created an illusion so real that the young king believed that his wife somehow came back to life. The illusion lasted long enough for the king to be persuaded to lead his defending armies. Fearing his king's retribution once he'd find out about the truth, the wizard Ganilot fleed the kingdom never to return. This spell has only later been used by illusionists of a less benevolent disposition to cause mischief and grief.
-Description: All summoned creature illusions become real for a brief period of time.
+Origin: The story of the first use of this spell is well known among illusionists of the lands. A young king's wife succumbed to a disease, leaving him in depression and despair. When he refused to lead his armies to defend the kingdom against a barbarian attack, a wizard by the name of Ganilot created an illusion so real that the young king believed that his wife somehow came back to life. The illusion lasted long enough for the king to be persuaded to lead his defending armies. Fearing his king's retribution once he'd find out about the truth, the wizard Ganilot fled the kingdom never to return. This spell has only later been used by illusionists of a less benevolent disposition to cause mischief and grief.
+Description: All summoned creature illusions become real for a brief period of time, thus being able to inflict damage and cast spells.
 
 Rhea's Light
 Origin: Great wizardess Rhea devised this spell as part of her acceptance test for the wizard's guild, thus showing a high level of brilliance for her young age.
@@ -195,14 +203,14 @@ Description: Creates an impenetrable barrier. This enchantment lasts permanently
 
 Reflection Globe
 Origin: An apprentice of Kariim is said to have devised this spell. When wizards started gaining advantage over the warriors in the south, they started turning against each other. This globe not only protected the caster, but turned the spells back against the attacking wizard.
-Description: Creates a globe around the caster such that any spell cast on him by others is reflected back at the source.
+Description: Creates a globe around the caster such that any level 5 spell cast on him by others is reflected back at the source.
 
 Antimagic
 Origin: The history of this spell is not exactly known, but its uses have been recorded and known to historians for at least three centuries. Some claim it was given to humans as a gift from the avenfolk when the realm had to be defended against an invasion of vile creatures.
 Description: Enchants the area so that no spell of level 7 or below subsequently cast succeeds. All existing enchantments are dispelled, regardless of their level.
 
 Tracking Sword
-Origin: A subtle method of performing assassinations of various lords and leaders, this spell has been utilized by some wizards to serve their intents since fifty years ago when it was devised. It is said that an assassination attempt was made on the Great Count Gerald once, but he was nimble enough to avoid the sword and get away with merely a scar. He used the very same sword to slit the throat of the very same wizard who cast the spell on him.
+Origin: A subtle method of performing assassinations of various lords and military leaders, this spell has been utilized by some wizards to serve their intents since fifty years ago when it was devised. It is said that an assassination attempt was made on the Great Count Gerald once, but he was nimble enough to avoid the sword and get away with merely a scar. He used the same sword to slit the throat of the very same wizard who cast the spell on him.
 Description: Animates a target melee weapon so that it starts attacking the enemies of the spellcaster.
 
 Fireburst
@@ -243,10 +251,15 @@ Origin: Now kept in utmost secrecy by the dogfolk, this spell was once created i
 Description: Transforms the caster into an Urdevii.
 
 Power Equilibrium
-Origin: It's said that the wizard Kariim was exhausted after one of the battles and a traitor in his ranks decided to take advantage of this. He attempted to cast a swarm of magic missiles at his master. To his surprise, Kariim expertly stole some of his mana using a spell he previously devised and then created a reflective mantle to repel the missiles back.
+Origin: It's said that the wizard Kariim was exhausted after one of the battles and a traitor in his ranks decided to take advantage of this. He attempted to cast a swarm of magic missiles at the master. To his surprise, Kariim expertly stole some of his mana using a spell he previously devised and then created a reflective mantle to repel the missiles back.
 Description: Exchanges mana with the target character so that their mana levels become equal. Mana above the maximum mana level is always lost in this exchange.
 
 Sprite Transformation
 Origin: A wizard is said to have followed and studied a pack of sprites living in a huge forest, and learned enough about them to devise this spell. After producing the scroll, he disappeared mysteriously, and was never heard from again. Some claim he transformed himself into a sprite, and spent the rest of his days living with his new kin.
 Description: Transforms the caster into a sprite, trading toughness for great speed and agility. Sprites have the teleport ability, and can use it as much as they want.
+
+Spell Shield
+Origin: Often used by the great wizard Kariim to shield himself from other wizards that worked behind his back, the origin of this protection spell is suspected to actually have been devised by the Urdevii long before and gifted to Kariim by them as a sign of trust and friendship.
+Description: Creates a powerful shield around the target which guards him against any spell of level 6 or below being cast upon him.
+
 

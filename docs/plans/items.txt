@@ -1,5 +1,6 @@
 Excalibur
 - ignores lesser armors
+- casts solar ray provided the wielder has enough mana
 
 Oblivion
 - destroys lesser undead instantly
