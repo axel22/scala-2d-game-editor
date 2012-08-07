@@ -278,6 +278,104 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  class BookshelvesLeft(val id: EntityId) extends Character {
+    dimensions := (1, 3);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class BookshelvesRight(val id: EntityId) extends Character {
+    dimensions := (3, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class Bookshelves2Left(val id: EntityId) extends Character {
+    dimensions := (1, 3);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class Bookshelves2Right(val id: EntityId) extends Character {
+    dimensions := (3, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class Bust(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class DeadPlant(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class SofaNorth(val id: EntityId) extends Character {
+    dimensions := (3, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class ArmchairNorth(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class ArmchairWest(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class ArmchairSouth(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class ArmchairEast(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
 }
 
 
