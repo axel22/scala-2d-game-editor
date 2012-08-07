@@ -222,6 +222,62 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  class TavernTable(val id: EntityId) extends Character {
+    dimensions := (2, 3);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class TavernTableWithCloth(val id: EntityId) extends Character {
+    dimensions := (2, 3);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class ArmsShelves(val id: EntityId) extends Character {
+    dimensions := (2, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class BowsShelves(val id: EntityId) extends Character {
+    dimensions := (2, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class RightTarget(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class LeftTarget(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
 }
 
 

@@ -103,6 +103,12 @@ object CharacterSet extends ClassSet[Character] {
   register[characters.castle.LeftBarDoor]
   register[characters.castle.RightBarFence]
   register[characters.castle.LeftBarFence]
+  register[characters.castle.TavernTable]
+  register[characters.castle.TavernTableWithCloth]
+  register[characters.castle.ArmsShelves]
+  register[characters.castle.BowsShelves]
+  register[characters.castle.RightTarget]
+  register[characters.castle.LeftTarget]
   
   register[characters.dungeon.Sarcophagus]
   register[characters.dungeon.Altar]

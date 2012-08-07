@@ -51,7 +51,7 @@ class AreaView extends Struct with ProtectedMutable {
   
   final def isWalkable(x: Int, y: Int) = isWalkableTerrain(x, y) && (characters.locs.apply(x, y) == NoCharacter)
   
-  final def isWalkableTerrain(x: Int, y: Int) = terrain(x, y).walkable
+  final def isWalkableTerrain(x: Int, y: Int) = contains(x, y) && terrain(x, y).walkable
   
   def newEntityId()(implicit m: mutable) = {
     entitycount += 1
@@ -66,9 +66,9 @@ class AreaView extends Struct with ProtectedMutable {
   
   def character(id: EntityId): Character = characters.ids(id)
   
-  def character(x: Int, y: Int): Character = characters.locs(x, y)
+  def character(x: Int, y: Int): Character = if (contains(x, y)) characters.locs(x, y) else NoCharacter
   
-  def character(p: Pos): Character = characters.locs(p.x, p.y)
+  def character(p: Pos): Character = character(p.x, p.y)
   
   def insert(x: Int, y: Int, item: Item)(implicit m: Area) {
     items.insert(x, y, item)
