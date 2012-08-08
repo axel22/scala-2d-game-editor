@@ -344,6 +344,36 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  class SofaWest(val id: EntityId) extends Character {
+    dimensions := (1, 3);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class SofaSouth(val id: EntityId) extends Character {
+    dimensions := (3, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class SofaEast(val id: EntityId) extends Character {
+    dimensions := (1, 3);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
   class ArmchairNorth(val id: EntityId) extends Character {
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
@@ -369,6 +399,34 @@ package castle {
   }
   
   class ArmchairEast(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class SmallTable(val id: EntityId) extends Character {
+    dimensions := (3, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class CoffeeTable(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class WorkDesk(val id: EntityId) extends Character {
+    dimensions := (3, 1);
+    
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
     def chr = '='
