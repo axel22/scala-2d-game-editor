@@ -8,6 +8,12 @@ Level 1:
 Steal item - illusionists can use their abilities to create a distraction and steal items from others.
 
 
+Level 5:
+--------
+
+Write scroll - create a scroll of a known spell.
+
+
 
 
 
@@ -19,11 +25,9 @@ Level 1:
 --------
 => The illusions that you create are something barely more than mere tricks.
 
-Spark - creates sparks in the vicinity of the illusionist. This can distract some opponents.
+Spark - creates sparks in the vicinity of the illusionist. This can distract guards and draw their attention away.
 
 Sleight of the Hand - allows the illusionist to trick the unsuspecting opponent and score a critical hit in melee combat. This spell only succeeds if the opponent isn't already attacking the spellcaster. Also, intelligent and perceptive opponents may see through the roose.
-
-Friendlyness - gives the opponents a temporary illusion that the spellcaster is his friend. The illusion ends if the spellcaster attacks any of the opponents. This can lend the caster some time.
 
 Flash - all characters around the spellcaster suffer from a temporary decrease in perception, unless they are quick enough to shield their eyes.
 
@@ -32,6 +36,8 @@ Veiling - hides the spellcaster from his opponents, given that the spellcaster i
 Deceptive Throw - throws a missile weapon such as a dagger while in the same time casting a deceptive illusion, making it harder for the target to notice and evade the dagger.
 
 Distract - distracts the target that is casting a spell, causing the spell to fail.
+
+Mimic - enables the illusionist to mimic the form of a neighbouring object or a character. The less perceptive characters will not notice the caster at all, unless he moves or they stand right in front of him.
 
 
 Level 2:
@@ -131,6 +137,8 @@ Interference - twists the images around a target opponent so that he is unable t
 
 Local Scrying - allows the spellcaster to temporarily view what is happening on some other location in the same area.
 
+Reflection - summons an illusionary copy of the caster, which disappears as soon as it receives damage. The copy itself is unable to do damage or effect the environment in any way other than to draw attention.
+
 
 Level 6:
 --------
@@ -221,6 +229,10 @@ Energy Ray
 Origin: It is said that this spell was devised by illusionist master mages working together with a now lost sect of solitary wizards that lived in monasteries high in the mountains. While these solitary wizards drew their magical power from the skies themselves and were thus able to tap into enormous amounts of energy from the sun, the illusionists were versed in working with the light and focusing it.
 Description: Releases a highly concentrated ray of light at the target, causing massive damage. This spell is much more effective when cast in open areas, during daylight.
 
+Chain Lightning
+Origin: This spell is favoured by the wandering master priests of the north. While its origin remains unclear, its deadliness in the hands of a skilled wizard is unquestioned.
+Description: Releases a lightning bolt at the target opponent. If the opponent is surrounded by other characters, the bolt bounces at the nearest character, and so forth, inflicting half the damage amount to each subsequent character.
+
 
 Level 8
 -------
@@ -262,4 +274,6 @@ Spell Shield
 Origin: Often used by the great wizard Kariim to shield himself from other wizards that worked behind his back, the origin of this protection spell is suspected to actually have been devised by the Urdevii long before and gifted to Kariim by them as a sign of trust and friendship.
 Description: Creates a powerful shield around the target which guards him against any spell of level 6 or below being cast upon him.
 
-
+Replication
+Origin: When the Great Count Gerald needed to defeat a mighty barbarian army that invaded the Lands, the wizardess Rhea devised this spell and shared it with the rest of the wizards to enlarge Gerald's forces that opposed the barbarians. Originally meant to target his entire army, the spell turned out to be so taxing that it was in the end applied only to the elite soldiers. Nonetheless, it turned out to be one of the prevailing factors in the successful defense.
+Description: Creates a temporary replica of the target character, which can cause damage and cast spells in the similar way as the original. The replica is weaker, less powerful and experienced, but deadly nonetheless. The caster commands the replica if his will is stronger than the replicas, otherwise the replica can turn on him.
