@@ -470,7 +470,7 @@ package castle {
     def pov(area: AreaView) = area
   }
   
-  class KitchenShelvesRight(val id: EntityId) extends Character {
+  class LogPile(val id: EntityId) extends Character {
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
     def chr = '*'
