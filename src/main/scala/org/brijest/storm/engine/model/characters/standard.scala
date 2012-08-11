@@ -470,10 +470,36 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  class KitchenShelvesRight(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '*'
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
   class LogPile(val id: EntityId) extends Character {
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
     def chr = '*'
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class WoodenTub(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '*'
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class DiningTable(val id: EntityId) extends Character {
+    dimensions := (7, 3);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
     def color = 0x88555500
     def pov(area: AreaView) = area
   }

@@ -84,6 +84,8 @@ object Terrain extends ClassSet[Slot] {
   register[DungeonFungus]
   register[StoneTiles]
   register[BlueStoneTiles]
+  register[BlueStoneTilesBlood]
+  register[BlueStoneTilesBurned]
   register[BlueStoneTilesMirror]
   register[BlueStoneTilesMountainPic]
   register[BlueStoneTilesArms]
@@ -263,6 +265,31 @@ case class StoneTiles(val height: Int) extends Slot {
 
 case class BlueStoneTiles(val height: Int) extends Slot {
   def this() = this(0)
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 600
+}
+
+
+case class BlueStoneTilesBlood(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def wallIdentifier = classOf[BlueStoneTiles].getName + "-wall"
+  override def edgeIdentifier = classOf[BlueStoneTiles].getName + "-edges"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 600
+}
+
+
+case class BlueStoneTilesBurned(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[BlueStoneTiles].getName + "-edges"
   
   def walkable = true
   def chr = '.'
