@@ -123,7 +123,7 @@ package object model {
     for (i <- 1 until h; x <- i until h; y = h - 1 + i - x) f(x0 + x, y0 + y)
   } else if (w > h) {
     for (i <- 0 until h; x <- 0 to i; y = i - x) f(x0 + x, y0 + y)
-    for (i <- h until (w - h); x <- i until (w - h); y = h - 1 + i - x) f(x0 + x, y0 + y)
+    for (i <- 1 until (w - h); x <- i until (i + h); y = h - 1 + i - x) f(x0 + x, y0 + y)
     for (i <- (w - h) until w; x <- i until w; y = h - 1 + i - x) f(x0 + x, y0 + y)
   } else {
     for (i <- 0 until w; x <- 0 to i; y = i - x) f(x0 + x, y0 + y)
