@@ -310,7 +310,7 @@ self =>
           val slot = area.terrain(x, y)
           slot match {
             case slot: EmptySlot =>
-            case slot => drawCube(x, y, 0.5f, 0.f, slot.height * 0.55f)
+            case slot => drawCube(x, y, 0.5f, 0.f, slot.height * 0.275f)
           }
           if (withCharacters) area.character(x, y) match {
             case NoCharacter =>
@@ -318,7 +318,8 @@ self =>
               val (w, h) = chr.dimensions()
               val sprite = palette.sprite(chr)
               // TODO adjust for multi slot characters
-              drawCube(x + w / 2, y + h / 2, sprite.width / 32.f, slot.height * 0.55f, slot.height * 0.55f + sprite.height / 16.f)
+              //drawCube(x + w / 2, y + h / 2, sprite.width / 32.f, slot.height * 0.55f, slot.height * 0.55f + sprite.height / 16.f)
+            case _ =>
           }
           x += 1
         }
