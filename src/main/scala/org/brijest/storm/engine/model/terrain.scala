@@ -88,7 +88,9 @@ object Terrain extends ClassSet[Slot] {
   register[BlueStoneTilesBurned]
   register[BlueStoneTilesMirror]
   register[BlueStoneTilesMountainPic]
+  register[BlueStoneTilesDukePic]
   register[BlueStoneTilesArms]
+  register[BlueStoneTilesDragonHead]
   register[RedCarpet]
   register[MeadowGrassPlain]
   register[MeadowGrass]
@@ -324,7 +326,31 @@ case class BlueStoneTilesMountainPic(val height: Int) extends Slot {
 }
 
 
+case class BlueStoneTilesDukePic(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[BlueStoneTiles].getName + "-edges"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 600
+}
+
+
 case class BlueStoneTilesArms(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[BlueStoneTiles].getName + "-edges"
+  
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 600
+}
+
+
+case class BlueStoneTilesDragonHead(val height: Int) extends Slot {
   def this() = this(0)
   
   override def edgeIdentifier = classOf[BlueStoneTiles].getName + "-edges"
