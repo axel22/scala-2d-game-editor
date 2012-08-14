@@ -80,7 +80,7 @@ object Scripts {
     """#!/bin/sh
 BASEDIR=`dirname $0`
 JARS=%s
-UNAME=$(uname)
+UNAME=`uname`
 if [[ "$UNAME" == 'Darwin' ]]; then
    COCOAFLAGS=-XstartOnFirstThread
 fi
