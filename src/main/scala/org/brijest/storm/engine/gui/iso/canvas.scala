@@ -659,7 +659,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   def framelength = (1000.0 / framespersec).toInt
   
   @inline final def planar2iso(u: Double, v: Double, mapsz: Int): (Double, Double) =
-    (v / tileHeight + u / tileWidth - mapsz / 2, v / tileHeight - u / tileWidth + mapsz / 2);
+    (v / tileHeight + u / tileWidth - mapsz / 2.0, v / tileHeight - u / tileWidth + mapsz / 2.0);
   
   @inline final def planar2iso(u: Int, v: Int, mapsz: Int): (Double, Double) =
     planar2iso(u.toDouble, v.toDouble, mapsz)
@@ -710,7 +710,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
     val u0 = ustart
     val v0 = vstart
     val pw = width
-    val ph = height + area.maxheight() * levelheight + palette.maxSpriteHeight
+    val ph = height + area.maxHeight * levelheight + palette.maxSpriteHeight
     val (xtl, ytl) = planar2iso(u0, v0, area.sidelength)
     val (xtr, ytr) = planar2iso(u0 + pw, v0, area.sidelength)
     val (xbr, ybr) = planar2iso(u0 + pw, v0 + ph, area.sidelength)

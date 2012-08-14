@@ -124,7 +124,7 @@ class Editor(config: Config) extends Logging {
           val diff = elevpress._2 - p._2
           val leveldiff = diff / areadisplay.levelheight
           val oslot = area.terrain(xt, yt)
-          val nheight = if (oslot.isEmpty) 0 else math.min(math.max(0, elevzeroheight + leveldiff), area.maxheight())
+          val nheight = if (oslot.isEmpty) 0 else math.min(math.max(0, elevzeroheight + leveldiff), area.maxHeight)
           val nslot = Slot(oslot, nheight)
           area.terrain(xt, yt) = nslot
         }

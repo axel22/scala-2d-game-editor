@@ -22,8 +22,11 @@ class AreaView extends Struct with ProtectedMutable {
   val id = access[mutable] cell(invalidAreaId)
   val characters = new CharacterTable(1, 1)
   val items = new ItemTable(1, 1)
-  val maxheight = access[const] cell(40)
   val exits = access[mutable].table[Pos, AreaId]
+  @deprecated("", "")
+  val maxheight = access[const] cell(40)
+  
+  def maxHeight = 40
   
   def sidelength = terrain.dimensions._1 max terrain.dimensions._2
   

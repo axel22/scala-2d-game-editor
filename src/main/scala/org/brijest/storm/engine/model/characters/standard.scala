@@ -504,6 +504,48 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  class DiningChairNorth(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class DiningChairWest(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class DiningChairSouth(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class DiningChairEast(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class StuffedBearLeft(val id: EntityId) extends Character {
+    dimensions := (2, 2);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
 }
 
 

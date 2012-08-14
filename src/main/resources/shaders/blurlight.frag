@@ -41,8 +41,8 @@ void main() {
   vec4 texcoord = gl_TexCoord[0] / gl_TexCoord[0].w * 0.5 + 0.5;
   vec4 color = blurred(texcoord);
   float intensity = (color.x + color.y + color.z) / 3.0;
-  float alpha = 1.0 - intensity * 2.0;
-  if (alpha < 0.6) alpha = 0.6;
+  float alpha = 1.0 - intensity * 2.5;
+  if (alpha < 0.0) alpha = 0.0;
   
   gl_FragColor = vec4(color.xyz, 0.5 * alpha);
 }
