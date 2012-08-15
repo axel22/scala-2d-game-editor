@@ -546,6 +546,22 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  class KnightArmourLeft(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
+  class KnightArmourRight(val id: EntityId) extends Character {
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x88555500
+    def pov(area: AreaView) = area
+  }
+  
 }
 
 
