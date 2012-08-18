@@ -13,7 +13,6 @@ package gui.iso
 
 
 import collection._
-import swing._
 import org.apache.commons.io.IOUtils
 import java.awt.image._
 import java.lang.ref.SoftReference
@@ -29,10 +28,12 @@ import GL2ES2._
 import fixedfunc.GLLightingFunc._
 import fixedfunc.GLMatrixFunc._
 import org.brijest.storm.engine.model._
+import opengl._
 
 
 
-class GLIsoUI(val area: Area, val caps: GLCapabilities) extends GLCanvas(caps) with IsoUI with GLPaletteCanvas with Logging {
+class GLIsoCanvas(val area: Area, val caps: GLCapabilities)
+extends GLCanvas(caps) with IsoCanvas with UI with GLPaletteCanvas with Logging {
 self =>
   
   var resizestamp = 0L
@@ -63,22 +64,7 @@ self =>
   
   def iheight: Int = this.getHeight
   
-  def refresh(area: AreaView, state: Engine.State) = this.synchronized {
-    // cachedarea = area
-    // this.repaint()
-    
-    // val glad = new GLAutoDrawableDrawAdapter(this)
-    
-    // val t = timed {
-    //   redraw(area, state, glad)
-    // }
-    
-    //println("Time to render: %d ms".format(t))
-  }
-  
-  //var cachedarea: AreaView = null
-  
-  val palette = new DefaultGLPalette
+  val palette = new GLPalette
   
   /* shadows */
   
@@ -235,7 +221,7 @@ self =>
   }
   
   protected override def redrawRect(area: AreaView, engine: Engine.State, a: DrawAdapter, ustart: Int, vstart: Int, width: Int, height: Int, vpuoffs: Int, vpvoffs: Int) {
-    val gl = a.asInstanceOf[GLAutoDrawableDrawAdapter].gl
+    implicit val gl = a.asInstanceOf[GLAutoDrawableDrawAdapter].gl
     val glu = new GLU
     import gl._
     
@@ -268,39 +254,35 @@ self =>
     }
     
     def drawScene(withCharacters: Boolean) {
-      def drawCube(x: Int, y: Int, span: Float, bottom: Float, top: Float) {
-        glBegin(GL_QUADS)
-        
+      def drawCube(x: Int, y: Int, span: Float, bottom: Float, top: Float) = geometry(GL_QUADS) {
         /* top */
-        glVertex3d(x - span, y - span, top)
-        glVertex3d(x - span, y + span, top)
-        glVertex3d(x + span, y + span, top)
-        glVertex3d(x + span, y - span, top)
-        
+        v(x - span, y - span, top)
+        v(x - span, y + span, top)
+        v(x + span, y + span, top)
+        v(x + span, y - span, top)
+
         /* sides */
         if (top > 0) {
-          glVertex3f(x - span, y - span, top)
-          glVertex3f(x - span, y - span, bottom)
-          glVertex3f(x - span, y + span, bottom)
-          glVertex3f(x - span, y + span, top)
-          
-          glVertex3f(x + span, y - span, top)
-          glVertex3f(x + span, y - span, bottom)
-          glVertex3f(x - span, y - span, bottom)
-          glVertex3f(x - span, y - span, top)
-          
-          glVertex3f(x + span, y + span, top)
-          glVertex3f(x + span, y + span, bottom)
-          glVertex3f(x + span, y - span, bottom)
-          glVertex3f(x + span, y - span, top)
-          
-          glVertex3f(x - span, y + span, top)
-          glVertex3f(x - span, y + span, bottom)
-          glVertex3f(x + span, y + span, bottom)
-          glVertex3f(x + span, y + span, top)
+          v(x - span, y - span, top)
+          v(x - span, y - span, bottom)
+          v(x - span, y + span, bottom)
+          v(x - span, y + span, top)
+
+          v(x + span, y - span, top)
+          v(x + span, y - span, bottom)
+          v(x - span, y - span, bottom)
+          v(x - span, y - span, top)
+
+          v(x + span, y + span, top)
+          v(x + span, y + span, bottom)
+          v(x + span, y - span, bottom)
+          v(x + span, y - span, top)
+
+          v(x - span, y + span, top)
+          v(x - span, y + span, bottom)
+          v(x + span, y + span, bottom)
+          v(x + span, y + span, top)
         }
-        
-        glEnd()
       }
       
       var x = xfrom

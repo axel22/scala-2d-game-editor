@@ -58,15 +58,12 @@ object StormEnrouteBuild extends Build {
   
   lazy val mempool = RootProject(uri("git://github.com/axel22/scalapool.git#HEAD"))
   
-  lazy val bufferz = RootProject(uri("git://git.assembla.com/bufferz.git#HEAD"))
-  
   lazy val storm = Project(
     "storm-enroute",
     file("."),
     settings = Defaults.defaultSettings ++ Seq(deployTask)
   ) dependsOn (
-    mempool,
-    bufferz
+    mempool
   )
   
 }

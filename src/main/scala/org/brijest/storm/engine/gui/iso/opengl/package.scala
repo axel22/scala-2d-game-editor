@@ -6,29 +6,35 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package gui.iso
 
 
 
-import model._
 import collection._
+import javax.media.opengl._
 
 
 
-trait IsoUI extends IsoCanvas with UI {
-  var pos = (0, 0);
-  var playerId: PlayerId = invalidPlayerId
-  var engine: Option[Engine] = None
-  
-  def iwidth: Int
-  
-  def iheight: Int
-  
-  def update(actions: Seq[Action], area: AreaView, state: Engine.State) = refresh(area, state)
-  
-  def message(msg: String) {}
+package object opengl {
+
+  @inline def geometry[T](geomtype: Int)(block: =>T)(implicit gl: GL2) {
+    import gl._
+    gl.glBegin(geomtype)
+    block
+    glEnd()
+  }
+
+  @inline def v(x: Float, y: Float, z: Float)(implicit gl: GL2) {
+    gl.glVertex3f(x, y, z)
+  }
+
+  @inline def v(x: Double, y: Double, z: Double)(implicit gl: GL2) {
+    gl.glVertex3d(x, y, z)
+  }
   
 }
+
 
 

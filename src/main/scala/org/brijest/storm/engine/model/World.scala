@@ -70,10 +70,10 @@ object World {
     def area(id: AreaId) = Some(new AreaProvider.Strict(Area.emptyDungeon(60, 30)))
     def position(p: Player) = 0L
     def pc(p: Player): PlayerCharacter = PlayerCharacter.simpleTestCharacter(p.id)
-    def plane(id: PlaneId) = unsupported
-    def planes = unsupported
-    def mainPlane: PlaneId = unsupported
-    def newPlaneId() = unsupported
+    def plane(id: PlaneId) = unsupported()
+    def planes = unsupported()
+    def mainPlane: PlaneId = unsupported()
+    def newPlaneId() = unsupported()
     
     private def place(p: Player, area: Area): PlayerCharacter = {
       implicit val a = area

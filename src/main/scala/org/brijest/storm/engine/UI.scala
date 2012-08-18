@@ -11,16 +11,12 @@ package org.brijest.storm.engine
 
 
 import model._
+import collection._
 
 
 
 trait UI {
-  var pos: (Int, Int)
-  var playerId: PlayerId
-  var engine: Option[Engine]
-  def refresh(area: AreaView, state: Engine.State): Unit
-  def update(actions: Seq[Action], area: AreaView, state: Engine.State): Unit
-  def message(msg: String): Unit
+  var engine: Option[Engine] = None
 }
 
 

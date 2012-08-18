@@ -46,6 +46,15 @@ package object storm {
     def -(q: (T, T)) = (implicitly[Numeric[T]].minus(p._1, q._1), implicitly[Numeric[T]].minus(p._2, q._2))
   }
   
+  /* utils */
+
+  def timed(thunk: =>Unit) = {
+    val t1 = System.currentTimeMillis
+    thunk
+    val time = System.currentTimeMillis - t1
+    time
+  }
+  
   /* constants */
   
   object app {

@@ -22,15 +22,6 @@ package object engine {
     def compare(x: Time, y: Time) = math.signum(y - x).toInt
   }
   
-  def unsupported() = throw new UnsupportedOperationException
-  
-  def timed(thunk: =>Unit) = {
-    val t1 = System.currentTimeMillis
-    thunk
-    val time = System.currentTimeMillis - t1
-    time
-  }
-  
   def interval(l1: Int, l2: Int)(x: Int) = math.max(l1, math.min(l2, x))
   
 }

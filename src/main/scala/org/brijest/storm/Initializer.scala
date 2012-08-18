@@ -12,8 +12,6 @@ package org.brijest.storm
 
 import java.io.File
 import org.apache.commons.io.FileUtils
-import org.brijest.bufferz._
-import org.brijest.bufferz.shells._
 import collection._
 import engine._
 import engine.model.{World, Player}
@@ -103,8 +101,7 @@ object Initializer extends Logging {
   }
   
   private def createUI(config: Config): UI = config.ui match {
-    case ui.swingConsole => new gui.console.ConsoleUI(new SwingStandaloneShell(app.name) with Buffers)
-    case ui.swingIso => new gui.iso.SwingIsoUI(app.name)
+    // TODO
     case e => exit("User interface '%s' not recognized".format(e))
   }
   

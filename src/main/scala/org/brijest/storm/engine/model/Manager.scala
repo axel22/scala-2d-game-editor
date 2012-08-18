@@ -6,7 +6,8 @@
 **                                            Storm Enroute (c) 2011      **
 \*                                            www.storm-enroute.com       */
 
-package org.brijest.storm.engine
+package org.brijest.storm
+package engine
 package model
 
 

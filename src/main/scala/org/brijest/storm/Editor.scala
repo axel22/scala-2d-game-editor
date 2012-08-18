@@ -94,7 +94,7 @@ class Editor(config: Config) extends Logging {
   })
   
   def createGLIsoUI(implicit area: Area) = {
-    val areadisplay = new GLIsoUI(area, caps)
+    val areadisplay = new GLIsoCanvas(area, caps)
     
     /* events */
     

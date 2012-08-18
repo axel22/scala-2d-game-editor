@@ -38,7 +38,6 @@ engine =>
     
     override def run() {
       sim.init()
-      playeruis.foreach(_.refresh(area, engine))
       
       while (running) {
         /* collect inputs */
@@ -47,15 +46,11 @@ engine =>
         /* step through simulation */
         val (_, actions) = sim.step()
         
-        /* update screens */
-        playeruis.foreach(_.update(actions, area, engine))
-        
         /* wait */
         Thread.sleep(10)
         engine.synchronized {
           while (paused) {
             processCommands()
-            playeruis.foreach(_.update(actions, area, engine))
             if (paused) engine.wait()
           }
         }
@@ -82,7 +77,6 @@ engine =>
   
   def listen(ui: UI) = {
     playeruis += ui
-    ui.playerId = player.id
   }
   
   def push(comm: Command) = engine.synchronized {

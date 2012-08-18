@@ -95,7 +95,9 @@ trait Canvas {
 
 
 trait IsoCanvas extends Canvas with PaletteCanvas {
-  lazy val stars = imageFromPngStream(pngStream("stars"))
+  var pos = (0, 0);
+
+  lazy val stars = palette.newImageFromPngStream(pngStream("stars"))
   val deppool: singlethread.FreeList[DepNode] = new singlethread.FreeList(new DepNode)({ _.reset() }) {
     override def allocate() = {
       val dp = super.allocate()
@@ -649,8 +651,6 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
     var background: Boolean = app.render.background
     var shadows: Boolean = app.render.shadows
   }
-  
-  def pos: (Int, Int)
   
   var highlight: (Int, Int) = null;
   
