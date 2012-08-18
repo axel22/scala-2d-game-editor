@@ -99,21 +99,15 @@ trait PaletteCanvas extends Canvas {
   }
 
   trait Caching extends Palette {
-    import java.lang.ref.SoftReference
+    val spritemap = mutable.Map[String, Sprite]()
     
-    type Cachee = Sprite
-    
-    val activesprites = new CircularQueue[Cachee](512)
-    val spritemap = mutable.Map[String, SoftReference[Cachee]]()
-    
-    def addCache(name: String, c: Cachee) {
-      if (!spritemap.contains(name) || spritemap(name).get == null) {
-        activesprites += c
-        spritemap(name) = new SoftReference(c)
+    def addCache(name: String, c: Sprite) {
+      if (!spritemap.contains(name)) {
+        spritemap(name) = c
       }
     }
     
-    def getCache(name: String): Cachee = if (spritemap.contains(name)) spritemap(name).get else null
+    def getCache(name: String): Sprite = if (spritemap.contains(name)) spritemap(name) else null
     
     abstract override def findSprite(name: String): Sprite = {
       val cached = getCache(name)

@@ -460,61 +460,6 @@ self =>
       
       glViewport(0, 0, width, height)
       
-      //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-      
-      def initfixed() {
-        orthoView()
-        
-        import Jama._
-        
-        val bi = new Matrix(4, 4)
-        val lp = new Matrix(4, 4)
-        val lv = new Matrix(4, 4)
-        val cv = new Matrix(4, 4)
-        for (y <- 0 until 4; x <- 0 until 4) bi.set(x, y, biasmatrix(y * 4 + x))
-        for (y <- 0 until 4; x <- 0 until 4) lp.set(x, y, lightprojmatrix(y * 4 + x))
-        for (y <- 0 until 4; x <- 0 until 4) lv.set(x, y, lightviewmatrix(y * 4 + x))
-        for (y <- 0 until 4; x <- 0 until 4) cv.set(x, y, camviewmatrix(y * 4 + x))
-        
-        val st = bi.times(lp).times(lv)
-        for (y <- 0 until 4; x <- 0 until 4) shadowtexmatrix(y * 4 + x) = st.get(y, x).toFloat
-        
-        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-        glTexGenfv(GL_S, GL_EYE_PLANE, shadowtexmatrix, 0)
-        glEnable(GL_TEXTURE_GEN_S)
-
-        glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-        glTexGenfv(GL_T, GL_EYE_PLANE, shadowtexmatrix, 4)
-        glEnable(GL_TEXTURE_GEN_T)
-
-        glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-        glTexGenfv(GL_R, GL_EYE_PLANE, shadowtexmatrix, 8)
-        glEnable(GL_TEXTURE_GEN_R)
-
-        glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
-        glTexGenfv(GL_Q, GL_EYE_PLANE, shadowtexmatrix, 12)
-        glEnable(GL_TEXTURE_GEN_Q)
-        
-        glBindTexture(GL_TEXTURE_2D, shadowtexno)
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        glScalef(1.f, 1.f, 0.9999f)
-        
-        glEnable(GL_TEXTURE_2D)
-        glEnable(GL_CULL_FACE)
-        glCullFace(GL_BACK)
-        glEnable(GL_DEPTH_TEST)
-        glClear(GL_DEPTH_BUFFER_BIT)
-        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
-        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE)
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
-        
-        glAlphaFunc(GL_GEQUAL, 0.99f)
-        glEnable(GL_ALPHA_TEST)
-      }
-      
       def initglsl() {
         glMatrixMode(GL_TEXTURE)
         glLoadMatrixf(lightprojmatrix, 0)
