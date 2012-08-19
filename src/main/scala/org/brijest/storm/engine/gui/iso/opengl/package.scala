@@ -23,9 +23,11 @@ import javax.media.opengl.glu.GLU
 
 
 
-package object opengl {
+package object scalagl {
 
-  private val glu = new GLU
+  private val result = Array(1)
+
+  private[scalagl] val glu = new GLU
 
   /* geometry */
 
@@ -36,76 +38,31 @@ package object opengl {
     finally glEnd()
   }
 
-  @inline def v(x: Float, y: Float, z: Float)(implicit gl: GL2) {
+  @inline def v3f(x: Float, y: Float, z: Float)(implicit gl: GL2) {
     gl.glVertex3f(x, y, z)
   }
 
-  @inline def v(x: Double, y: Double, z: Double)(implicit gl: GL2) {
+  @inline def v3d(x: Double, y: Double, z: Double)(implicit gl: GL2) {
     gl.glVertex3d(x, y, z)
   }
-  
-  /* transformation matrices */
 
-  class Matrix(arr: Array[Double]) {
-    final val array: AnyRef = arr
-  }
+  /* contexts */
 
-  final class ProjectionMatrix(a: Array[Double]) extends Matrix(a)
+  object using {
 
-  final class ModelviewMatrix(a: Array[Double]) extends Matrix(a)
-
-  object Matrix {
-
-    val identity = new Matrix(Array(
-      1.0, 0.0, 0.0, 0.0,
-      0.0, 1.0, 0.0, 0.0,
-      0.0, 0.0, 1.0, 0.0,
-      0.0, 0.0, 0.0, 1.0
-      ))
-
-    def orthoProjection(wdt: Double, hgt: Double, nearPlane: Double, farPlane: Double)(implicit gl: GL2): ProjectionMatrix = {
+    @inline def program(h: ShaderProgram)(block: =>Unit)(implicit gl: GL2) {
       import gl._
-      glPushMatrix()
+      glGetIntegerv(GL_CURRENT_PROGRAM, result, 0)
+      val oldprogram = result(0)
       try {
-        val array = new Array[Double](16)
-        glLoadIdentity()
-        glOrtho(wdt, -wdt, -hgt, hgt, nearPlane, farPlane)
-        glGetDoublev(GL_MODELVIEW_MATRIX, array, 0)
-        new ProjectionMatrix(array)
-      } finally glPopMatrix()
-    }
-
-    def orthoView(xfrom: Double, yfrom: Double, zfrom: Double, xto: Double, yto: Double, zto: Double, xup: Double, yup: Double, zup: Double)(implicit gl: GL2): ModelviewMatrix = {
-      import gl._
-      glPushMatrix()
-      try {
-        val array = new Array[Double](16)
-        glLoadIdentity()
-        glu.gluLookAt(xfrom, yfrom, zfrom, xto, yto, zto, xup, yup, zup)
-        glGetDoublev(GL_MODELVIEW_MATRIX, array, 0)
-        new ModelviewMatrix(array)
-      } finally glPopMatrix()
-    }
-
-    @inline def apply[T](m: Matrix)(block: =>T)(implicit gl: GL2): T = {
-      import gl._
-      val mt = m match {
-        case pm: ProjectionMatrix => GL_PROJECTION
-        case mm: ModelviewMatrix => GL_MODELVIEW
-      }
-
-      glMatrixMode(mt)
-      glPushMatrix()
-      try {
-        glLoadMatrixd(m.array.asInstanceOf[Array[Double]], 0)
+        glUseProgram(h.pindex)
         block
-      } finally {
-        glMatrixMode(mt)
-        glPopMatrix()
-      }
+        glUseProgram(0)
+      } finally glUseProgram(oldprogram)
     }
-  }
-}
 
+  }
+
+}
 
 

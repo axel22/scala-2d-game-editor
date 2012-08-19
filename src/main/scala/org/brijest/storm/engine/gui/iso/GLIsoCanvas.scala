@@ -28,7 +28,7 @@ import GL2ES2._
 import fixedfunc.GLLightingFunc._
 import fixedfunc.GLMatrixFunc._
 import org.brijest.storm.engine.model._
-import opengl._
+import scalagl._
 
 
 
@@ -75,29 +75,12 @@ self =>
   val LITE_TEX_SIZE = 1024
   var litetexno: Int = -1
   var litefbo: Int = -1
-  val lightprojmatrix = new Array[Float](16)
-  val lightviewmatrix = new Array[Float](16)
-  val camprojmatrix = new Array[Float](16)
-  val camviewmatrix = new Array[Float](16)
-  val shadowtexmatrix = new Array[Float](16)
-  val biasmatrix = Array[Float](
-    0.5f, 0.f, 0.f, 0.f,
-    0.f, 0.5f, 0.f, 0.f,
-    0.f, 0.f, 0.5f, 0.f,
-    0.5f, 0.5f, 0.5f, 1.f
-  )
-  val identmatrix = Array[Float](
-    1.f, 0.f, 0.f, 0.f,
-    0.f, 1.f, 0.f, 0.f,
-    0.f, 0.f, 1.f, 0.f,
-    0.f, 0.f, 0.f, 1.f
-  )
-  var orthoshadowProgram: Int = -1
-  var liteProgram: Int = -1
+  val orthoshadowProgram = ShaderProgram()
+  val lightProgram = ShaderProgram()
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
   
   private def initialize(drawable: GLAutoDrawable) {
-    val gl = drawable.getGL().getGL2()
+    implicit val gl = drawable.getGL().getGL2()
     val index = new Array[Int](1)
     import gl._
     
@@ -147,7 +130,7 @@ self =>
     
     /* shaders */
     
-    def createShaderProgram(name: String): Int = {
+    def createShaderProgram(name: String, proghandle: ShaderProgram) {
       var program = -1
       val vs = glCreateShader(GL_VERTEX_SHADER)
       val fs = glCreateShader(GL_FRAGMENT_SHADER)
@@ -159,38 +142,18 @@ self =>
       IOUtils.closeQuietly(vsprogis)
       IOUtils.closeQuietly(fsprogis)
       
-      def errorLog(shname: String, shader: Int) {
-        val compstatus = new Array[Int](1)
-        glGetShaderiv(shader, GL_COMPILE_STATUS, compstatus, 0)
-        if (compstatus(0) == GL_FALSE) {
-          val len = Array(0)
-          val maxlen = 1000
-          val buff = new Array[Byte](maxlen)
-          glGetShaderInfoLog(shader, maxlen, len, 0, buff, 0)
-          val comperrors = buff.map(_.toChar).mkString
-          logger.warn("error compiling %s shader in %s\n%s".format(shname, name, comperrors))
-        } else logger.info("compiled %s shader in %s successfully".format(shname, name))
+      proghandle.acquire()
+
+      try {
+        proghandle.vertex.attach("vertex", vsrc)
+        proghandle.fragment.attach("fragment", fsrc)
+      } catch {
+        case e => logger.error(e.getMessage)
       }
-      
-      glShaderSource(vs, 1, Array(vsrc), null)
-      glCompileShader(vs)
-      errorLog("vertex", vs)
-      
-      glShaderSource(fs, 1, Array(fsrc), null)
-      glCompileShader(fs)
-      errorLog("fragment", fs)
-      
-      program = glCreateProgram()
-      glAttachShader(program, vs)
-      glAttachShader(program, fs)
-      glLinkProgram(program)
-      glValidateProgram(program)
-      
-      program
     }
     
-    orthoshadowProgram = createShaderProgram("orthoshadow")
-    liteProgram = createShaderProgram("blurlight")
+    createShaderProgram("orthoshadow", orthoshadowProgram)
+    createShaderProgram("blurlight", lightProgram)
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
@@ -245,7 +208,7 @@ self =>
     type Vec3 = (Float, Float, Float);
     
     trait Light {
-      def shader: Int
+      def shader: ShaderProgram
       def color: Vec3
     }
     
@@ -256,32 +219,32 @@ self =>
     def drawScene(withCharacters: Boolean) {
       def drawCube(x: Int, y: Int, span: Float, bottom: Float, top: Float) = geometry(GL_QUADS) {
         /* top */
-        v(x - span, y - span, top)
-        v(x - span, y + span, top)
-        v(x + span, y + span, top)
-        v(x + span, y - span, top)
+        v3d(x - span, y - span, top)
+        v3d(x - span, y + span, top)
+        v3d(x + span, y + span, top)
+        v3d(x + span, y - span, top)
 
         /* sides */
         if (top > 0) {
-          v(x - span, y - span, top)
-          v(x - span, y - span, bottom)
-          v(x - span, y + span, bottom)
-          v(x - span, y + span, top)
+          v3d(x - span, y - span, top)
+          v3d(x - span, y - span, bottom)
+          v3d(x - span, y + span, bottom)
+          v3d(x - span, y + span, top)
 
-          v(x + span, y - span, top)
-          v(x + span, y - span, bottom)
-          v(x - span, y - span, bottom)
-          v(x - span, y - span, top)
+          v3d(x + span, y - span, top)
+          v3d(x + span, y - span, bottom)
+          v3d(x - span, y - span, bottom)
+          v3d(x - span, y - span, top)
 
-          v(x + span, y + span, top)
-          v(x + span, y + span, bottom)
-          v(x + span, y - span, bottom)
-          v(x + span, y - span, top)
+          v3d(x + span, y + span, top)
+          v3d(x + span, y + span, bottom)
+          v3d(x + span, y - span, bottom)
+          v3d(x + span, y - span, top)
 
-          v(x - span, y + span, top)
-          v(x - span, y + span, bottom)
-          v(x + span, y + span, bottom)
-          v(x + span, y + span, top)
+          v3d(x - span, y + span, top)
+          v3d(x - span, y + span, bottom)
+          v3d(x + span, y + span, bottom)
+          v3d(x + span, y + span, top)
         }
       }
       
@@ -367,59 +330,25 @@ self =>
       val xyside = 100.f
       val zcenter = xyside * math.sqrt(2) / math.sqrt(3)
       val campos = (xyside, xyside, zcenter.toFloat);
-      val shaderProgram = light.shader
-      
-      def initLightMatrices() {
-        light match {
-          case OrthoLight(lightpos, _) =>
-            glLoadIdentity()
-            val wdt = 1050 / 14
-            val hgt = 1050 / 14
-            glOrtho(wdt, -wdt, -hgt, hgt, -600.0, 600.0)
-            glGetFloatv(GL_MODELVIEW_MATRIX, lightprojmatrix, 0)
-            
-            glLoadIdentity()
-            glu.gluLookAt(
-              xlook + 60.f + lightpos._1, ylook - 50.f + lightpos._2, lightpos._3,
-              xlook + 60.f, ylook - 50.f, 0.f,
-              0.f, 0.f, 1.f)
-            glGetFloatv(GL_MODELVIEW_MATRIX, lightviewmatrix, 0)
-        }
+      val shader = light.shader
+      val (lightProjMatrix, lightViewMatrix) = light match {
+        case OrthoLight(lightpos, _) =>
+          val pm = matrices.orthoProjection(1050 / 14, 1050 / 14, -600.0, 600.0)
+          val vm = matrices.orthoView(
+            xlook + 60.f + lightpos._1, ylook - 50.f + lightpos._2, lightpos._3,
+            xlook + 60.f, ylook - 50.f, 0.f,
+            0.f, 0.f, 1.f)
+          (pm, vm)
       }
-      
-      def initCamMatrices() {
-        glLoadIdentity()
+      val camProjMatrix = {
         val wdt = width / (tileWidth * math.sqrt(2))
         val hgt = height / (tileHeight * math.sqrt(2) * 2)
-        glOrtho(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
-        glGetFloatv(GL_MODELVIEW_MATRIX, camprojmatrix, 0)
-        
-        glLoadIdentity()
-        glu.gluLookAt(
-          xlook + campos._1, ylook + campos._2, campos._3,
-          xlook, ylook, 0.f,
-          0.f, 0.f, 1.f)
-        glGetFloatv(GL_MODELVIEW_MATRIX, camviewmatrix, 0)
+        matrices.orthoProjection(wdt, hgt, -300.0, 900.0)
       }
-      
-      initLightMatrices()
-      initCamMatrices()
-      
-      def lightView() {
-        glMatrixMode(GL_PROJECTION)
-        glLoadMatrixf(lightprojmatrix, 0)
-        
-        glMatrixMode(GL_MODELVIEW)
-        glLoadMatrixf(lightviewmatrix, 0)
-      }
-      
-      def orthoView() {
-        glMatrixMode(GL_PROJECTION)
-        glLoadMatrixf(camprojmatrix, 0)
-        
-        glMatrixMode(GL_MODELVIEW)
-        glLoadMatrixf(camviewmatrix, 0)
-      }
+      val camViewMatrix = matrices.orthoView(
+        xlook + campos._1, ylook + campos._2, campos._3,
+        xlook, ylook, 0.f,
+        0.f, 0.f, 1.f)
       
       /* draw scene from light point of view and copy to the texture buffer */
       
@@ -427,27 +356,28 @@ self =>
       glEnable(GL_CULL_FACE)
       glCullFace(GL_FRONT)
       
-      lightView()
-      
-      glDisable(GL_CULL_FACE)
-      
-      glColor4f(1.f, 1.f, 1.f, 0.f)
-      glEnable(GL_DEPTH_TEST)
-      
-      //glBindFramebuffer(GL_FRAMEBUFFER, shadowfbo)
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowtexno, 0)
-      
-      glClear(GL_DEPTH_BUFFER_BIT)
-      
-      drawScene(true)
-      
-      glBindFramebuffer(GL_FRAMEBUFFER, 0)
-      
-      glBindTexture(GL_TEXTURE_2D, shadowtexno)
-      if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
-      //debugTexture(shadowtexno)
-      //return
-      
+      matrices(lightProjMatrix, lightViewMatrix) {
+        //lightView()
+        glDisable(GL_CULL_FACE)
+
+        glColor4f(1.f, 1.f, 1.f, 0.f)
+        glEnable(GL_DEPTH_TEST)
+
+        //glBindFramebuffer(GL_FRAMEBUFFER, shadowfbo)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowtexno, 0)
+
+        glClear(GL_DEPTH_BUFFER_BIT)
+
+        drawScene(true)
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
+
+        glBindTexture(GL_TEXTURE_2D, shadowtexno)
+        if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+        //debugTexture(shadowtexno)
+        //return
+      }
+
       def debugReadScreen() {
         glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
       }
@@ -459,24 +389,11 @@ self =>
       /* render scene with shadows from camera point of view */
       
       glViewport(0, 0, width, height)
-      
+
       def initglsl() {
-        glMatrixMode(GL_TEXTURE)
-        glLoadMatrixf(lightprojmatrix, 0)
-        glMultMatrixf(lightviewmatrix, 0)
-        
-        glMatrixMode(GL_MODELVIEW)
-        
-        orthoView()
-        
-        glUseProgram(shaderProgram)
-        
         glActiveTexture(GL_TEXTURE0)
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, shadowtexno)
-        
-        sendUniform1i(shaderProgram, "shadowtex", 0)
-        sendUniform3f(shaderProgram, "light_color", light.color._1, light.color._2, light.color._3)
         
         glEnable(GL_DEPTH_TEST)
         glClear(GL_DEPTH_BUFFER_BIT)
@@ -484,40 +401,47 @@ self =>
         glCullFace(GL_BACK)
       }
       
-      initglsl()
+      val depTexMatrix = (lightProjMatrix * lightViewMatrix).to[TextureMatrix]
       
-      glViewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
-      glEnable(GL_CULL_FACE)
-      glCullFace(GL_BACK)
-      
-      glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
-      
-      drawScene(false)
-      
-      glBindFramebuffer(GL_FRAMEBUFFER, 0)
-      
-      glDisable(GL_CULL_FACE)
-      
-      glUseProgram(0)
-      
-      glMatrixMode(GL_TEXTURE)
-      glLoadIdentity()
-      
-      glMatrixMode(GL_MODELVIEW)
-      
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE)
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NONE)
-      glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_NONE)
-      
-      glDisable(GL_TEXTURE_2D)
-      
-      glDisable(GL_TEXTURE_GEN_S)
-      glDisable(GL_TEXTURE_GEN_T)
-      glDisable(GL_TEXTURE_GEN_R)
-      glDisable(GL_TEXTURE_GEN_Q)
-      
-      glDisable(GL_ALPHA_TEST)
+      matrices(depTexMatrix, camProjMatrix, camViewMatrix) {
+        initglsl()
+
+        glViewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
+
+        glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
+
+        using.program(shader) {
+          shader.uniform("shadowtex") << 0
+          shader.uniform("light_color") << light.color
+        
+          drawScene(false)
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
+
+        glDisable(GL_CULL_FACE)
+
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+
+        glMatrixMode(GL_MODELVIEW)
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NONE)
+        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_NONE)
+
+        glDisable(GL_TEXTURE_2D)
+
+        glDisable(GL_TEXTURE_GEN_S)
+        glDisable(GL_TEXTURE_GEN_T)
+        glDisable(GL_TEXTURE_GEN_R)
+        glDisable(GL_TEXTURE_GEN_Q)
+
+        glDisable(GL_ALPHA_TEST)
+      }
     }
     
     /* first clear texture */
@@ -569,19 +493,18 @@ self =>
       
       glBindTexture(GL_TEXTURE_2D, litetexno)
       
-      glUseProgram(liteProgram)
-      
-      sendUniform1i(liteProgram, "litetex", 0)
-      
-      glBegin(GL_QUADS)
-      glTexCoord2f(0, 1); glVertex2d(0, 0)
-      glTexCoord2f(1, 1); glVertex2d(width, 0)
-      glTexCoord2f(1, 0); glVertex2d(width, height)
-      glTexCoord2f(0, 0); glVertex2d(0, height)
-      glEnd()
-      
-      glUseProgram(0)
-      
+      using.program(lightProgram) {
+        lightProgram.uniform("litetex") << 0
+
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 1); glVertex2d(0, 0)
+        glTexCoord2f(1, 1); glVertex2d(width, 0)
+        glTexCoord2f(1, 0); glVertex2d(width, height)
+        glTexCoord2f(0, 0); glVertex2d(0, height)
+        glEnd()
+
+      }
+
       glEnable(GL_DEPTH_TEST)
       glDisable(GL_TEXTURE_2D)
     }
