@@ -356,8 +356,7 @@ self =>
       glEnable(GL_CULL_FACE)
       glCullFace(GL_FRONT)
       
-      matrices(lightProjMatrix, lightViewMatrix) {
-        //lightView()
+      using.matrix(lightProjMatrix, lightViewMatrix) {
         glDisable(GL_CULL_FACE)
 
         glColor4f(1.f, 1.f, 1.f, 0.f)
@@ -403,7 +402,7 @@ self =>
       
       val depTexMatrix = (lightProjMatrix * lightViewMatrix).to[TextureMatrix]
       
-      matrices(depTexMatrix, camProjMatrix, camViewMatrix) {
+      using.matrix(depTexMatrix, camProjMatrix, camViewMatrix) {
         initglsl()
 
         glViewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
@@ -423,9 +422,6 @@ self =>
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
         glDisable(GL_CULL_FACE)
-
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
 
         glMatrixMode(GL_MODELVIEW)
 

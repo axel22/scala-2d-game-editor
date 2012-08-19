@@ -25,7 +25,7 @@ import javax.media.opengl.glu.GLU
 
 package object scalagl {
 
-  private val result = Array(1)
+  val result = Array(1)
 
   private[scalagl] val glu = new GLU
 
@@ -59,6 +59,29 @@ package object scalagl {
         block
         glUseProgram(0)
       } finally glUseProgram(oldprogram)
+    }
+
+    @inline def matrix[T](ms: Matrix*)(block: =>T)(implicit gl: GL2): T = {
+      import gl._
+
+      glGetIntegerv(GL_MATRIX_MODE, result, 0)
+      val oldmode = result(0)
+      glPushMatrix()
+      try {
+        for (m <- ms) {
+          glMatrixMode(m.mode)
+          glPushMatrix()
+          glLoadMatrixd(m.array, 0)
+        }
+        block
+      } finally {
+        for (m <- ms.reverse) {
+          glMatrixMode(m.mode)
+          glPopMatrix()
+        }
+        glMatrixMode(oldmode)
+        glPopMatrix()
+      }
     }
 
   }

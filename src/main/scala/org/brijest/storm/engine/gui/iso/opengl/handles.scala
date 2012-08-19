@@ -84,7 +84,7 @@ final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
 
     @inline def apply(varname: String)(implicit gl: GL2) = new Sink {
       def location = {
-        val loc = gl.glGetUniformLocation(pindex, varname)
+        val loc = gl.glGetUniformLocation(index, varname)
         if (loc == -1) new ShaderProgram.Exception("could not send uniform: " + varname)
         loc
       }

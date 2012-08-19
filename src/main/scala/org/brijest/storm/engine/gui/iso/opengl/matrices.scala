@@ -120,27 +120,4 @@ object matrices {
    }
  }
 
- @inline def apply[T](ms: Matrix*)(block: =>T)(implicit gl: GL2): T = {
-  import gl._
-
-  glGetIntegerv(GL_MATRIX_MODE, result, 0)
-  val oldmode = result(0)
-  glPushMatrix()
-  try {
-    for (m <- ms) {
-      glMatrixMode(m.mode)
-      glPushMatrix()
-      glLoadMatrixd(m.array, 0)
-    }
-    block
-    } finally {
-      for (m <- ms.reverse) {
-        glMatrixMode(m.mode)
-        glPopMatrix()
-      }
-      glMatrixMode(oldmode)
-      glPopMatrix()
-    }
-  }
-
 }
