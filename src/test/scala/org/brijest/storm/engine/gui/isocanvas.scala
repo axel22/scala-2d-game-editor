@@ -34,7 +34,6 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       drawing.outline = true
       
       val palette = new DefaultSwingPalette
-      def pos = (0, 0);
       def iwidth = img.getWidth
       def iheight = img.getHeight
     }
@@ -43,7 +42,7 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       val abuff = a.getData.getDataBuffer
       val braster = b.getData
       val bbuff = braster.getDataBuffer
-      
+
       var same = true
       if (abuff.size != bbuff.size) return false else {
         var i = 0
@@ -72,7 +71,7 @@ class IsoCanvasTests extends WordSpec with ShouldMatchers {
       
       val result = canvas.img
       save(picname, result)
-      val expected = canvas.imageFromPngStream(pngStream(picname))
+      val expected = canvas.palette.newImageFromPngStream(pngStream(picname))
       equalImages(result, expected, "diff-" + picname) should equal (true)
     }
     

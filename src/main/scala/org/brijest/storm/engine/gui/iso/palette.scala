@@ -199,3 +199,35 @@ trait GLPaletteCanvas extends PaletteCanvas {
 }
 
 
+trait SwingPaletteCanvas extends PaletteCanvas {
+
+  type Img = BufferedImage
+
+  class DefaultSwingPalette extends Palette with Caching {
+
+    /* types */
+
+    class Sprite(val images: Seq[Img]) extends SpriteOps {
+      def image(frame: Int) = images(frame)
+      def animated = false
+      def frames = images.length
+      def width = images.head.getWidth
+      def height = images.head.getHeight
+    }
+
+    object NullSprite extends Sprite(null) {
+      override def width = 0
+      override def height = 0
+    }
+
+    def newSprite(imgs: Seq[Img]) = new Sprite(imgs)
+
+    def toImg(img: BufferedImage) = img
+
+    def width(img: Img) = img.getWidth(null)
+
+    def height(img: Img) = img.getHeight(null)
+
+  }
+
+}
