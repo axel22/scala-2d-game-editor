@@ -30,6 +30,10 @@ trait Handle[H <: Handle[H]] {
 }
 
 
+object Handle {
+}
+
+
 final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
 
   private[scalagl] var pindex = -1
@@ -77,20 +81,22 @@ final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
     def mode = GL2ES2.GL_FRAGMENT_SHADER
   }
 
-  object uniform {
-    trait Sink {
-      def <<(v: Int): Unit
+  object uniform extends Dynamic {
+    trait Var {
+      def :=(v: Int)
+      def :=(x: Float, y: Float, z: Float)
+      def :=(t: (Float, Float, Float))
     }
 
-    @inline def apply(varname: String)(implicit gl: GL2) = new Sink {
+    @inline def applyDynamic(varname: String)()(implicit gl: GL2) = new Var {
       def location = {
         val loc = gl.glGetUniformLocation(index, varname)
         if (loc == -1) new ShaderProgram.Exception("could not send uniform: " + varname)
         loc
       }
-      def <<(v: Int) = gl.glUniform1i(location, v)
-      def <<(x: Float, y: Float, z: Float): Unit = gl.glUniform3f(location, x, y, z)
-      def <<(t: (Float, Float, Float)): Unit = <<(t._1, t._2, t._3)
+      def :=(v: Int) = gl.glUniform1i(location, v)
+      def :=(x: Float, y: Float, z: Float): Unit = gl.glUniform3f(location, x, y, z)
+      def :=(t: (Float, Float, Float)): Unit = :=(t._1, t._2, t._3)
     }
   }
 
@@ -112,6 +118,7 @@ final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
   def release()(implicit gl: GL2) {
     if (pindex != -1) {
       gl.glDeleteProgram(pindex)
+      pindex = -1
       vertex.release()
       fragment.release()
     }
@@ -127,10 +134,81 @@ object ShaderProgram {
 }
 
 
-abstract class Texture extends Handle[Texture] {
+final class Texture(val target: Int) extends Handle[Texture] {
+
+  private[scalagl] var tindex = -1
+  private val result = new Array[Int](1)
+
+  def index = tindex
+
+  def binding = target match {
+    case GL_TEXTURE_2D => GL_TEXTURE_BINDING_2D
+    case _ => throw new UnsupportedOperationException
+  }
+
+  def acquire()(implicit gl: GL2) {
+    import gl._
+    release()
+    glGenTextures(1, result, 0)
+    tindex = result(0)
+  }
+
+  def update(name: Int, v: Float)(implicit gl: GL2) {
+    gl.glBindTexture(GL_TEXTURE_2D, tindex)
+    gl.glTexParameterf(target, name, v)
+  }
+
+  def update(name: Int, v: Int)(implicit gl: GL2) {
+    gl.glBindTexture(GL_TEXTURE_2D, tindex)
+    gl.glTexParameteri(target, name, v)
+  }
+
+  def apply(name: Int)(implicit gl: GL2): Int = {
+    gl.glGetTexParameteriv(target, name, result, 0)
+    result(0)
+  }
+
+  def minFilter(implicit gl: GL2) = this(GL_TEXTURE_MIN_FILTER)
+
+  def minFilter_=(v: Int)(implicit gl: GL2) = this(GL_TEXTURE_MIN_FILTER) = v
+
+  def magFilter(implicit gl: GL2) = this(GL_TEXTURE_MAG_FILTER)
+
+  def magFilter_=(v: Int)(implicit gl: GL2) = this(GL_TEXTURE_MAG_FILTER) = v
+
+  def wrapS(implicit gl: GL2) = this(GL_TEXTURE_WRAP_S)
+
+  def wrapS_=(v: Int)(implicit gl: GL2) = this(GL_TEXTURE_WRAP_S) = v
+
+  def wrapT(implicit gl: GL2) = this(GL_TEXTURE_WRAP_T)
+
+  def wrapT_=(v: Int)(implicit gl: GL2) = this(GL_TEXTURE_WRAP_T) = v
+
+  def compareMode(implicit gl: GL2) = this(GL_TEXTURE_COMPARE_MODE)
+
+  def compareMode_=(v: Int)(implicit gl: GL2) = this(GL_TEXTURE_COMPARE_MODE) = v
+
+  def compareFunc(implicit gl: GL2) = this(GL_TEXTURE_COMPARE_FUNC)
+
+  def compareFunc_=(v: Int)(implicit gl: GL2) = this(GL_TEXTURE_COMPARE_FUNC) = v
+
+  def depthTextureMode(implicit gl: GL2) = this(GL_DEPTH_TEXTURE_MODE)
+
+  def depthTextureMode_=(v: Int)(implicit gl: GL2) = this(GL_DEPTH_TEXTURE_MODE) = v
+
+  def allocateImage(level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int)(implicit gl: GL2) {
+    target match {
+      case GL_TEXTURE_2D => gl.glTexImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, null)
+      case _ => throw new UnsupportedOperationException
+    }
+  }
 
   def release()(implicit gl: GL2) {
-    // TODO
+    if (tindex != -1) {
+      result(0) = tindex
+      gl.glDeleteTextures(1, result, 0)
+      tindex = -1
+    }
   }
 
 }
@@ -143,3 +221,10 @@ abstract class FrameBuffer extends Handle[FrameBuffer] {
   }
 
 }
+
+
+
+
+
+
+

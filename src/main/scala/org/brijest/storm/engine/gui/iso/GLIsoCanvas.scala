@@ -69,11 +69,11 @@ self =>
   /* shadows */
   
   val SHADOW_TEX_SIZE = 2048
-  var shadowtexno: Int = -1
+  val shadowTexture = new Texture(GL_TEXTURE_2D)
   var shadowfbo: Int = -1
   var shadowdrb: Int = -1
   val LITE_TEX_SIZE = 1024
-  var litetexno: Int = -1
+  val lightTexture = new Texture(GL_TEXTURE_2D)
   var litefbo: Int = -1
   val orthoshadowProgram = ShaderProgram()
   val lightProgram = ShaderProgram()
@@ -84,18 +84,17 @@ self =>
     val index = new Array[Int](1)
     import gl._
     
-    glGenTextures(1, index, 0)
-    shadowtexno = index(0)
-    glBindTexture(GL_TEXTURE_2D, shadowtexno)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
-    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
-                 GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, null)
+    shadowTexture.acquire()
+    shadowTexture.minFilter = GL_NEAREST
+    shadowTexture.magFilter = GL_NEAREST
+    shadowTexture.wrapS = GL_CLAMP_TO_EDGE
+    shadowTexture.wrapT = GL_CLAMP_TO_EDGE
+    shadowTexture.compareMode = GL_COMPARE_R_TO_TEXTURE
+    shadowTexture.compareFunc = GL_LEQUAL
+    shadowTexture.depthTextureMode = GL_INTENSITY
+    shadowTexture.allocateImage(
+      0, GL_DEPTH_COMPONENT, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
+      GL_DEPTH_COMPONENT, GL_UNSIGNED_INT)
     
     glGenFramebuffers(1, index, 0)
     shadowfbo = index(0)
@@ -103,19 +102,18 @@ self =>
     glGenRenderbuffers(1, index, 0)
     shadowdrb = index(0)
     
-    glGenTextures(1, index, 0)
-    litetexno = index(0)
-    glBindTexture(GL_TEXTURE_2D, litetexno)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL)
-    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, LITE_TEX_SIZE, LITE_TEX_SIZE, 0,
-                 GL_RGB, GL_UNSIGNED_INT, null)
-    
+    lightTexture.acquire()
+    lightTexture.minFilter = GL_LINEAR
+    lightTexture.magFilter = GL_LINEAR
+    lightTexture.wrapS = GL_CLAMP_TO_EDGE
+    lightTexture.wrapT = GL_CLAMP_TO_EDGE
+    lightTexture.compareMode = GL_COMPARE_R_TO_TEXTURE
+    lightTexture.compareFunc = GL_LEQUAL
+    lightTexture.depthTextureMode = GL_INTENSITY
+    lightTexture.allocateImage(
+      0, GL_RGB, LITE_TEX_SIZE, LITE_TEX_SIZE, 0,
+      GL_RGB, GL_UNSIGNED_INT)
+
     glGenFramebuffers(1, index, 0)
     litefbo = index(0)
     
@@ -131,7 +129,6 @@ self =>
     /* shaders */
     
     def createShaderProgram(name: String, proghandle: ShaderProgram) {
-      var program = -1
       val vs = glCreateShader(GL_VERTEX_SHADER)
       val fs = glCreateShader(GL_FRAGMENT_SHADER)
       val vsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/%s.vert".format(name))
@@ -273,22 +270,6 @@ self =>
       }
     }
     
-    def sendUniform1i(program: Int, varname: String, v: Int) {
-      val loc = glGetUniformLocation(program, varname)
-      if (loc == -1) {
-        logger.warn("could not send uniform: " + varname)
-      }
-      glUniform1i(loc, v)
-    }
-    
-    def sendUniform3f(program: Int, varname: String, x: Float, y: Float, z: Float) {
-      val loc = glGetUniformLocation(program, varname)
-      if (loc == -1) {
-        logger.warn("could not send uniform: " + varname)
-      }
-      glUniform3f(loc, x, y, z)
-    }
-    
     def debugTexture(texno: Int) {
       glPushMatrix()
       glEnable(GL_TEXTURE_2D)
@@ -363,7 +344,7 @@ self =>
         glEnable(GL_DEPTH_TEST)
 
         //glBindFramebuffer(GL_FRAMEBUFFER, shadowfbo)
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowtexno, 0)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowTexture.index, 0)
 
         glClear(GL_DEPTH_BUFFER_BIT)
 
@@ -371,10 +352,9 @@ self =>
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
-        glBindTexture(GL_TEXTURE_2D, shadowtexno)
-        if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
-        //debugTexture(shadowtexno)
-        //return
+        using.texture(shadowTexture) {
+          if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+        }
       }
 
       def debugReadScreen() {
@@ -389,54 +369,32 @@ self =>
       
       glViewport(0, 0, width, height)
 
-      def initglsl() {
-        glActiveTexture(GL_TEXTURE0)
-        glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, shadowtexno)
-        
-        glEnable(GL_DEPTH_TEST)
-        glClear(GL_DEPTH_BUFFER_BIT)
-        glEnable(GL_CULL_FACE)
-        glCullFace(GL_BACK)
-      }
-      
       val depTexMatrix = (lightProjMatrix * lightViewMatrix).to[TextureMatrix]
       
       using.matrix(depTexMatrix, camProjMatrix, camViewMatrix) {
-        initglsl()
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
 
         glViewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
 
         glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
 
-        using.program(shader) {
-          shader.uniform("shadowtex") << 0
-          shader.uniform("light_color") << light.color
-        
-          drawScene(false)
+        using.texture(shadowTexture) {
+
+          using.program(shader) {
+            shader.uniform.shadowtex := 0
+            shader.uniform.light_color := light.color
+
+            drawScene(false)
+          }
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
         glDisable(GL_CULL_FACE)
-
-        glMatrixMode(GL_MODELVIEW)
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NONE)
-        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_NONE)
-
-        glDisable(GL_TEXTURE_2D)
-
-        glDisable(GL_TEXTURE_GEN_S)
-        glDisable(GL_TEXTURE_GEN_T)
-        glDisable(GL_TEXTURE_GEN_R)
-        glDisable(GL_TEXTURE_GEN_Q)
-
-        glDisable(GL_ALPHA_TEST)
       }
     }
     
@@ -444,15 +402,12 @@ self =>
     
     if (drawing.shadows) {
       glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, litetexno, 0)
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       glBindFramebuffer(GL_FRAMEBUFFER, 0)
       
       renderLightLayer(OrthoLight(mainlightpos, (0.3f, 0.3f, 0.3f)))
     }
-    
-    //glBindTexture(GL_TEXTURE_2D, litetexno)
-    //glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
     
     glViewport(vpuoffs, vpvoffs, width, height)
     
@@ -487,18 +442,18 @@ self =>
       glOrtho(0, width, height, 0, 0, 1)
       glMatrixMode(GL_MODELVIEW)
       
-      glBindTexture(GL_TEXTURE_2D, litetexno)
-      
-      using.program(lightProgram) {
-        lightProgram.uniform("litetex") << 0
+      using.texture(lightTexture) {
+        using.program(lightProgram) {
+          lightProgram.uniform.litetex := 0
 
-        glBegin(GL_QUADS)
-        glTexCoord2f(0, 1); glVertex2d(0, 0)
-        glTexCoord2f(1, 1); glVertex2d(width, 0)
-        glTexCoord2f(1, 0); glVertex2d(width, height)
-        glTexCoord2f(0, 0); glVertex2d(0, height)
-        glEnd()
+          glBegin(GL_QUADS)
+          glTexCoord2f(0, 1); glVertex2d(0, 0)
+          glTexCoord2f(1, 1); glVertex2d(width, 0)
+          glTexCoord2f(1, 0); glVertex2d(width, height)
+          glTexCoord2f(0, 0); glVertex2d(0, height)
+          glEnd()
 
+        }
       }
 
       glEnable(GL_DEPTH_TEST)

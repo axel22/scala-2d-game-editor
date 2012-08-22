@@ -61,18 +61,30 @@ package object scalagl {
       } finally glUseProgram(oldprogram)
     }
 
+    @inline def texture[T](t: Texture)(block: =>Unit)(implicit gl: GL2) {
+      import gl._
+      glGetIntegerv(t.binding, result, 0)
+      val oldbinding = result(0)
+      glBindTexture(t.target, t.index)
+      try {
+        block
+      } finally {
+        glBindTexture(t.target, oldbinding)
+      }
+    }
+
     @inline def matrix[T](ms: Matrix*)(block: =>T)(implicit gl: GL2): T = {
       import gl._
 
       glGetIntegerv(GL_MATRIX_MODE, result, 0)
       val oldmode = result(0)
       glPushMatrix()
+      for (m <- ms) {
+        glMatrixMode(m.mode)
+        glPushMatrix()
+        glLoadMatrixd(m.array, 0)
+      }
       try {
-        for (m <- ms) {
-          glMatrixMode(m.mode)
-          glPushMatrix()
-          glLoadMatrixd(m.array, 0)
-        }
         block
       } finally {
         for (m <- ms.reverse) {
