@@ -70,11 +70,10 @@ self =>
   
   val SHADOW_TEX_SIZE = 2048
   val shadowTexture = new Texture(GL_TEXTURE_2D)
-  var shadowfbo: Int = -1
-  var shadowdrb: Int = -1
+  val shadowFrameBuffer = new FrameBuffer()
   val LITE_TEX_SIZE = 1024
   val lightTexture = new Texture(GL_TEXTURE_2D)
-  var litefbo: Int = -1
+  var lightFrameBuffer = new FrameBuffer()
   val orthoshadowProgram = ShaderProgram()
   val lightProgram = ShaderProgram()
   lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
@@ -96,11 +95,7 @@ self =>
       0, GL_DEPTH_COMPONENT, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, 0,
       GL_DEPTH_COMPONENT, GL_UNSIGNED_INT)
     
-    glGenFramebuffers(1, index, 0)
-    shadowfbo = index(0)
-    
-    glGenRenderbuffers(1, index, 0)
-    shadowdrb = index(0)
+    shadowFrameBuffer.acquire()
     
     lightTexture.acquire()
     lightTexture.minFilter = GL_LINEAR
@@ -114,8 +109,7 @@ self =>
       0, GL_RGB, LITE_TEX_SIZE, LITE_TEX_SIZE, 0,
       GL_RGB, GL_UNSIGNED_INT)
 
-    glGenFramebuffers(1, index, 0)
-    litefbo = index(0)
+    lightFrameBuffer.acquire()
     
     glEnable(GL_NORMALIZE)
     
@@ -343,8 +337,8 @@ self =>
         glColor4f(1.f, 1.f, 1.f, 0.f)
         glEnable(GL_DEPTH_TEST)
 
-        //glBindFramebuffer(GL_FRAMEBUFFER, shadowfbo)
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowTexture.index, 0)
+        //glBindFramebuffer(GL_FRAMEBUFFER, shadowFrameBuffer.index)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowTexture.index, 0)
 
         glClear(GL_DEPTH_BUFFER_BIT)
 
@@ -379,7 +373,7 @@ self =>
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
 
-        glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
+        glBindFramebuffer(GL_FRAMEBUFFER, lightFrameBuffer.index)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
 
         using.texture(shadowTexture) {
@@ -401,7 +395,7 @@ self =>
     /* first clear texture */
     
     if (drawing.shadows) {
-      glBindFramebuffer(GL_FRAMEBUFFER, litefbo)
+      glBindFramebuffer(GL_FRAMEBUFFER, lightFrameBuffer.index)
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       glBindFramebuffer(GL_FRAMEBUFFER, 0)

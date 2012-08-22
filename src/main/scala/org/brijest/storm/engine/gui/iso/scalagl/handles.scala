@@ -30,10 +30,6 @@ trait Handle[H <: Handle[H]] {
 }
 
 
-object Handle {
-}
-
-
 final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
 
   private[scalagl] var pindex = -1
@@ -214,10 +210,25 @@ final class Texture(val target: Int) extends Handle[Texture] {
 }
 
 
-abstract class FrameBuffer extends Handle[FrameBuffer] {
+final class FrameBuffer extends Handle[FrameBuffer] {
+
+  private[scalagl] var fbindex = -1
+  private val result = new Array[Int](1)
+
+  def index = fbindex
+
+  def acquire()(implicit gl: GL2) {
+    release()
+    gl.glGenFramebuffers(1, result, 0)
+    fbindex = result(0)
+  }
 
   def release()(implicit gl: GL2) {
-    // TODO
+    if (fbindex != -1) {
+      result(0) = fbindex
+      gl.glDeleteFramebuffers (1, result, 0)
+      fbindex = -1
+    }
   }
 
 }
