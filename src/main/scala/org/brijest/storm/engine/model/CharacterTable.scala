@@ -16,7 +16,9 @@ import components._
 
 
 @SerialVersionUID(1000L)
-class CharacterTable(w: Int, h: Int) extends PublicMutable with Struct {
+class CharacterTable(w: Int, h: Int) extends mutable with Struct {
+  private implicit val m = new mutable {}
+
   private val dflt = Some(NoCharacter)
   val ids = access[mutable].table[EntityId, Character]
   val locs = access[mutable].quad[Character](w, h, dflt)

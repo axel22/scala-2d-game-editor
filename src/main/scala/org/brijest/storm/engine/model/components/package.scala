@@ -52,10 +52,4 @@ package components {
   
   trait Struct extends Serializable
   
-  trait ProtectedMutable {
-    protected implicit val mutableEvidence: mutable = new mutable {}
-  }
-  
-  trait PublicMutable extends ProtectedMutable with mutable
-  
 }

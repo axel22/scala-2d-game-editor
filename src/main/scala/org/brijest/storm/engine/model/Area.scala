@@ -16,7 +16,7 @@ import components._
 
 
 @SerialVersionUID(1000L)
-class AreaView extends Struct with ProtectedMutable {
+class AreaView extends Struct {
   private val entitycount = access[mutable] cell(0l)
   private var rawterrain = access[mutable].quad[Slot](1, 1, Some(NoSlot), true)
   val id = access[mutable] cell(invalidAreaId)
@@ -110,7 +110,7 @@ class AreaView extends Struct with ProtectedMutable {
 
 
 @SerialVersionUID(1000L)
-class Area extends AreaView with PublicMutable
+class Area extends AreaView with mutable
 
 
 object Area {

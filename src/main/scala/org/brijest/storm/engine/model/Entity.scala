@@ -16,6 +16,8 @@ import components._
 
 
 trait EntityView extends Struct {
+  protected implicit def m = new mutable {}
+
   def id: EntityId
   def action(area: AreaView): (Action, Trigger)
   def pov(area: AreaView): AreaView
@@ -29,4 +31,4 @@ trait EntityView extends Struct {
 }
 
 
-trait Entity extends EntityView with PublicMutable
+trait Entity extends EntityView with mutable
