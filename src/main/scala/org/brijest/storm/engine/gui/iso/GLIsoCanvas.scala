@@ -69,14 +69,13 @@ self =>
   /* shadows */
   
   val SHADOW_TEX_SIZE = 2048
+  val LITE_TEX_SIZE = 1024
   val shadowTexture = new Texture(GL_TEXTURE_2D)
   val shadowFrameBuffer = new FrameBuffer()
-  val LITE_TEX_SIZE = 1024
   val lightTexture = new Texture(GL_TEXTURE_2D)
   var lightFrameBuffer = new FrameBuffer()
   val orthoshadowProgram = ShaderProgram()
   val lightProgram = ShaderProgram()
-  lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
   
   private def initialize(drawable: GLAutoDrawable) {
     implicit val gl = drawable.getGL().getGL2()
@@ -112,19 +111,11 @@ self =>
     lightFrameBuffer.acquire()
     
     glEnable(GL_NORMALIZE)
-    
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
-    glEnable(GL_COLOR_MATERIAL)
-    glMaterialfv(GL_FRONT, GL_SPECULAR, Array[Float](1.f, 1.f, 1.f, 1.f), 0)
-    glMaterialf(GL_FRONT, GL_SHININESS, 16.f)
-    
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
     
     /* shaders */
     
     def createShaderProgram(name: String, proghandle: ShaderProgram) {
-      val vs = glCreateShader(GL_VERTEX_SHADER)
-      val fs = glCreateShader(GL_FRAGMENT_SHADER)
       val vsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/%s.vert".format(name))
       val fsprogis = this.getClass.getClassLoader.getResourceAsStream("shaders/%s.frag".format(name))
       import JavaConverters._
@@ -264,39 +255,6 @@ self =>
       }
     }
     
-    def debugTexture(texno: Int) {
-      glPushMatrix()
-      glEnable(GL_TEXTURE_2D)
-      glEnable(GL_DEPTH_TEST)
-      glColor4f(1.0f,1.0f,1.0f,1.0f)
-      glEnable(GL_BLEND)
-      glBlendFunc(GL_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
-      
-      glMatrixMode(GL_PROJECTION)
-      glLoadIdentity()
-      glOrtho(0, width, height, 0, 0, 1)
-      glMatrixMode(GL_MODELVIEW)
-      glDisable(GL_DEPTH_TEST)
-      glEnable(GL_BLEND)
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-      
-      glMatrixMode(GL_TEXTURE)
-      glLoadIdentity()
-      
-      glBindTexture(GL_TEXTURE_2D, texno)
-      
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 1); glVertex2d(0, 0);
-      glTexCoord2f(1, 1); glVertex2d(width / 4, 0);
-      glTexCoord2f(1, 0); glVertex2d(width / 4, height / 4);
-      glTexCoord2f(0, 0); glVertex2d(0, height / 4);
-      glEnd();
-      
-      glDisable(GL_DEPTH_TEST)
-      glDisable(GL_TEXTURE_2D)
-      glPopMatrix()
-    }
-    
     /* calc matrices */
     
     val mainlightpos = (-40.f, 100.f, 70.f);
@@ -328,37 +286,19 @@ self =>
       /* draw scene from light point of view and copy to the texture buffer */
       
       glViewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
-      glEnable(GL_CULL_FACE)
-      glCullFace(GL_FRONT)
       
       using.matrix(lightProjMatrix, lightViewMatrix) {
-        glDisable(GL_CULL_FACE)
-
         glColor4f(1.f, 1.f, 1.f, 0.f)
         glEnable(GL_DEPTH_TEST)
-
-        //glBindFramebuffer(GL_FRAMEBUFFER, shadowFrameBuffer.index)
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowTexture.index, 0)
-
         glClear(GL_DEPTH_BUFFER_BIT)
 
         drawScene(true)
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
         using.texture(shadowTexture) {
           if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
         }
       }
 
-      def debugReadScreen() {
-        glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
-      }
-      
-      def debugScreen() {
-        glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
-      }
-      
       /* render scene with shadows from camera point of view */
       
       glViewport(0, 0, width, height)
@@ -373,20 +313,16 @@ self =>
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
 
-        glBindFramebuffer(GL_FRAMEBUFFER, lightFrameBuffer.index)
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
-
-        using.texture(shadowTexture) {
-
-          using.program(shader) {
-            shader.uniform.shadowtex := 0
-            shader.uniform.light_color := light.color
-
-            drawScene(false)
+        using.framebuffer(lightFrameBuffer) {
+          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
+          using.texture(shadowTexture) {
+            using.program(shader) {
+              shader.uniform.shadowtex := 0
+              shader.uniform.light_color := light.color
+              drawScene(false)
+            }
           }
         }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
         glDisable(GL_CULL_FACE)
       }
@@ -395,10 +331,10 @@ self =>
     /* first clear texture */
     
     if (drawing.shadows) {
-      glBindFramebuffer(GL_FRAMEBUFFER, lightFrameBuffer.index)
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-      glBindFramebuffer(GL_FRAMEBUFFER, 0)
+      using.framebuffer(lightFrameBuffer) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+      }
       
       renderLightLayer(OrthoLight(mainlightpos, (0.3f, 0.3f, 0.3f)))
     }
@@ -408,7 +344,6 @@ self =>
     /* 2d render scene */
     
     def renderScene() {
-      //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       glMatrixMode(GL_PROJECTION)
       glLoadIdentity()
       glOrtho(0, width, height, 0, 0, 1)
@@ -563,3 +498,50 @@ self =>
 }
 
 
+object debug {
+
+  def texture(gl: GL2, texno: Int, width: Int, height: Int) {
+    import gl._
+    glPushMatrix()
+    glEnable(GL_TEXTURE_2D)
+    glEnable(GL_DEPTH_TEST)
+    glColor4f(1.0f,1.0f,1.0f,1.0f)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
+
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(0, width, height, 0, 0, 1)
+    glMatrixMode(GL_MODELVIEW)
+    glDisable(GL_DEPTH_TEST)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+    glMatrixMode(GL_TEXTURE)
+    glLoadIdentity()
+
+    glBindTexture(GL_TEXTURE_2D, texno)
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 1); glVertex2d(0, 0);
+    glTexCoord2f(1, 1); glVertex2d(width / 4, 0);
+    glTexCoord2f(1, 0); glVertex2d(width / 4, height / 4);
+    glTexCoord2f(0, 0); glVertex2d(0, height / 4);
+    glEnd();
+
+    glDisable(GL_DEPTH_TEST)
+    glDisable(GL_TEXTURE_2D)
+    glPopMatrix()
+  }
+
+  lazy val debugscreen = new Array[Byte](1680 * 1050 * 4)
+
+  def readScreen(gl: GL2, width: Int, height: Int) {
+    gl.glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+  }
+
+  def writeScreen(gl: GL2, width: Int, height: Int) {
+    gl.glDrawPixels(width, height, GL_LUMINANCE, GL_FLOAT, java.nio.ByteBuffer.wrap(debugscreen));
+  }
+
+}

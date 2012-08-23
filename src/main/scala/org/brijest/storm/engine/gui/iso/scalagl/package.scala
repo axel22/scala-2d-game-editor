@@ -61,7 +61,7 @@ package object scalagl {
       } finally glUseProgram(oldprogram)
     }
 
-    @inline def texture[T](t: Texture)(block: =>Unit)(implicit gl: GL2) {
+    @inline def texture(t: Texture)(block: =>Unit)(implicit gl: GL2) {
       import gl._
       glGetIntegerv(t.binding, result, 0)
       val oldbinding = result(0)
@@ -70,6 +70,18 @@ package object scalagl {
         block
       } finally {
         glBindTexture(t.target, oldbinding)
+      }
+    }
+
+    @inline def framebuffer(fb: FrameBuffer)(block: =>Unit)(implicit gl: GL2) {
+      import gl._
+      glGetIntegerv(GL_FRAMEBUFFER_BINDING, result, 0)
+      val oldbinding = result(0)
+      glBindFramebuffer(GL_FRAMEBUFFER, fb.index)
+      try {
+        block
+      } finally {
+        glBindFramebuffer(GL_FRAMEBUFFER, oldbinding)
       }
     }
 
