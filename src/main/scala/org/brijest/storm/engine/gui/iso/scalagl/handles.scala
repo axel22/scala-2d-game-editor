@@ -30,12 +30,12 @@ trait Handle[H <: Handle[H]] {
 }
 
 
-final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
+final class ShaderProgram private[scalagl] (nm: String) extends Handle[ShaderProgram] {
 
   private[scalagl] var pindex = -1
-  private var spname = ""
   private val result = new Array[Int](1)
   private val errorbuff = new Array[Byte](1000)
+  val name = nm
 
   trait Shader {
     val shaders = mutable.Map[String, Int]()
@@ -46,7 +46,7 @@ final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
       if (result(0) == GL_FALSE) {
         glGetShaderInfoLog(shader, errorbuff.length, result, 0, errorbuff, 0)
         val comperrors = errorbuff.map(_.toChar).mkString
-        throw new ShaderProgram.Exception("error compiling %s shader in %s\n%s".format(shname, spname, comperrors))
+        throw new ShaderProgram.Exception("error compiling %s shader in program %s\n%s".format(shname, name, comperrors))
       }
     }
 
@@ -96,14 +96,6 @@ final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
     }
   }
 
-  def name = spname
-
-  def name_=(n: String) {
-    if (pindex != -1) {
-      spname = n
-    }
-  }
-
   def index = pindex
 
   def acquire()(implicit gl: GL2) {
@@ -126,7 +118,7 @@ final class ShaderProgram private[scalagl] () extends Handle[ShaderProgram] {
 object ShaderProgram {
   case class Exception(msg: String) extends java.lang.Exception(msg)
 
-  def apply() = new ShaderProgram()
+  def apply(name: String) = new ShaderProgram(name)
 }
 
 

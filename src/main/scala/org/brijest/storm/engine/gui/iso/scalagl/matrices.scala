@@ -55,36 +55,52 @@ abstract class Matrix(val array: Array[Double]) {
 object Matrix {
   type Ctor[M <: Matrix] = Array[Double] => M
 
-  implicit val projectionCtor = a => new ProjectionMatrix(a)
-  implicit val modelviewCtor = a => new ModelviewMatrix(a)
-  implicit val textureCtor = a => new TextureMatrix(a)
+  implicit val projectionCtor = a => new Projection(a)
+  implicit val modelviewCtor = a => new Modelview(a)
+  implicit val textureCtor = a => new Texture(a)
 
   def apply[M <: Matrix: Ctor](a: Array[Float]) = implicitly[Ctor[M]].apply(a.map(_.toDouble))
-}
 
-final class ProjectionMatrix(a: Array[Double]) extends Matrix(a) {
-  def mode = GL_PROJECTION
-  def matrixMode = GL_PROJECTION_MATRIX
-  protected final def newMatrix = new ProjectionMatrix(empty).asInstanceOf[this.type]
-}
+  final case class Projection(a: Array[Double]) extends Matrix(a) {
+    def mode = GL_PROJECTION
+    def matrixMode = GL_PROJECTION_MATRIX
+    protected final def newMatrix = new Projection(empty).asInstanceOf[this.type]
+  }
 
-final class ModelviewMatrix(a: Array[Double]) extends Matrix(a) {
-  def mode = GL_MODELVIEW
-  def matrixMode = GL_MODELVIEW_MATRIX
-  protected final def newMatrix = new ModelviewMatrix(empty).asInstanceOf[this.type]
-}
+  final case class Modelview(a: Array[Double]) extends Matrix(a) {
+    def mode = GL_MODELVIEW
+    def matrixMode = GL_MODELVIEW_MATRIX
+    protected final def newMatrix = new Modelview(empty).asInstanceOf[this.type]
+  }
 
-final class TextureMatrix(a: Array[Double]) extends Matrix(a) {
-  def mode = GL_TEXTURE
-  def matrixMode = GL_TEXTURE_MATRIX
-  protected final def newMatrix = new TextureMatrix(empty).asInstanceOf[this.type]
-}
+  final case class Texture(a: Array[Double]) extends Matrix(a) {
+    def mode = GL_TEXTURE
+    def matrixMode = GL_TEXTURE_MATRIX
+    protected final def newMatrix = new Texture(empty).asInstanceOf[this.type]
+  }
 
+  trait Factory[M <: Matrix] {
+    def apply(a: Array[Double]): M
+
+    val identity: M = apply(Array(
+      1.0, 0.0, 0.0, 0.0,
+      0.0, 1.0, 0.0, 0.0,
+      0.0, 0.0, 1.0, 0.0,
+      0.0, 0.0, 0.0, 1.0
+    ))
+  }
+
+  object Projection extends Factory[Projection]
+
+  object Modelview extends Factory[Modelview]
+
+  object Texture extends Factory[Texture]
+}
 
 object matrices {
-  val result = new Array[Int](1)
+  private val result = new Array[Int](1)
 
-  def orthoProjection(wdt: Double, hgt: Double, nearPlane: Double, farPlane: Double)(implicit gl: GL2): ProjectionMatrix = {
+  def orthoProjection(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: GL2): Matrix.Projection = {
     import gl._
     glGetIntegerv(GL_MATRIX_MODE, result, 0)
     val oldmode = result(0)
@@ -93,16 +109,16 @@ object matrices {
     try {
       val array = new Array[Double](16)
       glLoadIdentity()
-      glOrtho(wdt, -wdt, -hgt, hgt, nearPlane, farPlane)
+      glOrtho(left, right, bottom, top, nearPlane, farPlane)
       glGetDoublev(GL_MODELVIEW_MATRIX, array, 0)
-      new ProjectionMatrix(array)
+      new Matrix.Projection(array)
     } finally {
      glMatrixMode(oldmode)
      glPopMatrix()
    }
  }
 
-  def orthoView(xfrom: Double, yfrom: Double, zfrom: Double, xto: Double, yto: Double, zto: Double, xup: Double, yup: Double, zup: Double)(implicit gl: GL2): ModelviewMatrix = {
+  def orthoView(xfrom: Double, yfrom: Double, zfrom: Double, xto: Double, yto: Double, zto: Double, xup: Double, yup: Double, zup: Double)(implicit gl: GL2): Matrix.Modelview = {
     import gl._
     glGetIntegerv(GL_MATRIX_MODE, result, 0)
     val oldmode = result(0)
@@ -113,7 +129,7 @@ object matrices {
       glLoadIdentity()
       glu.gluLookAt(xfrom, yfrom, zfrom, xto, yto, zto, xup, yup, zup)
       glGetDoublev(GL_MODELVIEW_MATRIX, array, 0)
-      new ModelviewMatrix(array)
+      new Matrix.Modelview(array)
     } finally {
      glMatrixMode(oldmode)
      glPopMatrix()

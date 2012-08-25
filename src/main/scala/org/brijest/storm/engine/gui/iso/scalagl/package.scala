@@ -25,7 +25,7 @@ import javax.media.opengl.glu.GLU
 
 package object scalagl {
 
-  val result = Array(1)
+  private val result = new Array[Int](4)
 
   private[scalagl] val glu = new GLU
 
@@ -46,11 +46,102 @@ package object scalagl {
     gl.glVertex3d(x, y, z)
   }
 
+  @inline def v2d(x: Double, y: Double)(implicit gl: GL2) {
+    gl.glVertex2d(x, y)
+  }
+
+  @inline def tc2f(x: Float, y: Float)(implicit gl: GL2) {
+    gl.glTexCoord2f(x, y)
+  }
+
   /* contexts */
+
+  object graphics {
+    def clear(bits: Int)(implicit gl: GL2) {
+      gl.glClear(bits)
+    }
+  }
+
+  object enabling {
+
+    def apply(settings: Int*)(block: =>Unit)(implicit gl: GL2) {
+      import gl._
+      val filtered = settings.filter(!glIsEnabled(_))
+      for (s <- filtered) glEnable(s)
+      try block
+      finally {
+        for (s <- filtered) glDisable(s)
+      }
+    }
+
+  }
+
+  object disabling {
+
+    def apply(settings: Int*)(block: =>Unit)(implicit gl: GL2) {
+      import gl._
+      val filtered = settings.filter(glIsEnabled(_))
+      for (s <- filtered) glDisable(s)
+      try block
+      finally {
+        for (s <- filtered) glEnable(s)
+      }
+    }
+
+  }
+
+  object setting {
+    private val color4f = new Array[Float](4)
+    private val color4i = new Array[Int](4)
+
+    def color(r: Float, g: Float, b: Float, a: Float)(block: =>Unit)(implicit gl: GL2) {
+      import gl._
+      glGetFloatv(GL_CURRENT_COLOR, color4f, 0)
+      val or = color4f(0)
+      val og = color4f(1)
+      val ob = color4f(2)
+      val oa = color4f(3)
+      glColor4f(r, g, b, a)
+      try block
+      finally glColor4f(or, og, ob, oa)
+    }
+
+    def cullFace(v: Int)(block: =>Unit)(implicit gl: GL2) {
+      import gl._
+      glGetIntegerv(GL_CULL_FACE_MODE, result, 0)
+      val ov = result(0)
+      glCullFace(v)
+      try block
+      finally glCullFace(ov)
+    }
+
+    def viewport(x: Int, y: Int, wdt: Int, hgt: Int)(block: =>Unit)(implicit gl: GL2) {
+      import gl._
+      glGetIntegerv(GL_VIEWPORT, result, 0)
+      val ox = result(0)
+      val oy = result(1)
+      val ow = result(2)
+      val oh = result(3)
+      glViewport(x, y, wdt, hgt)
+      try block
+      finally glViewport(ox, oy, ow, oh)
+    }
+
+    def blendFunc(sfactor: Int, dfactor: Int)(block: =>Unit)(implicit gl: GL2) {
+      import gl._
+      glGetIntegerv(GL_BLEND_SRC, result, 0)
+      val osrc = result(0)
+      glGetIntegerv(GL_BLEND_DST, result, 0)
+      val odst = result(0)
+      glBlendFunc(sfactor, dfactor)
+      try block
+      finally glBlendFunc(osrc, odst)
+    }
+  }
 
   object using {
 
-    @inline def program(h: ShaderProgram)(block: =>Unit)(implicit gl: GL2) {
+    def program(h: ShaderProgram)(block: =>Unit)(implicit gl: GL2) {
       import gl._
       glGetIntegerv(GL_CURRENT_PROGRAM, result, 0)
       val oldprogram = result(0)
@@ -61,7 +152,7 @@ package object scalagl {
       } finally glUseProgram(oldprogram)
     }
 
-    @inline def texture(t: Texture)(block: =>Unit)(implicit gl: GL2) {
+    def texture(t: Texture)(block: =>Unit)(implicit gl: GL2) {
       import gl._
       glGetIntegerv(t.binding, result, 0)
       val oldbinding = result(0)
@@ -73,7 +164,7 @@ package object scalagl {
       }
     }
 
-    @inline def framebuffer(fb: FrameBuffer)(block: =>Unit)(implicit gl: GL2) {
+    def framebuffer(fb: FrameBuffer)(block: =>Unit)(implicit gl: GL2) {
       import gl._
       glGetIntegerv(GL_FRAMEBUFFER_BINDING, result, 0)
       val oldbinding = result(0)
@@ -85,7 +176,7 @@ package object scalagl {
       }
     }
 
-    @inline def matrix[T](ms: Matrix*)(block: =>T)(implicit gl: GL2): T = {
+    def matrix[T](ms: Matrix*)(block: =>T)(implicit gl: GL2): T = {
       import gl._
 
       glGetIntegerv(GL_MATRIX_MODE, result, 0)
