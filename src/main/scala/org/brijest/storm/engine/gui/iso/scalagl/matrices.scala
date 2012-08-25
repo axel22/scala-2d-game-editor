@@ -100,21 +100,21 @@ object Matrix {
 object matrices {
   private val result = new Array[Int](1)
 
-  def orthoProjection(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: GL2): Matrix.Projection = {
+  def orthoProjection(matrixMode: Int, left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: GL2): Matrix.Projection = {
     import gl._
     glGetIntegerv(GL_MATRIX_MODE, result, 0)
     val oldmode = result(0)
+    glMatrixMode(matrixMode)
     glPushMatrix()
-    glMatrixMode(GL_MODELVIEW_MATRIX)
     try {
       val array = new Array[Double](16)
       glLoadIdentity()
       glOrtho(left, right, bottom, top, nearPlane, farPlane)
-      glGetDoublev(GL_MODELVIEW_MATRIX, array, 0)
+      glGetDoublev(matrixMode, array, 0)
       new Matrix.Projection(array)
     } finally {
-     glMatrixMode(oldmode)
      glPopMatrix()
+     glMatrixMode(oldmode)
    }
  }
 
@@ -122,8 +122,8 @@ object matrices {
     import gl._
     glGetIntegerv(GL_MATRIX_MODE, result, 0)
     val oldmode = result(0)
-    glPushMatrix()
     glMatrixMode(GL_MODELVIEW_MATRIX)
+    glPushMatrix()
     try {
       val array = new Array[Double](16)
       glLoadIdentity()
@@ -131,8 +131,8 @@ object matrices {
       glGetDoublev(GL_MODELVIEW_MATRIX, array, 0)
       new Matrix.Modelview(array)
     } finally {
-     glMatrixMode(oldmode)
      glPopMatrix()
+     glMatrixMode(oldmode)
    }
  }
 

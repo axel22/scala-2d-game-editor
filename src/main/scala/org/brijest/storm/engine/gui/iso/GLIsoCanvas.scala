@@ -268,7 +268,7 @@ self =>
         case OrthoLight(lightpos, _) =>
           val wdt = 1050 / 14
           val hgt = 1050 / 14
-          val pm = matrices.orthoProjection(wdt, -wdt, -hgt, hgt, -600.0, 600.0)
+          val pm = matrices.orthoProjection(GL_MODELVIEW_MATRIX, wdt, -wdt, -hgt, hgt, -600.0, 600.0)
           val vm = matrices.orthoView(
             xlook + 60.f + lightpos._1, ylook - 50.f + lightpos._2, lightpos._3,
             xlook + 60.f, ylook - 50.f, 0.f,
@@ -278,7 +278,7 @@ self =>
       val camProjMatrix = {
         val wdt = width / (tileWidth * math.sqrt(2))
         val hgt = height / (tileHeight * math.sqrt(2) * 2)
-        matrices.orthoProjection(wdt, -wdt, -hgt, hgt, -300.0, 900.0)
+        matrices.orthoProjection(GL_MODELVIEW_MATRIX, wdt, -wdt, -hgt, hgt, -300.0, 900.0)
       }
       val camViewMatrix = matrices.orthoView(
         xlook + campos._1, ylook + campos._2, campos._3,
@@ -287,50 +287,45 @@ self =>
       
       /* draw scene from light point of view and copy to the texture buffer */
       
-      setting.viewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE) { 
-        using.matrix(lightProjMatrix, lightViewMatrix) {
-          setting.color(1.f, 1.f, 1.f, 0.f) {
-            graphics.clear(GL_DEPTH_BUFFER_BIT)
-          }
+      
+      for {
+        _ <- setting.viewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
+        _ <- using.matrix(lightProjMatrix, lightViewMatrix)
+        _ <- setting.color(1.f, 1.f, 1.f, 0.f)
+        _ <- enabling(GL_DEPTH_TEST)
+        _ <- using.texture(shadowTexture)
+      } {
+        graphics.clear(GL_DEPTH_BUFFER_BIT)
 
-          enabling(GL_DEPTH_TEST) {
-            drawScene(true)
-          }
+        drawScene(true)
 
-          using.texture(shadowTexture) {
-            if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
-          }
-        }
+        if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
       }
 
       /* render scene with shadows from camera point of view */
 
       val depTexMatrix = (lightProjMatrix * lightViewMatrix).to[Matrix.Texture]
       
-      using.matrix(depTexMatrix, camProjMatrix, camViewMatrix) {
-        setting.viewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE) {
-          enabling(GL_CULL_FACE) {
-            setting.cullFace(GL_BACK) {
-              using.framebuffer(lightFrameBuffer) {
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
-                using.texture(shadowTexture) {
-                  using.program(shader) {
-                    shader.uniform.shadowtex := 0
-                    shader.uniform.light_color := light.color
-                    drawScene(false)
-                  }
-                }
-              }
-            }
-          }
-        }
+      for {
+        _ <- setting.viewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
+        _ <- enabling(GL_CULL_FACE)
+        _ <- using.matrix(depTexMatrix, camProjMatrix, camViewMatrix)
+        _ <- using.framebuffer(lightFrameBuffer)
+        _ <- using.texture(shadowTexture)
+        _ <- using.program(shader)
+        _ <- setting.cullFace(GL_BACK)
+      } {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
+        shader.uniform.shadowtex := 0
+        shader.uniform.light_color := light.color
+        drawScene(false)
       }
     }
-    
+
     /* first clear texture */
     
     if (drawing.shadows) {
-      using.framebuffer(lightFrameBuffer) {
+      for (_ <- using.framebuffer(lightFrameBuffer)) {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
         graphics.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       }
@@ -340,54 +335,44 @@ self =>
     
     /* 2d render scene */
     
-    def renderScene() {
-      val proj2d = matrices.orthoProjection(0, width, height, 0, 0, 1)
-
-      glMatrixMode(GL_PROJECTION)
-      glLoadIdentity()
-      glOrtho(0, width, height, 0, 0, 1)
-      glMatrixMode(GL_MODELVIEW)
-      glLoadIdentity()
-      glDisable(GL_DEPTH_TEST)
-      glDisable(GL_CULL_FACE)
-      glEnable(GL_BLEND)
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-      
-      super.redrawRect(area, engine, a, ustart, vstart, width, height, vpuoffs, vpvoffs)
-      
-      glEnable(GL_DEPTH_TEST)
-    }
-    
-    def blurLightLayer() {
-      val proj2d = matrices.orthoProjection(0, width, height, 0, 0, 1)
-
-      disabling(GL_DEPTH_TEST) {
-        enabling(GL_TEXTURE_2D) {
-          using.matrix(Matrix.Texture.identity, proj2d) {
-            using.texture(lightTexture) {
-              using.program(lightProgram) {
-                lightProgram.uniform.litetex := 0
-
-                geometry(GL_QUADS) {
-                  tc2f(0, 1)
-                  v2d(0, 0)
-                  tc2f(1, 1)
-                  v2d(width, 0)
-                  tc2f(1, 0)
-                  v2d(width, height)
-                  tc2f(0, 0)
-                  v2d(0, height)
-                }
-              }
-            }
-          }
-        }
+    def renderScene(proj2d: Matrix.Projection) {
+      for {
+        _ <- using.matrix(Matrix.Modelview.identity, proj2d)
+        _ <- disabling(GL_DEPTH_TEST, GL_CULL_FACE)
+        _ <- enabling(GL_BLEND)
+        _ <- setting.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      } {
+        super.redrawRect(area, engine, a, ustart, vstart, width, height, vpuoffs, vpvoffs)
       }
     }
     
-    setting.viewport(vpuoffs, vpvoffs, width, height) {
-      renderScene()
-      if (drawing.shadows) blurLightLayer()
+    def blurLightLayer(proj2d: Matrix.Projection) {
+      for {
+        _ <- disabling(GL_DEPTH_TEST)
+        _ <- enabling(GL_TEXTURE_2D)
+        _ <- using.matrix(Matrix.Texture.identity, proj2d, Matrix.Modelview.identity)
+        _ <- using.texture(lightTexture)
+        _ <- using.program(lightProgram)
+      } {
+        lightProgram.uniform.litetex := 0
+
+        geometry(GL_QUADS) {
+          tc2f(0, 1)
+          v2d(0, 0)
+          tc2f(1, 1)
+          v2d(width, 0)
+          tc2f(1, 0)
+          v2d(width, height)
+          tc2f(0, 0)
+          v2d(0, height)
+        }
+      }
+    }
+
+    for (_ <- setting.viewport(vpuoffs, vpvoffs, width, height)) {
+      val proj2d = matrices.orthoProjection(GL_PROJECTION_MATRIX, 0, width, height, 0, 0, 1)
+      renderScene(proj2d)
+      if (drawing.shadows) blurLightLayer(proj2d)
     }
   }
   
