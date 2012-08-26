@@ -209,6 +209,17 @@ final class FrameBuffer extends Handle[FrameBuffer] {
 
   def index = fbindex
 
+  private[scalagl] object binding {
+    def attachTexture2D(target: Int, attachment: Int, t: Texture, level: Int)(implicit gl: GL2): Setup[Null] = new Setup[Null] {
+      def foreach[U](f: Null => U) {
+        gl.glFramebufferTexture2D(target, attachment, t.target, t.index, level)
+        try f(null)
+        finally {
+        }
+      }
+    }
+  }
+
   def acquire()(implicit gl: GL2) {
     release()
     gl.glGenFramebuffers(1, result, 0)

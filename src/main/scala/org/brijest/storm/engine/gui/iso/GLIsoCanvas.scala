@@ -287,7 +287,6 @@ self =>
       
       /* draw scene from light point of view and copy to the texture buffer */
       
-      
       for {
         _ <- setting.viewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
         _ <- using.matrix(lightProjMatrix, lightViewMatrix)
@@ -310,12 +309,12 @@ self =>
         _ <- setting.viewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
         _ <- enabling(GL_CULL_FACE)
         _ <- using.matrix(depTexMatrix, camProjMatrix, camViewMatrix)
-        _ <- using.framebuffer(lightFrameBuffer)
+        b <- using.framebuffer(lightFrameBuffer)
+        _ <- b.attachTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lightTexture, 0)
         _ <- using.texture(shadowTexture)
         _ <- using.program(shader)
         _ <- setting.cullFace(GL_BACK)
       } {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
         shader.uniform.shadowtex := 0
         shader.uniform.light_color := light.color
         drawScene(false)
@@ -325,8 +324,10 @@ self =>
     /* first clear texture */
     
     if (drawing.shadows) {
-      for (_ <- using.framebuffer(lightFrameBuffer)) {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture.index, 0)
+      for {
+        b <- using.framebuffer(lightFrameBuffer)
+        _ <- b.attachTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lightTexture, 0)
+      } {
         graphics.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       }
       

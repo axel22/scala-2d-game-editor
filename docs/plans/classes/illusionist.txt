@@ -58,7 +58,7 @@ Optimism - changes the target's perception of the surroundings so that it is les
 
 Pessimism - changes the target's perception of the surroundings so that it is more susceptible to fear. A character under the influence of this spell is more likely to lose focus, panic or run away.
 
-Kaleidoscope - twists the light around the caster, creating double images. Each time an opponent misses the spellcaster, one of these images disappears. The chance of hitting the spellcaster is inversely proportionate to the number of images surrounding him.
+Refraction - twists the light around the caster, creating double images. Each time an opponent misses the spellcaster, one of these images disappears. The chance of hitting the spellcaster is inversely proportionate to the number of images surrounding him.
 
 Aura of Vile Visage - creates an aura around an opponent which makes him appear as a vile monster to others, possibly provoking an attack.
 
@@ -139,6 +139,8 @@ Local Scrying - allows the spellcaster to temporarily view what is happening on 
 
 Reflection - summons an illusionary copy of the caster, which disappears as soon as it receives damage. The copy itself is unable to do damage or effect the environment in any way other than to draw attention.
 
+Kaleidoscope - enchants the target so that any spell targeting it is reflected on a random adjacent character. If there are no characters in the target's vicinity, the spell is not reflected.
+
 
 Level 6:
 --------
@@ -169,7 +171,7 @@ Origin: Great wizardess Rhea devised this spell as part of her acceptance test f
 Description: Creates a ray of light so strong that it causes physical damage to the target.
 
 Coupled Teleswitch
-Origin: Neglected by many mages and generally regarded to have little use, this spell is said to have been devised by Urdevii enchanters.
+Origin: Neglected by many mages and generally regarded to have little use, this spell is said to have been devised by Urdevii enchanters. Those who lived to tell about an encounter with an Urdevii enchanter claim it can be devastating when used smartly.
 Description: Exchanges the locations of the caster and the target. After several seconds it exchanges their locations again.
 
 Teleport
@@ -209,6 +211,10 @@ Greater Warding
 Origin: Master mages employed by the rulers of the land often use this spell to protect the royal treasury or valuable artifacts and magic items from thieving hands.
 Description: Creates an impenetrable barrier. This enchantment lasts permanently and can only be removed by the spellcaster passing through it or his death. A more powerful form of a dispel may also be enough to remove the barrier.
 
+Summon Lava Elemental
+Origin: It is said that a high mage of the north committed suicide using this spell when his political arch-nemesis, the local lord, seized him and accused him of a crime he did not commit. The mage had his vengeance against the lord, though, for the afterblast took the lord with him. This spell is as powerful as it is unstable, hence most illusionists avoid it.
+Description: Summons an illusion of a lava elemental adjacent to the caster. The illusion is very unstable and soon starts to heat up, only to explode into violent flames. The spell appears to be of little practical use, since most spellcasters are not quick enough to escape after the summoning.
+
 Reflection Globe
 Origin: An apprentice of Kariim is said to have devised this spell. When wizards started gaining advantage over the warriors in the south, they started turning against each other. This globe not only protected the caster, but turned the spells back against the attacking wizard.
 Description: Creates a globe around the caster such that any level 5 spell cast on him by others is reflected back at the source.
@@ -223,7 +229,7 @@ Description: Animates a target melee weapon so that it starts attacking the enem
 
 Fireburst
 Origin: Coming in far too many forms and variations to bear a clear origin, this destructive spell is preferred weapon in the arsenal of most master battle mages that fight alone. Those fighting in groups can endanger their friends with this spell, so they usually avoid it.
-Description: Releases a circular burst of flames around the caster which explodes violently, consuming anything in its path.
+Description: Releases a circular burst of flames around the caster which explodes violently, consuming anything in its path. It does not hurt the caster, however.
 
 Energy Ray
 Origin: It is said that this spell was devised by illusionist master mages working together with a now lost sect of solitary wizards that lived in monasteries high in the mountains. While these solitary wizards drew their magical power from the skies themselves and were thus able to tap into enormous amounts of energy from the sun, the illusionists were versed in working with the light and focusing it.
