@@ -100,6 +100,7 @@ object Terrain extends ClassSet[Slot] {
   register[MeadowSunflower]
   register[MeadowShortGrass]
   register[MeadowDirt]
+  register[MeadowDirtGrassy]
 }
 
 
@@ -472,6 +473,19 @@ case class MeadowShortGrass(val height: Int) extends Slot {
 case class MeadowDirt(val height: Int) extends Slot {
   def this() = this(0)
   
+  def walkable = true
+  def chr = '.'
+  def color = 0x55555500
+  def layer = 450
+}
+
+
+case class MeadowDirtGrassy(val height: Int) extends Slot {
+  def this() = this(0)
+  
+  override def edgeIdentifier = classOf[MeadowDirt].getName + "-edges"
+  override def wallIdentifier = classOf[MeadowDirt].getName + "-wall"
+
   def walkable = true
   def chr = '.'
   def color = 0x55555500
