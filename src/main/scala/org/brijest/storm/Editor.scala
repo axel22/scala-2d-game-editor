@@ -90,7 +90,12 @@ class Editor(config: Config) extends Logging {
   editorwindow.setVisible(true)
   
   displ.asyncExec(new Runnable {
-    override def run() = initialize()
+    override def run() {
+      try initialize()
+      catch {
+        case e: Exception => e.printStackTrace
+      }
+    }
   })
   
   def createGLIsoUI(implicit area: Area) = {

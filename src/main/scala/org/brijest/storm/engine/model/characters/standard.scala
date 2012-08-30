@@ -562,6 +562,26 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  class FireplaceLeft(val id: EntityId) extends Character {
+    dimensions := (1, 3);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x22559900
+    def pov(area: AreaView) = area
+  }
+  
+  class FireplaceRight(val id: EntityId) extends Character {
+    dimensions := (3, 1);
+    
+    def manager = IdleManager
+    def canWalk(from: Slot, to: Slot) = false
+    def chr = '='
+    def color = 0x22559900
+    def pov(area: AreaView) = area
+  }
+  
 }
 
 
