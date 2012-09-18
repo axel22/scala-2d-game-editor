@@ -199,34 +199,37 @@ self =>
     }
     
     def drawScene(withCharacters: Boolean) {
-      def drawCube(x: Int, y: Int, span: Float, bottom: Float, top: Float) = geometry(GL_QUADS) {
+      def drawCube(x: Float, y: Float, xspan2: Float, yspan2: Float, bottom: Float, top: Float) = geometry(GL_QUADS) {
+        val xspan = xspan2 / 2
+        val yspan = yspan2 / 2
+
         /* top */
-        v3d(x - span, y - span, top)
-        v3d(x - span, y + span, top)
-        v3d(x + span, y + span, top)
-        v3d(x + span, y - span, top)
+        v3d(x - xspan, y - yspan, top)
+        v3d(x - xspan, y + yspan, top)
+        v3d(x + xspan, y + yspan, top)
+        v3d(x + xspan, y - yspan, top)
 
         /* sides */
         if (top > 0) {
-          v3d(x - span, y - span, top)
-          v3d(x - span, y - span, bottom)
-          v3d(x - span, y + span, bottom)
-          v3d(x - span, y + span, top)
+          v3d(x - xspan, y - yspan, top)
+          v3d(x - xspan, y - yspan, bottom)
+          v3d(x - xspan, y + yspan, bottom)
+          v3d(x - xspan, y + yspan, top)
 
-          v3d(x + span, y - span, top)
-          v3d(x + span, y - span, bottom)
-          v3d(x - span, y - span, bottom)
-          v3d(x - span, y - span, top)
+          v3d(x + xspan, y - yspan, top)
+          v3d(x + xspan, y - yspan, bottom)
+          v3d(x - xspan, y - yspan, bottom)
+          v3d(x - xspan, y - yspan, top)
 
-          v3d(x + span, y + span, top)
-          v3d(x + span, y + span, bottom)
-          v3d(x + span, y - span, bottom)
-          v3d(x + span, y - span, top)
+          v3d(x + xspan, y + yspan, top)
+          v3d(x + xspan, y + yspan, bottom)
+          v3d(x + xspan, y - yspan, bottom)
+          v3d(x + xspan, y - yspan, top)
 
-          v3d(x - span, y + span, top)
-          v3d(x - span, y + span, bottom)
-          v3d(x + span, y + span, bottom)
-          v3d(x + span, y + span, top)
+          v3d(x - xspan, y + yspan, top)
+          v3d(x - xspan, y + yspan, bottom)
+          v3d(x + xspan, y + yspan, bottom)
+          v3d(x + xspan, y + yspan, top)
         }
       }
       
@@ -237,15 +240,19 @@ self =>
           val slot = area.terrain(x, y)
           slot match {
             case slot: EmptySlot =>
-            case slot => drawCube(x, y, 0.5f, 0.f, slot.height * 0.275f)
+            case slot => drawCube(x, y, 1.0f, 1.0f, 0.f, slot.height * 0.275f)
           }
           if (withCharacters) area.character(x, y) match {
             case NoCharacter =>
             case chr if chr.pos().x == x && chr.pos().y == y =>
               val (w, h) = chr.dimensions()
               val sprite = palette.sprite(chr)
-              // TODO adjust for multi slot characters
-              //drawCube(x + w / 2, y + h / 2, sprite.width / 32.f, slot.height * 0.55f, slot.height * 0.55f + sprite.height / 16.f)
+              def draw(s: Shape): Unit = s match {
+                case Shape.Cube(xd, yd, zd, xoff, yoff, zoff) => drawCube(x + xoff, y + yoff, xd, yd, zoff, zoff + zd)
+                case Shape.Composite(subs) => for (sub <- subs) draw(sub)
+                case Shape.None => // do nothing
+              }
+              draw(chr.shape)
             case _ =>
           }
           x += 1

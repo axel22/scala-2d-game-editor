@@ -72,6 +72,8 @@ abstract class Character extends Entity {
   
   def topy = 0
   
+  def shape: Shape = Shape.None
+
 }
 
 
@@ -79,6 +81,19 @@ object Character {
   def unapply(e: Entity): Option[EntityId] = if (e.isInstanceOf[Character]) Some(e.id) else None
 }
 
+
+trait Shape
+
+
+object Shape {
+
+  case object None extends Shape
+
+  case class Cube(xd: Float, yd: Float, zd: Float, xoff: Float, yoff: Float, zoff: Float) extends Shape
+
+  case class Composite(subs: Seq[Shape]) extends Shape
+
+}
 
 object CharacterSet extends ClassSet[Character] {
   register[characters.meadow.Bush]
