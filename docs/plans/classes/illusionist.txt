@@ -37,8 +37,6 @@ Deceptive Throw - throws a missile weapon such as a dagger while in the same tim
 
 Distract - distracts the target that is casting a spell, causing the spell to fail.
 
-Mimic - enables the illusionist to mimic the form of a neighbouring object or a character. The less perceptive characters will not notice the caster at all, unless he moves or they stand right in front of him.
-
 
 Level 2:
 --------
@@ -67,6 +65,10 @@ Illusion of Vile Visage - dillutes the opponent into thinking that the caster is
 Mirror Shield - creates an illusionary mirror around the caster, protecting him against light-based magic attacks. It additionally reflects these attacks back to their caster.
 
 Eagle Eye - temporarily increases the perception of the character touched by the spellcaster.
+
+Mimic - enables the illusionist to mimic the form of a neighbouring object or a character. The less perceptive characters will not notice the caster at all, unless he moves or they stand right in front of him.
+
+Deflect - distorts the light around the adjacent target character, making him difficult to target. The first melee hit the target receives fails.
 
 
 Level 3:
