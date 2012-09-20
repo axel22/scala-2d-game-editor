@@ -28,7 +28,7 @@ import GL2ES2._
 import fixedfunc.GLLightingFunc._
 import fixedfunc.GLMatrixFunc._
 import org.brijest.storm.engine.model._
-import scalagl._
+import org.scalagl._
 
 
 
