@@ -82,7 +82,7 @@ object Character {
 }
 
 
-trait Shape
+sealed trait Shape
 
 
 object Shape {

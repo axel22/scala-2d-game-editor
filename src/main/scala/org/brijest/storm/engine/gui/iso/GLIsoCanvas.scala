@@ -147,33 +147,13 @@ self =>
   }
 
   private def redrawInternal(area: AreaView, engine: Engine.State, a: DrawAdapter) {
-    a.asInstanceOf[GLAutoDrawableDrawAdapter].gl.glClear(GL_COLOR_BUFFER_BIT)
-    
-    val (wrect, hrect) = if (drawing.shadows) (1680, 1050) else (iwidth, iheight)
-    
-    var u = 0
-    var v = 0
-    while (v < iheight) {
-      val hgt = if (iheight - v < hrect) iheight - v else hrect
-      while (u < iwidth) {
-        val wdt = if (iwidth - u < wrect) iwidth - u else wrect
-        redrawRect(area, engine, a, pos._1 + u, pos._2 + v, wdt, hgt, u, iheight - hgt - v)
-        u += wdt
-      }
-      u = 0
-      v += hgt
-    }
-  }
-  
-  protected override def redrawRect(area: AreaView, engine: Engine.State, a: DrawAdapter, ustart: Int, vstart: Int, width: Int, height: Int, vpuoffs: Int, vpvoffs: Int) {
     implicit val gl = a.asInstanceOf[GLAutoDrawableDrawAdapter].gl
     val glu = new GLU
     import gl._
     
-    val u0 = ustart
-    val v0 = vstart
-    val pw = width
-    val ph = height + area.maxHeight * levelheight + palette.maxSpriteHeight
+    val (u0, v0) = pos
+    val pw = iwidth
+    val ph = iheight + area.maxHeight * levelheight + palette.maxSpriteHeight
     val (xtl, ytl) = planar2iso(u0, v0, area.sidelength)
     val (xtr, ytr) = planar2iso(u0 + pw, v0, area.sidelength)
     val (xbr, ybr) = planar2iso(u0 + pw, v0 + ph, area.sidelength)
@@ -283,8 +263,8 @@ self =>
           (pm, vm)
       }
       val camProjMatrix = {
-        val wdt = width / (tileWidth * math.sqrt(2))
-        val hgt = height / (tileHeight * math.sqrt(2) * 2)
+        val wdt = iwidth / (tileWidth * math.sqrt(2))
+        val hgt = iheight / (tileHeight * math.sqrt(2) * 2)
         matrices.orthoProjection(GL_MODELVIEW_MATRIX, wdt, -wdt, -hgt, hgt, -300.0, 900.0)
       }
       val camViewMatrix = matrices.orthoView(
@@ -299,13 +279,15 @@ self =>
         _ <- using.matrix(lightProjMatrix, lightViewMatrix)
         _ <- setting.color(1.f, 1.f, 1.f, 0.f)
         _ <- enabling(GL_DEPTH_TEST)
+        b <- using.framebuffer(shadowFrameBuffer)
+        _ <- b.attachTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowTexture, 0)
         _ <- using.texture(shadowTexture)
       } {
+        glDrawBuffer(GL_NONE)
+        glReadBuffer(GL_NONE)
         graphics.clear(GL_DEPTH_BUFFER_BIT)
-
+        
         drawScene(true)
-
-        if (drawing.shadows) glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
       }
 
       /* render scene with shadows from camera point of view */
@@ -350,7 +332,7 @@ self =>
         _ <- enabling(GL_BLEND)
         _ <- setting.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       } {
-        super.redrawRect(area, engine, a, ustart, vstart, width, height, vpuoffs, vpvoffs)
+        super.redraw(area, engine, a)
       }
     }
     
@@ -368,17 +350,17 @@ self =>
           tc2f(0, 1)
           v2d(0, 0)
           tc2f(1, 1)
-          v2d(width, 0)
+          v2d(iwidth, 0)
           tc2f(1, 0)
-          v2d(width, height)
+          v2d(iwidth, iheight)
           tc2f(0, 0)
-          v2d(0, height)
+          v2d(0, iheight)
         }
       }
     }
 
-    for (_ <- setting.viewport(vpuoffs, vpvoffs, width, height)) {
-      val proj2d = matrices.orthoProjection(GL_PROJECTION_MATRIX, 0, width, height, 0, 0, 1)
+    for (_ <- setting.viewport(0, 0, iwidth, iheight)) {
+      val proj2d = matrices.orthoProjection(GL_PROJECTION_MATRIX, 0, iwidth, iheight, 0, 0, 1)
       renderScene(proj2d)
       if (drawing.shadows) blurLightLayer(proj2d)
     }

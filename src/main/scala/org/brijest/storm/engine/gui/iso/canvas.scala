@@ -700,10 +700,12 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
   }
   
   def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
-    redrawRect(area, engine, a, pos._1, pos._2, iwidth, iheight, 0, 0)
-  }
-  
-  protected def redrawRect(area: AreaView, engine: Engine.State, a: DrawAdapter, ustart: Int, vstart: Int, width: Int, height: Int, vpuoffs: Int, vpvoffs: Int) {
+    val (ustart, vstart) = pos
+    val width = iwidth
+    val height = iheight
+    val vpuoffs = 0
+    val vpvoffs = 0
+    
     redrawBackground(area, a, ustart, vstart, vpuoffs, vpvoffs)
     
     // determine region
