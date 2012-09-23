@@ -74,7 +74,7 @@ self =>
   val shadowFrameBuffer = new FrameBuffer()
   val lightTexture = new Texture(GL_TEXTURE_2D)
   var lightFrameBuffer = new FrameBuffer()
-  val orthoshadowProgram = ShaderProgram("OrthoShadows")
+  val shadowProgram = ShaderProgram("ShadowMapper")
   val lightProgram = ShaderProgram("LightLayer")
   
   private def initialize(drawable: GLAutoDrawable) {
@@ -134,8 +134,8 @@ self =>
       }
     }
     
-    createShaderProgram("orthoshadow", orthoshadowProgram)
-    createShaderProgram("blurlight", lightProgram)
+    createShaderProgram("shadowmapper", shadowProgram)
+    createShaderProgram("lightlayer", lightProgram)
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
@@ -175,10 +175,10 @@ self =>
     }
     
     case class OrthoLight(pos: Vec3, color: Vec3) extends Light {
-      def shader = orthoshadowProgram
+      def shader = shadowProgram
     }
     
-    def drawScene(withCharacters: Boolean) {
+    def drawScene() {
       def drawCube(x: Float, y: Float, xspan2: Float, yspan2: Float, bottom: Float, top: Float) = geometry(GL_QUADS) {
         val xspan = xspan2 / 2
         val yspan = yspan2 / 2
@@ -217,20 +217,23 @@ self =>
       var y = yfrom
       while (y < yuntil) {
         while (x < xuntil) {
-          val slot = area.terrain(x, y)
-          slot match {
+          area.terrain(x, y) match {
             case slot: EmptySlot =>
             case slot => drawCube(x, y, 1.0f, 1.0f, 0.f, slot.height * 0.275f)
           }
-          if (withCharacters) area.character(x, y) match {
+          area.character(x, y) match {
             case NoCharacter =>
             case chr if chr.pos().x == x && chr.pos().y == y =>
               val (w, h) = chr.dimensions()
               val sprite = palette.sprite(chr)
               def draw(s: Shape): Unit = s match {
-                case Shape.Cube(xd, yd, zd, xoff, yoff, zoff) => drawCube(x + xoff, y + yoff, xd, yd, zoff, zoff + zd)
-                case Shape.Composite(subs) => for (sub <- subs) draw(sub)
-                case Shape.None => // do nothing
+                case Shape.Cube(xd, yd, zd, xoff, yoff, zoff) =>
+                  val bottom = area.terrain(x, y).height * 0.275f + zoff
+                  drawCube(x + xoff, y + yoff, xd, yd, bottom, bottom + zd)
+                case Shape.Composite(subs) =>
+                  for (sub <- subs) draw(sub)
+                case Shape.None =>
+                  // do nothing
               }
               draw(chr.shape)
             case _ =>
@@ -278,16 +281,16 @@ self =>
         _ <- setting.viewport(0, 0, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE)
         _ <- using.matrix(lightProjMatrix, lightViewMatrix)
         _ <- setting.color(1.f, 1.f, 1.f, 0.f)
-        _ <- enabling(GL_DEPTH_TEST)
         b <- using.framebuffer(shadowFrameBuffer)
         _ <- b.attachTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowTexture, 0)
         _ <- using.texture(shadowTexture)
+        _ <- enabling(GL_DEPTH_TEST)
       } {
         glDrawBuffer(GL_NONE)
         glReadBuffer(GL_NONE)
         graphics.clear(GL_DEPTH_BUFFER_BIT)
         
-        drawScene(true)
+        drawScene()
       }
 
       /* render scene with shadows from camera point of view */
@@ -296,17 +299,20 @@ self =>
       
       for {
         _ <- setting.viewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
-        _ <- enabling(GL_CULL_FACE)
         _ <- using.matrix(depTexMatrix, camProjMatrix, camViewMatrix)
         b <- using.framebuffer(lightFrameBuffer)
         _ <- b.attachTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lightTexture, 0)
         _ <- using.texture(shadowTexture)
         _ <- using.program(shader)
+        _ <- enabling(GL_CULL_FACE)
         _ <- setting.cullFace(GL_BACK)
+        _ <- enabling(GL_DEPTH_TEST)
       } {
+        graphics.clear(GL_DEPTH_BUFFER_BIT)
+        
         shader.uniform.shadowtex := 0
         shader.uniform.light_color := light.color
-        drawScene(false)
+        drawScene()
       }
     }
 

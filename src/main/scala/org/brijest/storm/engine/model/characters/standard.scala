@@ -288,6 +288,7 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  @SerialVersionUID(-4476385155620563740L)
   class BookshelvesRight(val id: EntityId) extends Character {
     dimensions := (3, 1);
     
@@ -296,6 +297,8 @@ package castle {
     def chr = '='
     def color = 0x88555500
     def pov(area: AreaView) = area
+
+    override def shape = Shape.Cube(2.8f, 0.8f, 2.0f, 1.f, 0.f, 0.f)
   }
   
   class Bookshelves2Left(val id: EntityId) extends Character {
