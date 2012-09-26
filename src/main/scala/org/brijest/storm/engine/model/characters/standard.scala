@@ -298,7 +298,7 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(2.8f, 0.8f, 2.0f, 1.f, 0.f, 0.f)
+    override def shape = Shape.Cube(2.8f, 0.8f, 1.9f, 1.f, 0.f, 0.f)
   }
   
   class Bookshelves2Left(val id: EntityId) extends Character {
