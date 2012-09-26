@@ -189,7 +189,7 @@ self =>
         v3d(x + xspan, y + yspan, top)
         v3d(x + xspan, y - yspan, top)
 
-        /* sides */
+        /* sides and bottom */
         if (top > 0) {
           v3d(x - xspan, y - yspan, top)
           v3d(x - xspan, y - yspan, bottom)
@@ -308,7 +308,7 @@ self =>
         _ <- setting.cullFace(GL_BACK)
         _ <- enabling(GL_DEPTH_TEST)
       } {
-        graphics.clear(GL_DEPTH_BUFFER_BIT)
+        //graphics.clear(GL_DEPTH_BUFFER_BIT)
         
         shader.uniform.shadowtex := 0
         shader.uniform.light_color := light.color

@@ -24,7 +24,7 @@ void main() {
   float distance = centerDistance(texcoord);
   float diff = texcoord.z - distance;
   float shadowed = directShadow(diff);
-  
+
   // set final color
   gl_FragColor = vec4(light_color * shadowed, 1.0);
 }
