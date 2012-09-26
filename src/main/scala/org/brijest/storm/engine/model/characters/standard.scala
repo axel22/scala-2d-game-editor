@@ -278,6 +278,7 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  @SerialVersionUID(1492045042735268608L)
   class BookshelvesLeft(val id: EntityId) extends Character {
     dimensions := (1, 3);
     
@@ -286,6 +287,8 @@ package castle {
     def chr = '='
     def color = 0x88555500
     def pov(area: AreaView) = area
+
+    override def shape = Shape.Cube(0.8f, 2.8f, 1.9f, 0.f, 1.f, 0.f)
   }
   
   @SerialVersionUID(-4476385155620563740L)
@@ -301,6 +304,7 @@ package castle {
     override def shape = Shape.Cube(2.8f, 0.8f, 1.9f, 1.f, 0.f, 0.f)
   }
   
+  @SerialVersionUID(285774375416175601L)
   class Bookshelves2Left(val id: EntityId) extends Character {
     dimensions := (1, 3);
     
@@ -309,8 +313,11 @@ package castle {
     def chr = '='
     def color = 0x88555500
     def pov(area: AreaView) = area
+
+    override def shape = Shape.Cube(0.8f, 2.8f, 1.9f, 0.f, 1.f, 0.f)
   }
   
+  @SerialVersionUID(-1917464447577858564L)
   class Bookshelves2Right(val id: EntityId) extends Character {
     dimensions := (3, 1);
     
@@ -319,6 +326,8 @@ package castle {
     def chr = '='
     def color = 0x88555500
     def pov(area: AreaView) = area
+
+    override def shape = Shape.Cube(2.8f, 0.8f, 1.9f, 1.f, 0.f, 0.f)
   }
   
   class Bust(val id: EntityId) extends Character {

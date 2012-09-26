@@ -217,10 +217,6 @@ self =>
       var y = yfrom
       while (y < yuntil) {
         while (x < xuntil) {
-          area.terrain(x, y) match {
-            case slot: EmptySlot =>
-            case slot => drawCube(x, y, 1.0f, 1.0f, 0.f, slot.height * 0.275f)
-          }
           area.character(x, y) match {
             case NoCharacter =>
             case chr if chr.pos().x == x && chr.pos().y == y =>
@@ -237,6 +233,10 @@ self =>
               }
               draw(chr.shape)
             case _ =>
+          }
+          area.terrain(x, y) match {
+            case slot: EmptySlot =>
+            case slot => drawCube(x, y, 1.0f, 1.0f, 0.f, slot.height * 0.275f)
           }
           x += 1
         }
@@ -308,7 +308,7 @@ self =>
         _ <- setting.cullFace(GL_BACK)
         _ <- enabling(GL_DEPTH_TEST)
       } {
-        //graphics.clear(GL_DEPTH_BUFFER_BIT)
+        graphics.clear(GL_DEPTH_BUFFER_BIT)
         
         shader.uniform.shadowtex := 0
         shader.uniform.light_color := light.color

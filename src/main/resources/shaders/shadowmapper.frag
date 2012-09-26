@@ -4,9 +4,6 @@ uniform sampler2D shadowtex;
 uniform vec3 light_color;
 
 
-varying float polydirection;
-
-
 float centerDistance(vec4 texcenter) {
   return texture2D(shadowtex, texcenter.xy).z;
 }
