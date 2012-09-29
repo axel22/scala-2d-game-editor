@@ -74,6 +74,7 @@ self =>
   val shadowFrameBuffer = new FrameBuffer()
   val lightTexture = new Texture(GL_TEXTURE_2D)
   var lightFrameBuffer = new FrameBuffer()
+  val depthRenderBuffer = new RenderBuffer()
   val shadowProgram = ShaderProgram("ShadowMapper")
   val lightProgram = ShaderProgram("LightLayer")
   
@@ -109,6 +110,9 @@ self =>
       GL_RGB, GL_UNSIGNED_INT)
 
     lightFrameBuffer.acquire()
+
+    depthRenderBuffer.acquire()
+    depthRenderBuffer.allocateStorage(GL_DEPTH_COMPONENT, LITE_TEX_SIZE, LITE_TEX_SIZE)
     
     glEnable(GL_NORMALIZE)
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
@@ -282,7 +286,7 @@ self =>
         _ <- using.matrix(lightProjMatrix, lightViewMatrix)
         _ <- setting.color(1.f, 1.f, 1.f, 0.f)
         b <- using.framebuffer(shadowFrameBuffer)
-        _ <- b.attachTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowTexture, 0)
+        _ <- b.attachTexture2D(GL_DEPTH_ATTACHMENT, shadowTexture, 0)
         _ <- using.texture(shadowTexture)
         _ <- enabling(GL_DEPTH_TEST)
       } {
@@ -301,8 +305,10 @@ self =>
         _ <- setting.viewport(0, 0, LITE_TEX_SIZE, LITE_TEX_SIZE)
         _ <- using.matrix(depTexMatrix, camProjMatrix, camViewMatrix)
         b <- using.framebuffer(lightFrameBuffer)
-        _ <- b.attachTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lightTexture, 0)
+        _ <- b.attachTexture2D(GL_COLOR_ATTACHMENT0, lightTexture, 0)
+        _ <- b.attachRenderBuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthRenderBuffer)
         _ <- using.texture(shadowTexture)
+        _ <- using.renderbuffer(depthRenderBuffer)
         _ <- using.program(shader)
         _ <- enabling(GL_CULL_FACE)
         _ <- setting.cullFace(GL_BACK)
@@ -321,7 +327,7 @@ self =>
     if (drawing.shadows) {
       for {
         b <- using.framebuffer(lightFrameBuffer)
-        _ <- b.attachTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lightTexture, 0)
+        _ <- b.attachTexture2D(GL_COLOR_ATTACHMENT0, lightTexture, 0)
       } {
         graphics.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       }
