@@ -288,7 +288,7 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(0.8f, 2.8f, 1.9f, 0.f, 1.f, 0.f)
+    override def shape = Shape.Cube(0.9f, 2.9f, 1.8f, 0.f, 1.f, 0.12f)
   }
   
   @SerialVersionUID(-4476385155620563740L)
@@ -301,7 +301,7 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(2.8f, 0.8f, 1.9f, 1.f, 0.f, 0.f)
+    override def shape = Shape.Cube(2.9f, 0.9f, 1.8f, 1.f, 0.f, 0.12f)
   }
   
   @SerialVersionUID(285774375416175601L)
@@ -314,7 +314,7 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(0.8f, 2.8f, 1.9f, 0.f, 1.f, 0.f)
+    override def shape = Shape.Cube(0.9f, 2.9f, 1.8f, 0.f, 1.f, 0.12f)
   }
   
   @SerialVersionUID(-1917464447577858564L)
@@ -327,7 +327,7 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(2.8f, 0.8f, 1.9f, 1.f, 0.f, 0.f)
+    override def shape = Shape.Cube(2.9f, 0.9f, 1.8f, 1.f, 0.f, 0.12f)
   }
   
   class Bust(val id: EntityId) extends Character {
@@ -418,6 +418,7 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  @SerialVersionUID(188428235819303064L)
   class SmallTable(val id: EntityId) extends Character {
     dimensions := (3, 1);
     
@@ -426,6 +427,10 @@ package castle {
     def chr = '='
     def color = 0x88555500
     def pov(area: AreaView) = area
+
+    override def shape = Shape.Composite(Seq(
+      Shape.Cube(2.9f, 0.95f, 0.03f, 1.f, 0.f, 0.42f)
+    ))
   }
   
   class CoffeeTable(val id: EntityId) extends Character {
@@ -474,20 +479,26 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  @SerialVersionUID(5403330276913686200L)
   class KitchenShelvesLeft(val id: EntityId) extends Character {
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
     def chr = '*'
     def color = 0x88555500
     def pov(area: AreaView) = area
+
+    override def shape = Shape.Cube(1.0f, 0.9f, 1.85f, 0.0f, 0.f, 0.12f)
   }
   
+  @SerialVersionUID(-5777070330309251522L)
   class KitchenShelvesRight(val id: EntityId) extends Character {
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
     def chr = '*'
     def color = 0x88555500
     def pov(area: AreaView) = area
+
+    override def shape = Shape.Cube(0.9f, 1.0f, 1.85f, 0.0f, 0.f, 0.12f)
   }
   
   class LogPile(val id: EntityId) extends Character {
