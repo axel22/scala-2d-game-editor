@@ -430,7 +430,9 @@ package castle {
 
     override def shape = Shape.Composite(Seq(
       Shape.Cube(2.9f, 0.95f, 0.03f, 1.f, 0.f, 0.42f),
-      Shape.TriPrism(0.2f, 0.2f, 0.42f, 2.2f, 0.3f, 0.f)
+      Shape.TriPrism(0.2f, 0.2f, 0.42f, 2.2f, 0.35f, 0.f),
+      Shape.TriPrism(0.2f, 0.2f, 0.42f, 2.2f, -0.3f, 0.f),
+      Shape.TriPrism(0.2f, 0.2f, 0.42f, -0.45f, 0.35f, 0.f)
     ))
   }
   
