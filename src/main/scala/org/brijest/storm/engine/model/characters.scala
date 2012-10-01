@@ -91,6 +91,8 @@ object Shape {
 
   case class Cube(xd: Float, yd: Float, zd: Float, xoff: Float, yoff: Float, zoff: Float) extends Shape
 
+  case class TriPrism(xd: Float, yd: Float, zd: Float, xoff: Float, yoff: Float, zoff: Float) extends Shape
+
   case class Composite(subs: Seq[Shape]) extends Shape
 
 }

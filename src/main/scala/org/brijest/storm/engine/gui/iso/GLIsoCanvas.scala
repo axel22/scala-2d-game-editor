@@ -183,40 +183,6 @@ self =>
     }
     
     def drawScene() {
-      def drawCube(x: Float, y: Float, xspan2: Float, yspan2: Float, bottom: Float, top: Float) = geometry(GL_QUADS) {
-        val xspan = xspan2 / 2
-        val yspan = yspan2 / 2
-
-        /* top */
-        v3d(x - xspan, y - yspan, top)
-        v3d(x - xspan, y + yspan, top)
-        v3d(x + xspan, y + yspan, top)
-        v3d(x + xspan, y - yspan, top)
-
-        /* sides and bottom */
-        if (top > 0) {
-          v3d(x - xspan, y - yspan, top)
-          v3d(x - xspan, y - yspan, bottom)
-          v3d(x - xspan, y + yspan, bottom)
-          v3d(x - xspan, y + yspan, top)
-
-          v3d(x + xspan, y - yspan, top)
-          v3d(x + xspan, y - yspan, bottom)
-          v3d(x - xspan, y - yspan, bottom)
-          v3d(x - xspan, y - yspan, top)
-
-          v3d(x + xspan, y + yspan, top)
-          v3d(x + xspan, y + yspan, bottom)
-          v3d(x + xspan, y - yspan, bottom)
-          v3d(x + xspan, y - yspan, top)
-
-          v3d(x - xspan, y + yspan, top)
-          v3d(x - xspan, y + yspan, bottom)
-          v3d(x + xspan, y + yspan, bottom)
-          v3d(x + xspan, y + yspan, top)
-        }
-      }
-      
       var x = xfrom
       var y = yfrom
       while (y < yuntil) {
@@ -226,21 +192,13 @@ self =>
             case chr if chr.pos().x == x && chr.pos().y == y =>
               val (w, h) = chr.dimensions()
               val sprite = palette.sprite(chr)
-              def draw(s: Shape): Unit = s match {
-                case Shape.Cube(xd, yd, zd, xoff, yoff, zoff) =>
-                  val bottom = area.terrain(x, y).height * 0.275f + zoff
-                  drawCube(x + xoff, y + yoff, xd, yd, bottom, bottom + zd)
-                case Shape.Composite(subs) =>
-                  for (sub <- subs) draw(sub)
-                case Shape.None =>
-                  // do nothing
-              }
-              draw(chr.shape)
+              val hgt = area.terrain(x, y).height * 0.275f
+              renderShape(x, y, chr.shape, hgt)
             case _ =>
           }
           area.terrain(x, y) match {
             case slot: EmptySlot =>
-            case slot => drawCube(x, y, 1.0f, 1.0f, 0.f, slot.height * 0.275f)
+            case slot => renderCube(x, y, 1.0f, 1.0f, 0.f, slot.height * 0.275f)
           }
           x += 1
         }
