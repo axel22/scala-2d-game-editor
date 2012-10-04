@@ -30,8 +30,8 @@ void main() {
   vec3 color = light_color * shadowed;
   float alpha = (1.0 - shadowed) * 0.6;
   // fog influence
-  float fogamount = (1.0 - clamp(height, 0.0, fogheight)) * fogstrength;
-  vec3 fogcolor = light_color * (shadowed / 2.0 + 0.45);
+  float fogamount = (1.0 - clamp(height, 0.0, fogheight) / fogheight) * fogstrength;
+  vec3 fogcolor = light_color * (shadowed / 2.0 + 0.7);
   color = mix(color, fogcolor, fogamount);
   alpha = max(alpha, fogamount);
 
