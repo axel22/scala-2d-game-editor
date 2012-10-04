@@ -68,7 +68,7 @@ self =>
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = 2048
+  val SHADOW_TEX_SIZE = 3072
   val LITE_TEX_SIZE = 1024
   val shadowTexture = new Texture(GL_TEXTURE_2D)
   val shadowFrameBuffer = new FrameBuffer()
