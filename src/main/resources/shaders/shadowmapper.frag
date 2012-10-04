@@ -2,6 +2,7 @@
 
 uniform sampler2D shadowtex;
 uniform vec3 light_color;
+uniform float shadowstrength;
 uniform float fogstrength;
 uniform float fogheight;
 varying float height;
@@ -64,7 +65,7 @@ void main() {
   float alpha = (1.0 - shadowed) * 0.7;
   // fog influence
   float fogamount = (1.0 - clamp(height, 0.0, fogheight) / fogheight) * fogstrength;
-  vec3 fogcolor = light_color * (shadowed / 1.5 + 0.6);
+  vec3 fogcolor = light_color * (max(shadowed, fogamount * 6.0 - 5.0) / 1.5 + 0.6) * (0.9 + shadowed * 0.2);
   color = mix(color, fogcolor, fogamount);
   alpha = max(alpha, fogamount);
 

@@ -68,7 +68,7 @@ self =>
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = 3584
+  val SHADOW_TEX_SIZE = 2048 //3584
   val LITE_TEX_SIZE = 1024
   val shadowTexture = new Texture(GL_TEXTURE_2D)
   val shadowFrameBuffer = new FrameBuffer()
@@ -164,14 +164,14 @@ self =>
     val (xbl, ybl) = planar2iso(u0, v0 + ph, area.sidelength)
     val xmid = (xtl + xbr) / 2.0
     val ymid = (ytr + ybl) / 2.0
-    val xfrom = interval(0, area.width)(xtl.toInt - 4)
-    val xuntil = interval(0, area.width)(xbr.toInt)
-    val yfrom = interval(0, area.height)(ytr.toInt - 1)
-    val yuntil = interval(0, area.height)(ybl.toInt)
+    val xfrom = (xtl.toInt - 4) // interval(0, area.width)
+    val xuntil = (xbr.toInt)
+    val yfrom = (ytr.toInt - 1)
+    val yuntil = (ybl.toInt)
     val xlook = xmid - 14.50
     val ylook = ymid - 13.50
-    val fogstrength = 1.f
-    val fogheight = 1.f
+    val fogstrength = 0.f//0.85f
+    val fogheight = 3.f
     
     type Vec3 = (Float, Float, Float);
     
@@ -198,16 +198,15 @@ self =>
               renderShape(x, y, chr.shape, hgt)
             case _ =>
           }
-          area.terrain(x, y) match {
-            case slot: EmptySlot =>
+          area.safeTerrain(x, y) match {
+            case slot: EmptySlot => renderCube(x, y, 1.0f, 1.0f, 0.f, 0.f)
             case slot => renderCube(x, y, 1.0f, 1.0f, 0.f, slot.height * 0.275f)
           }
           x += 1
         }
         y += 1
-        x = 0
+        x = xfrom
       }
-      // TODO figure this out renderRectangle(xtl.toFloat, ytr.toFloat, xbr.toFloat, ybl.toFloat, fogheight * fogstrength / 2.f)
     }
     
     /* calc matrices */
