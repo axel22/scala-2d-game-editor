@@ -2,6 +2,9 @@
 
 uniform sampler2D shadowtex;
 uniform vec3 light_color;
+uniform float fogstrength;
+uniform float fogheight;
+varying float height;
 
 
 float centerDistance(vec4 texcenter) {
@@ -22,8 +25,18 @@ void main() {
   float diff = texcoord.z - distance;
   float shadowed = directShadow(diff);
 
+  // compute colors and alpha
+  // light influence
+  vec3 color = light_color * shadowed;
+  float alpha = (1.0 - shadowed) * 0.6;
+  // fog influence
+  float fogamount = (1.0 - clamp(height, 0.0, fogheight)) * fogstrength;
+  vec3 fogcolor = light_color * (shadowed / 2.0 + 0.45);
+  color = mix(color, fogcolor, fogamount);
+  alpha = max(alpha, fogamount);
+
   // set final color
-  gl_FragColor = vec4(light_color * shadowed, 1.0);
+  gl_FragColor = vec4(color, alpha);
 }
 
 

@@ -68,7 +68,7 @@ self =>
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = 3072
+  val SHADOW_TEX_SIZE = 3584
   val LITE_TEX_SIZE = 1024
   val shadowTexture = new Texture(GL_TEXTURE_2D)
   val shadowFrameBuffer = new FrameBuffer()
@@ -106,8 +106,8 @@ self =>
     lightTexture.compareFunc = GL_LEQUAL
     lightTexture.depthTextureMode = GL_INTENSITY
     lightTexture.allocateImage(
-      0, GL_RGB, LITE_TEX_SIZE, LITE_TEX_SIZE, 0,
-      GL_RGB, GL_UNSIGNED_INT)
+      0, GL_RGBA, LITE_TEX_SIZE, LITE_TEX_SIZE, 0,
+      GL_RGBA, GL_UNSIGNED_INT)
 
     lightFrameBuffer.acquire()
 
@@ -271,11 +271,14 @@ self =>
         _ <- enabling(GL_CULL_FACE)
         _ <- setting.cullFace(GL_BACK)
         _ <- enabling(GL_DEPTH_TEST)
+        _ <- disabling(GL_BLEND)
       } {
         graphics.clear(GL_DEPTH_BUFFER_BIT)
         
         shader.uniform.shadowtex := 0
         shader.uniform.light_color := light.color
+        shader.uniform.fogstrength := 0.0f
+        shader.uniform.fogheight := 1.0f
         drawScene()
       }
     }
