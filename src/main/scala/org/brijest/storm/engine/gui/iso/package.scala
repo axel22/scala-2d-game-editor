@@ -120,6 +120,13 @@ package object iso {
     }
   }
 
+  private[iso] def renderRectangle(xtl: Float, ytl: Float, xbr: Float, ybr: Float, height: Float)(implicit gl: GL2) = geometry(GL_QUADS) {
+    v3d(xtl, ytl, height)
+    v3d(xbr, ytl, height)
+    v3d(xbr, ybr, height)
+    v3d(xtl, ybr, height)
+  }
+
   def renderShape(x: Int, y: Int, s: Shape, hgt: Float)(implicit gl: GL2): Unit = s match {
     case Shape.Cube(xd, yd, zd, xoff, yoff, zoff) =>
       val bottom = hgt + zoff

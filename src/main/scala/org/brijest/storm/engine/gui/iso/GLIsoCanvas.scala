@@ -170,6 +170,8 @@ self =>
     val yuntil = interval(0, area.height)(ybl.toInt)
     val xlook = xmid - 14.50
     val ylook = ymid - 13.50
+    val fogstrength = 1.f
+    val fogheight = 1.f
     
     type Vec3 = (Float, Float, Float);
     
@@ -205,6 +207,7 @@ self =>
         y += 1
         x = 0
       }
+      // TODO figure this out renderRectangle(xtl.toFloat, ytr.toFloat, xbr.toFloat, ybl.toFloat, fogheight * fogstrength / 2.f)
     }
     
     /* calc matrices */
@@ -277,8 +280,8 @@ self =>
         
         shader.uniform.shadowtex := 0
         shader.uniform.light_color := light.color
-        shader.uniform.fogstrength := 0.0f
-        shader.uniform.fogheight := 1.0f
+        shader.uniform.fogstrength := fogstrength
+        shader.uniform.fogheight := fogheight
         drawScene()
       }
     }

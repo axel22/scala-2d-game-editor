@@ -11,7 +11,7 @@ vec4 exact(vec4 texcenter) {
 }
 
 
-vec4 blurred(vec4 texcenter) {
+vec4 heavyblur(vec4 texcenter) {
   vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
   
   color += texture2D(litetex, vec2(texcenter.x - 10.0 * blursize, texcenter.y)) * 0.03;
@@ -42,9 +42,37 @@ vec4 blurred(vec4 texcenter) {
 }
 
 
+vec4 blur(vec4 texcenter) {
+  vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
+  
+  color += texture2D(litetex, vec2(texcenter.x - 4.0 * blursize, texcenter.y)) * 0.15;
+  color += texture2D(litetex, vec2(texcenter.x - 2.0 * blursize, texcenter.y)) * 0.20;
+  color += texture2D(litetex, vec2(texcenter.x + 0.0 * blursize, texcenter.y)) * 0.28;
+  color += texture2D(litetex, vec2(texcenter.x + 2.0 * blursize, texcenter.y)) * 0.20;
+  color += texture2D(litetex, vec2(texcenter.x + 4.0 * blursize, texcenter.y)) * 0.15;
+  
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 4.0 * blursize)) * 0.15;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y - 2.0 * blursize)) * 0.20;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 0.0 * blursize)) * 0.28;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 2.0 * blursize)) * 0.20;
+  color += texture2D(litetex, vec2(texcenter.x, texcenter.y + 4.0 * blursize)) * 0.15;
+  
+  return color / 2.0;
+}
+
+
+
 void main() {
   vec4 texcoord = gl_TexCoord[0] / gl_TexCoord[0].w * 0.5 + 0.5;
-  vec4 color = blurred(texcoord);
+  vec4 color = blur(texcoord);
   
   gl_FragColor = vec4(color.rgb, color.a);
 }
+
+
+
+
+
+
+
+
