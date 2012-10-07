@@ -3,3 +3,4 @@ Delgado
 Oakenshield
 Timeniac
 Whitejoy
+Hackenslash

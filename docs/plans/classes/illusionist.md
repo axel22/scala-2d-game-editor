@@ -1,15 +1,13 @@
-#############
-# Abilities #
-#############
 
-Level 1:
---------
+
+# Abilities
+
+## Level 1
 
 Steal item - illusionists can use their abilities to create a distraction and steal items from others.
 
 
-Level 5:
---------
+## Level 5
 
 Write scroll - create a scroll of a known spell.
 
@@ -17,13 +15,11 @@ Write scroll - create a scroll of a known spell.
 
 
 
-##########
-# Spells #
-##########
+# Spells
 
-Level 1:
---------
-=> The illusions that you create are something barely more than mere tricks.
+## Level 1
+
+> The illusions that you create are something barely more than mere tricks.
 
 Spark - creates sparks in the vicinity of the illusionist. This can distract guards and draw their attention away.
 
@@ -38,9 +34,9 @@ Deceptive Throw - throws a missile weapon such as a dagger while in the same tim
 Distract - distracts the target that is casting a spell, causing the spell to fail.
 
 
-Level 2:
---------
-=> Your illusions become more powerful and you feel the magic within them.
+## Level 2
+
+> Your illusions become more powerful and you feel the magic within them.
 
 Light - illuminates an area around the spellcaster.
 
@@ -71,9 +67,9 @@ Mimic - enables the illusionist to mimic the form of a neighbouring object or a 
 Deflect - distorts the light around the adjacent target character, making him difficult to target. The first melee hit the target receives fails.
 
 
-Level 3:
---------
-=> Your illusions become more powerful and can disable enemies.
+## Level 3
+
+> Your illusions become more powerful and can disable enemies.
 
 Sleight of the Flame - these illusionary flames thrown at the opponent are known to cause him to panic and run if he is weak of will. They may even cause opponents to drop items held in their hands.
 
@@ -94,9 +90,9 @@ Sequencer - stores spells that the spellcaster chooses. It can store the level o
 Cloaking - magically cloaks the spellcaster so that opponents far enough and with a low perception fail to notice him. If the spellcaster attacks or casts a spell at some opponent, then only that opponent will notice him.
 
 
-Level 4:
---------
-=> You are able to create illusions away from your immediate vicinity. Your illusions are able to now affect others much more than yourself.
+## Level 4
+
+> You are able to create illusions away from your immediate vicinity. Your illusions are able to now affect others much more than yourself.
 
 Serpent Sword - if the characters affected by this spell wield a melee or a long range weapon, they will perceive it as a venomous serpent. Those with either a weak strength of will or without the knowledge that this may be a trick are quick to drop their weapons.
 
@@ -119,9 +115,9 @@ Spider Boot - sets an illusion of having the target opponent's boots filled with
 Armor of the Scorpion - gives the target opponent an illusion that his armor is filled with scorpions. Even the strongest are so terrified that they throw away their armor in an instant.
 
 
-Level 5:
---------
-=> You gain more control over illusions, and are able to refine them greatly to serve your purposes.
+## Level 5
+
+> You gain more control over illusions, and are able to refine them greatly to serve your purposes.
 
 Striking Resemblance - creates an aura around the illusionist allowing him to take form of another humanoid that is currently in the vicinity.
 
@@ -144,9 +140,9 @@ Reflection - summons an illusionary copy of the caster, which disappears as soon
 Kaleidoscope - enchants the target so that any spell targeting it is reflected on a random adjacent character. If there are no characters in the target's vicinity, the spell is not reflected.
 
 
-Level 6:
---------
-=> You begin to understand that there is no boundary between the illusion and reality, and gain more insight into the true nature of illusions. You start to comprehend that an object without an observer does not truly exist.
+## Level 6
+
+> You begin to understand that there is no boundary between the illusion and reality, and gain more insight into the true nature of illusions. You start to comprehend that an object without an observer does not truly exist.
 
 Flame of Undril
 Origin: Little is known about where the scroll for this spell originated. Some say that a mage Undril living as a hermit in the mountains near the volcanos far north learned it by watching a fire elemental that used to invoke it for some reason. He first wrote the spell down with coal on stones near his establishment. It is now one of the favoured spells among the mages in the north.
@@ -154,7 +150,7 @@ Description: Envelops an opponent with flames that feel very real. The opponent 
 
 Ring of Undril
 Origin: It is said that the hermit mage Undril learned this spell by following and observing fire elementals laying waste to lands in the north. Later, Undril had apprentices which spread knowledge of the spell throughout the lands.
-Description: Enchants an area in a ring of fire. Opponents that choose to remain within the ring will suffer continuous fire damage.
+Description: Enchants an area in a ring of fire. Any characters that choose to remain within the ring will suffer continuous fire damage.
 
 Globe of Kariim
 Origin: Long ago, in the harsh deserts in the south fierce warriors ruled the lands at this time and wizardry was perceived as nothing more than a mockery done for the amusement of the crowds at town centers. The heads of the warrior caste were well aware that the only way to prolong their rulership was to ban wizardry and wizard guilds. This lasted until a wizard known as Kariim invented a powerful spell which protected him from the warriors. It is said that he could create an impervious globe around himself that no sword could break. He shared his spell with other wizards of the lands and they forged an alliance against the tyranny of the warriors. Wizard schools and guilds were formed throughout the lands, and balance between might and magic was once again regained. Kariim enjoys great respect today among the wizards of the south.
@@ -173,7 +169,7 @@ Origin: Great wizardess Rhea devised this spell as part of her acceptance test f
 Description: Creates a ray of light so strong that it causes physical damage to the target.
 
 Coupled Teleswitch
-Origin: Neglected by many mages and generally regarded to have little use, this spell is said to have been devised by Urdevii enchanters. Those who lived to tell about an encounter with an Urdevii enchanter claim it can be devastating when used smartly.
+Origin: Neglected by many mages, this variant of the Teleswitch spell is said to have been devised by Urdevii enchanters. The story about an encounter with an Urdevii enchanter fighting a fire elemental says that the Urdevii has used it to "cool the fire elemental down a bit".
 Description: Exchanges the locations of the caster and the target. After several seconds it exchanges their locations again.
 
 Teleport
@@ -200,10 +196,14 @@ Holy Voice
 Origin: This spell was probably first used by a sect of wandering priests from the north. One of their deflecting priests is said to have became a wizard who wrote the scroll for this spell down.
 Description: Enchants the area with a source of a trembling voice for a limited amount of time. Causes damage to nearby minor undead. Causes major undead to panic.
 
+Deflect spell
+Origin: Long ago a master illusionist devised a protective shielding spell so strong that he was virtually invincible. His fame and glory spread all throughout the lands, until one day one of his apprentices devised a deflection spell which could deflect anything cast upon its target, but only once. Many doubt the truth of this story - how could an apprentice have defeated a master by deflecting his attacks only once?
+Description: Enchants the target so that the next spell of level 8 or below cast on it fails and is deflected on a random nearby target, if any.
 
-Level 7
--------
-=> Your ability to alter the reality around you becomes much more powerful.
+
+## Level 7
+
+> Your ability to alter the reality around you becomes much more powerful.
 
 Dimension Door
 Origin: It is said that this spell was devised by the monks living in the mountains in the north to avoid going through dangerous and unfriendly wilderness to reach other monasteries.
@@ -242,9 +242,9 @@ Origin: This spell is favoured by the wandering master priests of the north. Whi
 Description: Releases a lightning bolt at the target opponent. If the opponent is surrounded by other characters, the bolt bounces at the nearest character, and so forth, inflicting half the damage amount to each subsequent character.
 
 
-Level 8
--------
-=> You gain the ability to make your illusions permanent, thus being able to transform yourself and your surroundings.
+## Level 8
+
+> You gain the ability to make your illusions permanent, thus being able to transform yourself and your surroundings.
 
 Spell Shear
 Origin: A refined and more powerful cousin of the simple counterspell, this ancient spell is cast only by the mages who achieved the highest levels of the Art.
@@ -280,8 +280,13 @@ Description: Transforms the caster into a sprite, trading toughness for great sp
 
 Spell Shield
 Origin: Often used by the great wizard Kariim to shield himself from other wizards that worked behind his back, the origin of this protection spell is suspected to actually have been devised by the Urdevii long before and gifted to Kariim by them as a sign of trust and friendship.
-Description: Creates a powerful shield around the target which guards him against any spell of level 6 or below being cast upon him.
+Description: Creates a powerful shield around the target which guards him against any spell of level 7 or below being cast upon him.
 
 Replication
 Origin: When the Great Count Gerald needed to defeat a mighty barbarian army that invaded the Lands, the wizardess Rhea devised this spell and shared it with the rest of the wizards to enlarge Gerald's forces that opposed the barbarians. Originally meant to target his entire army, the spell turned out to be so taxing that it was in the end applied only to the elite soldiers. Nonetheless, it turned out to be one of the prevailing factors in the successful defense.
 Description: Creates a temporary replica of the target character, which can cause damage and cast spells in the similar way as the original. The replica is weaker, less powerful and experienced, but deadly nonetheless. The caster commands the replica if his will is stronger than the replicas, otherwise the replica can turn on him.
+
+
+
+
+

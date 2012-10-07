@@ -1,16 +1,22 @@
-Excalibur
+
+
+
+## Excalibur
 - ignores lesser armors
 - casts solar ray provided the wielder has enough mana
 
-Oblivion
+## Oblivion
 - destroys lesser undead instantly
 - causes experience loss
 
-Rod of Saevill
+## Rod of Saevill
 - fire damage
 - cast fireballs
 - red dragon control
 
-Rijndael
+## Rijndael
 - electrical damage
 - causes weather changes in exteriors
+
+## Behelit
+
