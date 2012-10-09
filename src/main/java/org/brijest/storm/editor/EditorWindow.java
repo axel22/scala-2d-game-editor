@@ -206,7 +206,10 @@ public class EditorWindow extends Shell {
 		gl_composite_7.horizontalSpacing = 0;
 		composite_7.setLayout(gl_composite_7);
 		
-		modeToolbar = new ToolBar(composite_7, SWT.FLAT | SWT.RIGHT);
+		Composite composite_8 = new Composite(composite_7, SWT.NONE);
+		
+		modeToolbar = new ToolBar(composite_8, SWT.FLAT | SWT.RIGHT);
+		modeToolbar.setSize(136, 22);
 		
 		saveButton = new ToolItem(modeToolbar, SWT.NONE);
 		saveButton.setToolTipText("Saves current world data.");
@@ -228,17 +231,17 @@ public class EditorWindow extends Shell {
 		
 		ToolItem toolItem_1 = new ToolItem(modeToolbar, SWT.SEPARATOR);
 		
-		brushSize = new CCombo(composite_7, SWT.BORDER | SWT.READ_ONLY | SWT.FLAT);
-		brushSize.setToolTipText("Sets the size of the terrain brush.");
-		brushSize.setItems(new String[] {"1x1", "2x2", "4x4", "8x8", "16x16", "1x8", "8x1", "1x16", "16x1"});
-		brushSize.setText("1x1");
-		
 		saveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				eventHandler.event("Save", null);
 			}
 		});
+		
+		brushSize = new CCombo(composite_7, SWT.BORDER | SWT.READ_ONLY | SWT.FLAT);
+		brushSize.setToolTipText("Sets the size of the terrain brush.");
+		brushSize.setItems(new String[] {"1x1", "2x2", "4x4", "8x8", "16x16", "1x8", "8x1", "1x16", "16x1"});
+		brushSize.setText("1x1");
 		
 		SashForm sashForm = new SashForm(this, SWT.NONE);
 		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));

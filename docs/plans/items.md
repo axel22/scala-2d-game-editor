@@ -16,7 +16,7 @@
 
 ## Rijndael
 - electrical damage
-- causes weather changes in exteriors
+- causes weather changes in exterior areas
 
-## Behelit
+## Behelith
 
