@@ -151,7 +151,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       if (other.isAnchor) this.anchor.x == xp && this.anchor.y == yp
       else this.anchor.x == other.anchor.x && this.anchor.y == other.anchor.y
     }
-    @inline def foreach[U](x0: Int, y0: Int)(f: (Int, Int) => U) = foreachNW2SE(x0, y0, dims._1, dims._2)(f)
+    @inline final def foreach[U](x0: Int, y0: Int)(f: (Int, Int) => U) = foreachNW2SE(x0, y0, dims._1, dims._2)(f)
     def contains(x0: Int, y0: Int, x: Int, y: Int) = x >= x0 && y >= y0 && x < (x0 + dims._1) && y < (y0 + dims._2)
     def leftXY(x0: Int, y0: Int) = (x0, y0 + dims._2 - 1)
     def rightXY(x0: Int, y0: Int) = (x0 + dims._1 - 1, y0)
@@ -196,7 +196,7 @@ trait IsoCanvas extends Canvas with PaletteCanvas {
       dp.add(x, y)
       dp
     }
-    @inline def foreach[U](f: (Int, Int) => U): Unit = {
+    @inline final def foreach[U](f: (Int, Int) => U): Unit = {
       var curr = this
       while (curr != null) {
         /* traverse contents of this depnode */

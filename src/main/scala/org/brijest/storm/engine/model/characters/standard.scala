@@ -288,7 +288,11 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(0.8f, 2.9f, 1.8f, -0.0f, 1.f, 0.12f)
+    override def shape = BookshelvesLeft.shape
+  }
+
+  object BookshelvesLeft {
+    val shape = Shape.Cube(0.8f, 2.9f, 1.8f, -0.0f, 1.f, 0.12f)
   }
   
   @SerialVersionUID(-4476385155620563740L)
@@ -301,7 +305,11 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(2.9f, 0.8f, 1.8f, 1.f, 0.f, 0.12f)
+    override def shape = BookshelvesRight.shape
+  }
+
+  object BookshelvesRight {
+    val shape = Shape.Cube(2.9f, 0.8f, 1.8f, 1.f, 0.f, 0.12f)
   }
   
   @SerialVersionUID(285774375416175601L)
@@ -314,7 +322,11 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(0.8f, 2.9f, 1.8f, -0.0f, 1.f, 0.12f)
+    override def shape = Bookshelves2Left.shape
+  }
+
+  object Bookshelves2Left {
+    val shape = Shape.Cube(0.8f, 2.9f, 1.8f, -0.0f, 1.f, 0.12f)
   }
   
   @SerialVersionUID(-1917464447577858564L)
@@ -327,7 +339,11 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Cube(2.9f, 0.8f, 1.8f, 1.f, 0.f, 0.12f)
+    override def shape = Bookshelves2Right.shape
+  }
+
+  object Bookshelves2Right {
+    val shape = Shape.Cube(2.9f, 0.8f, 1.8f, 1.f, 0.f, 0.12f)
   }
   
   class Bust(val id: EntityId) extends Character {
@@ -410,6 +426,7 @@ package castle {
     def pov(area: AreaView) = area
   }
   
+  @SerialVersionUID(-5520519164447632172L)
   class ArmchairEast(val id: EntityId) extends Character {
     def manager = IdleManager
     def canWalk(from: Slot, to: Slot) = false
@@ -428,11 +445,15 @@ package castle {
     def color = 0x88555500
     def pov(area: AreaView) = area
 
-    override def shape = Shape.Composite(Seq(
+    override def shape = SmallTable.shape
+  }
+
+  object SmallTable {
+    val shape = Shape.Composite(Seq(
       Shape.Cube(2.86f, 0.91f, 0.03f, 1.f, 0.f, 0.42f),
-      Shape.TriPrism(0.07f, 0.07f, 0.40f, 2.3f, 0.35f, 0.f),
-      Shape.TriPrism(0.07f, 0.07f, 0.40f, 2.3f, -0.3f, 0.f),
-      Shape.TriPrism(0.07f, 0.07f, 0.40f, -0.45f, 0.35f, 0.f)
+      Shape.Cube(0.07f, 0.07f, 0.40f, 2.3f, 0.35f, 0.f),
+      Shape.Cube(0.07f, 0.07f, 0.40f, 2.3f, -0.3f, 0.f),
+      Shape.Cube(0.07f, 0.07f, 0.40f, -0.45f, 0.35f, 0.f)
     ))
   }
   
