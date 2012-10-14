@@ -170,7 +170,7 @@ self =>
     val yuntil = (ybl.toInt)
     val xlook = xmid - 14.50
     val ylook = ymid - 13.50
-    val fogstrength = 0.f//0.85f
+    val fogstrength = 0.95f
     val fogheight = 3.f
     
     type Vec3 = (Float, Float, Float);

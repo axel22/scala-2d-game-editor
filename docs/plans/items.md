@@ -3,7 +3,7 @@
 
 ## Excalibur
 - ignores lesser armors
-- casts solar ray provided the wielder has enough mana
+- casts solar ray provided that the wielder has enough mana
 
 ## Oblivion
 - destroys lesser undead instantly
@@ -11,7 +11,7 @@
 
 ## Rod of Saevill
 - fire damage
-- cast fireballs
+- cast fireballs at the expense of wielder's mana
 - red dragon control
 
 ## Rijndael
@@ -19,4 +19,9 @@
 - causes weather changes in exterior areas
 
 ## Behelith
-
+- once put on by a character of a certain willpower can henceforth only be put on by a character with at least that willpower
+- gives wearer the "Smile of Fate" trait
+- piercing missile attacks cannot kill or poison the wearer
+- demons do not attack the wearer unless provoked
+- +20 to speed
+- +2 blocks per turn
