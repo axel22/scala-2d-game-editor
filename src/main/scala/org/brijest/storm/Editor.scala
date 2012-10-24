@@ -459,8 +459,14 @@ class Editor(config: Config) extends Logging {
           tbtmMap.setData(area)
           
           val canvasPane = createGLIsoUI(area)
-          
           areaPanel.areaCanvasPane.add(canvasPane)
+          class Repainter extends Thread {
+            override def run() = while (!tbtmMap.isDisposed) {
+              canvasPane.repaint()
+              Thread.sleep(16)
+            }
+          }
+          new Repainter().start()
         }
       }
       
@@ -568,7 +574,7 @@ class Editor(config: Config) extends Logging {
     editorwindow.layout()
     while (!editorwindow.isDisposed()) {
       if (!displ.readAndDispatch()) {
-	displ.sleep()
+       displ.sleep()
       }
     }
   } catch {

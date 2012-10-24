@@ -36,7 +36,8 @@ class GLIsoCanvas(val area: Area, val caps: GLCapabilities)
 extends GLCanvas(caps) with IsoCanvas with UI with GLPaletteCanvas with Logging {
 self =>
   
-  var resizestamp = 0L
+  private var frame: Int = 0
+  private var resizestamp = 0L
   
   this.addGLEventListener(new GLEventListener {
     def display(drawable: GLAutoDrawable) {
@@ -57,7 +58,7 @@ self =>
       resizestamp += 1
     }
   })
-  
+
   /* implementations */
   
   def iwidth: Int = this.getWidth
@@ -68,7 +69,7 @@ self =>
   
   /* shadows */
   
-  val SHADOW_TEX_SIZE = 2048 //3584
+  val SHADOW_TEX_SIZE = 3072 //3584
   val LITE_TEX_SIZE = 1024
   val shadowTexture = new Texture(GL_TEXTURE_2D)
   val shadowFrameBuffer = new FrameBuffer()
@@ -143,6 +144,8 @@ self =>
   }
   
   override def redraw(area: AreaView, engine: Engine.State, a: DrawAdapter) {
+    frame += 1
+
     val t = timed {
       redrawInternal(area, engine, a)
     }
@@ -277,6 +280,7 @@ self =>
       } {
         graphics.clear(GL_DEPTH_BUFFER_BIT)
         
+        shader.uniform.frame := frame
         shader.uniform.shadowtex := 0
         shader.uniform.light_color := light.color
         shader.uniform.fogstrength := fogstrength

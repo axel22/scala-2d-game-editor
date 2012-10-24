@@ -2,9 +2,9 @@
 
 uniform sampler2D shadowtex;
 uniform vec3 light_color;
-uniform float shadowstrength;
 uniform float fogstrength;
 uniform float fogheight;
+uniform int frame;
 varying float height;
 const float blursize = 1.0 / 2048.0;
 
@@ -63,9 +63,11 @@ void main() {
   // light influence
   vec3 color = light_color * shadowed;
   float alpha = (1.0 - shadowed) * 0.7;
+
   // fog influence
   float fogamount = (1.0 - clamp(height, 0.0, fogheight) / fogheight) * fogstrength;
-  vec3 fogcolor = light_color * (max(shadowed, fogamount * 6.0 - 5.0) / 1.5 + 0.6) * (0.9 + shadowed * 0.2);
+  float fogshadowinteraction = (max(shadowed, fogamount * 6.0 - 5.0) / 1.5 + 0.6) * (0.9 + shadowed * 0.2);
+  vec3 fogcolor = light_color * fogshadowinteraction;
   color = mix(color, fogcolor, fogamount);
   alpha = max(alpha, fogamount);
 

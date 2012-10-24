@@ -50,37 +50,26 @@ package object iso {
 
   /* model rendering */
 
-  private[iso] def renderCube(x: Float, y: Float, xspan2: Float, yspan2: Float, bottom: Float, top: Float)(implicit gl: GL2) = geometry(GL_QUADS) {
+  private[iso] def renderCube(x: Float, y: Float, xspan2: Float, yspan2: Float, bottom: Float, top: Float)(implicit gl: GL2) = geometry(GL_TRIANGLE_STRIP) {
     val xspan = xspan2 / 2
     val yspan = yspan2 / 2
 
     /* top */
     v3d(x - xspan, y - yspan, top)
     v3d(x - xspan, y + yspan, top)
-    v3d(x + xspan, y + yspan, top)
     v3d(x + xspan, y - yspan, top)
+    v3d(x + xspan, y + yspan, top)
 
     /* sides and bottom */
     if (top > 0) {
-      v3d(x - xspan, y - yspan, top)
-      v3d(x - xspan, y - yspan, bottom)
-      v3d(x - xspan, y + yspan, bottom)
-      v3d(x - xspan, y + yspan, top)
-
-      v3d(x + xspan, y - yspan, top)
-      v3d(x + xspan, y - yspan, bottom)
-      v3d(x - xspan, y - yspan, bottom)
-      v3d(x - xspan, y - yspan, top)
-
-      v3d(x + xspan, y + yspan, top)
       v3d(x + xspan, y + yspan, bottom)
-      v3d(x + xspan, y - yspan, bottom)
-      v3d(x + xspan, y - yspan, top)
-
       v3d(x - xspan, y + yspan, top)
       v3d(x - xspan, y + yspan, bottom)
+      v3d(x - xspan, y - yspan, top)
+      v3d(x - xspan, y - yspan, bottom)
+      v3d(x + xspan, y - yspan, top)
+      v3d(x + xspan, y - yspan, bottom)
       v3d(x + xspan, y + yspan, bottom)
-      v3d(x + xspan, y + yspan, top)
     }
   }
 
