@@ -56,6 +56,8 @@ class Editor(config: Config) extends Logging {
   glp = GLProfile.getDefault()
   caps = new GLCapabilities(glp)
   
+  caps.setSampleBuffers(true)
+
   var filename: Option[String] = None
   
   def loadfrom(fn: String): World.Default = {
