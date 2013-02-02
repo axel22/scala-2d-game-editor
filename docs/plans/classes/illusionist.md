@@ -7,9 +7,14 @@
 Steal item - illusionists can use their abilities to create a distraction and steal items from others.
 
 
+## Level 2
+
+Eagle-eye - the illusionist's range of sight becomes greater by one half.
+
+
 ## Level 5
 
-Write scroll - create a scroll of a known spell.
+Write scroll - create a scroll of a known illusionist spell, the level of which is at most half of your own. This action takes a deal of time and can exhaust an illusionist.
 
 
 
@@ -138,6 +143,8 @@ Local Scrying - allows the spellcaster to temporarily view what is happening on 
 Reflection - summons an illusionary copy of the caster, which disappears as soon as it receives damage. The copy itself is unable to do damage or effect the environment in any way other than to draw attention.
 
 Kaleidoscope - enchants the target so that any spell targeting it is reflected on a random adjacent character. If there are no characters in the target's vicinity, the spell is not reflected.
+
+Devil's Advocate - enchants the intelligent target with an illusion of being caught up in a verbal argument. The enchanted target will lose focus, affecting his spellcasting, melee attacks and defense, depending on its willpower.
 
 
 ## Level 6

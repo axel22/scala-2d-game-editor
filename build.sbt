@@ -28,6 +28,8 @@ libraryDependencies += "commons-lang" % "commons-lang" % "2.2"
 
 libraryDependencies += "commons-io" % "commons-io" % "2.3"
 
+libraryDependencies += "com.esotericsoftware.kryo" % "kryo" % "2.20"
+
 resolvers += "swt-repo" at "https://swt-repo.googlecode.com/svn/repo/"
 
 libraryDependencies += {
