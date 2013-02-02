@@ -77,13 +77,6 @@ Niamh Ní Choisdealbha
 Ardanu Dinu
 Yama
 Kovid Yogal
-
-
-
-
-
-
-
-
-
+Hamza Haiken
+Guezel Can
 
