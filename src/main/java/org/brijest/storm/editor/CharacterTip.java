@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+
 public class CharacterTip extends Shell {
 	public CLabel imageLabel;
 	public Label nameLabel;
