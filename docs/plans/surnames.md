@@ -1,6 +1,0 @@
-Gettrado
-Delgado
-Oakenshield
-Timeniac
-Whitejoy
-Hackenslash
